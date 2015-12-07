@@ -1,0 +1,19 @@
+<resources>
+
+    <color name="splash_back">#FF336699</color>
+    <color name="menu_divider">#272727</color>
+    <color name="menu_background">#303030</color>
+    <color name="menu_background_first">#FF8800</color>
+    <color name="menu_background_pressed">#999999</color>
+    <color name="menu_text_color">#FFFFFF</color>
+
+    <color name="list_item_title">#fff</color>
+    <color name="list_background">#303030</color>
+    <color name="list_background_pressed">#FF8800</color>
+    <color name="list_divider">#272727</color>
+    <color name="counter_text_bg">#626262</color>
+    <color name="counter_text_color">#c5c4c4</color>
+
+    <!-- Barvy pro login aktivitu -->
+    <color name="login_second_color">#3399cc</color>
+</resources>

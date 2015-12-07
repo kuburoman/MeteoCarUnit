@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Název aplikace  -->
+    <string name="app_name">Jezdíto.cz</string>
+    <string name="app_menu_title">menu</string>
+    <string name="app_login_title">Přihlášení</string>
+
+    <!-- ========== Přihlašování ============================================================== -->
+    <!-- ====================================================================================== -->
+
+    <!-- Login - internet -->
+    <string name="login_title">PŘIHLAŠTE SE</string>
+    <string name="login_email_hint">jan.novak@seznam.cz</string>
+    <string name="login_password_hint">heslo</string>
+    <string name="login_ok_button_text">Přihlásit</string>
+    <string name="login_note">Pokud ještě nemáte účet, registrovat se můžete na <a href="http://www.jezdito.cz">jezdito.cz</a></string>
+
+    <!-- Login - internet -->
+    <string name="login_net_offline"><![CDATA[
+        <p>Není k dispozici žádné internetové připojení, nebude možné se přihlásit.<br /><br />
+        <small>Poznámka: stačí se přihlásit jen jednou, aplikace si Vás bude pamatovat. Během zapínání Wifi nebo 3G vyčkejte.</small></p>
+    ]]></string>
+    <string name="login_net_offline_title">Žádný internet</string>
+    <string name="login_net_btn_exit">Ukončit</string>
+    <string name="login_net_btn_wifi">Zapnout Wifi</string>
+    <string name="login_net_btn_mob">Zapnout 3G</string>
+    <string name="login_net_btn_OK">OK</string>
+
+    <!-- Login - přihlášení -->
+    <string name="login_check_title">Nelze přihlásit</string>
+    <string name="login_check_btn_OK">OK</string>
+    <string name="login_check_error_none">Při přihlášení došlo k neznámé chybě</string>
+    <string name="login_check_name_empty">Nebylo vyplněno uživatelské jméno</string>
+    <string name="login_check_pwd_empty">Nebylo vyplněno heslo</string>
+    <string name="login_check_db_error">Na serveru došlo k chybě databáze</string>
+    <string name="login_check_no_user">Uživatelský účet nebyl nalezen</string>
+    <string name="login_check_bad_pwd">Zadané heslo není správné</string>
+
+    <!-- ========== Menu ====================================================================== -->
+    <!-- ====================================================================================== -->
+
+    <!-- Položky navigace - Názvy -->
+    <string-array name="array_menu_item_names">
+        <item>Přístrojovka</item>
+        <item>Záznamy</item>
+        <item>Synchronizovat</item>
+        <item>Nastavení</item>
+        <item>Debug</item>
+        <item>Ukončit</item>
+    </string-array>
+
+    <!-- Položky navigace - Ikony -->
+    <string-array name="array_menu_item_icon">
+        <item>@drawable/icon_tacho</item>
+        <item>@drawable/icon_list</item>
+        <item>@drawable/icon_sync</item>
+        <item>@drawable/icon_settings</item>
+        <item>@drawable/icon_bug</item>
+        <item>@drawable/icon_off</item>
+    </string-array>
+
+    <!-- Menu toast -->
+    <string name="menu_no_such_fragment">Fragment pro tuto položku nebyl nenalezen :(</string>
+
+    <!-- Menu dialog zapnutí intrenetu -->
+    <string name="menu_net_offline"><![CDATA[
+        <p>Není k dispozici žádné internetové připojení, nelze synchronizovat.<br /><br />
+        <small>Poznámka: Během zapínání Wifi nebo 3G vyčkejte.</small></p>
+    ]]></string>
+
+    <!-- ========== Přístrojovka ============================================================== -->
+    <!-- ====================================================================================== -->
+
+    <string name="dashoard_btn_trip_start">  Start jízdy  </string>
+    <string name="dashoard_btn_trip_end">Konec jízdy</string>
+
+    <string name="dashoard_txt_empty"></string>
+
+    <!-- ========== Nastavení ================================================================= -->
+    <!-- ====================================================================================== -->
+
+    <!-- Nastavení -->
+    <string name="settings_title">Nastavení aplikace</string>
+
+    <!-- Nastavení - OBD -->
+    <string name="settings_obd_settings">OBD Nastavení</string>
+    <string name="settings_obd_enabled">Používat OBD zařízení</string>
+    <string name="settings_obd_enabled_summary">Povolte nebo zakažte použit bluetooth OBD adaptéru</string>
+    <string name="settings_obd_devices">OBD Zařízení</string>
+    <string name="settings_obd_devices_none">Žádné zařízení nevybráno</string>
+
+    <!-- Nastavení - OBD PIDs -->
+    <string name="settings_obd_pids_title">OBD PID příkazy</string>
+    <string name="settings_obd_pids_add">Přidat</string>
+    <string name="settings_obd_edit_title_name">Název veličiny</string>
+    <string name="settings_obd_edit_title_tag">JSON tag (pouze malá pásmena a "_")</string>
+    <string name="settings_obd_edit_title_code">OBD Kód dotazu</string>
+    <string name="settings_obd_edit_title_formula">Vzorec pro výpočet hodnoty</string>
+    <string name="settings_obd_edit_title_min">Min. hodnota</string>
+    <string name="settings_obd_edit_title_max">Max. hodnota</string>
+    <string name="settings_obd_edit_title_enabled">Aktivní</string>
+    <string name="settings_obd_edit_window_title">OBD Příkaz</string>
+    <string name="settings_obd_edit_btn_delete">Smazat</string>
+    <string name="settings_obd_edit_btn_save">Uložit</string>
+    <string name="settings_obd_edit_btn_cancel">Zrušit</string>
+
+
+    <!-- Nastavení - GPS -->
+    <string name="settings_gps_settings">GPS Nastavení</string>
+    <string name="settings_gps_enabled">Používat GPS</string>
+    <string name="settings_gps_enabled_summary">Používat satelity GPS a zaznamenávat trasu jízdy</string>
+
+    <!-- Bluetooth nastavení (ADMIN) -->
+    <string name="bt_no_device_1">Žádné spárované zařízení</string>
+    <string name="bt_no_device_2">Adresa není k dispozici</string>
+
+    <!-- ========== Dialogy =================================================================== -->
+    <!-- ====================================================================================== -->
+
+    <!-- Dialog zapnutí GPS -->
+    <string name="dialog_gps_title">Zapnutí GPS</string>
+    <string name="dialog_gps_enable">Aktivuji GPS</string>
+    <string name="dialog_gps_disable">Nechci používat GPS</string>
+    <string name="dialog_gps_html"><![CDATA[
+        <p>Určování polohy pomocí GPS není aktivní, pro záznamenání trasy jízdy je nutné jej aktivovat.<br /><br />
+        <small>Poznámka: po aktivaci GPS se vrátíte do aplikace tlačítkem zpět.</small></p>
+    ]]></string>
+
+    <!-- Dialog restart -->
+    <string name="dialog_restart_title">Restart</string>
+    <string name="dialog_restart_text">Pro změnu nastavení je vyžadován restart, aplikace se automaticky znovu spustí.</string>
+    <string name="dialog_restart_btn">OK</string>
+
+    <!-- Dialog varování o ukončení jízdy -->
+    <string name="dialog_trip_exit_title">Ukončení jízdy</string>
+    <string name="dialog_trip_exit_text">Jízda bude ukončena a uložena, pokračovat?</string>
+    <string name="dialog_trip_exit_exit">Ukončit</string>
+    <string name="dialog_trip_exit_off">Ukončit a vypnout</string>
+    <string name="dialog_trip_exit_storno">Storno</string>
+
+    <!-- Popisky pro přístupnost / accessibility -->
+    <string name="menu_item_icon_desc">Ikona položky menu</string>
+    <string name="menu_open">Otevřít menu</string>
+    <string name="menu_close">Uzavřít menu</string>
+
+
+</resources>

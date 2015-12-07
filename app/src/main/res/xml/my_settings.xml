@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen  xmlns:android="http://schemas.android.com/apk/res/android" >
+    <!-- OBD -->
+    <PreferenceScreen
+        android:key="button_obd_category"
+        android:title="@string/settings_obd_settings"
+        android:icon="@null"
+        android:persistent="false">
+        <CheckBoxPreference
+            android:key="checkbox_obd_enabled"
+            android:title="@string/settings_obd_enabled"
+            android:summary="@string/settings_obd_enabled_summary"
+            android:icon="@null"
+            android:defaultValue="true" />
+        <ListPreference
+            android:key="button_obd_list"
+            android:title="@string/settings_obd_devices"
+            android:icon="@null"
+            android:summary="summary"/>
+        <PreferenceScreen
+            android:key="button_obd_pids_category"
+            android:title="@string/settings_obd_pids_title"
+            android:icon="@null"
+            android:persistent="false">
+        </PreferenceScreen>
+    </PreferenceScreen>
+    <!-- GPS -->
+    <PreferenceScreen
+        android:key="button_gps_category"
+        android:title="@string/settings_gps_settings"
+        android:icon="@null"
+        android:persistent="false">
+        <CheckBoxPreference
+            android:key="checkbox_gps_enabled"
+            android:title="@string/settings_gps_enabled"
+            android:summary="@string/settings_gps_enabled_summary"
+            android:icon="@null"
+            android:defaultValue="true" />
+    </PreferenceScreen>
+</PreferenceScreen>

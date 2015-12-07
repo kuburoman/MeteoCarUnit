@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent" android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@drawable/dashboard_bg">
+
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent">
+
+        <view
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            class="cz.autonapul.androidcartracker.ui.view.SpeedMeterView"
+            android:id="@+id/speedGauge"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/dashboard_gauge_padding" />
+
+        <view
+            class="cz.autonapul.androidcartracker.ui.view.SpeedMeterView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rpmGauge"
+            android:layout_weight="1"
+            android:layout_margin="@dimen/dashboard_gauge_padding" />
+
+        </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/dashoard_txt_empty"
+        android:id="@+id/dashboardObdText"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:layout_marginLeft="140dp"
+        android:layout_marginStart="88dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/videoView"
+        android:layout_marginTop="15dp"
+        android:layout_toLeftOf="@+id/osmInfoText"
+        android:layout_toStartOf="@+id/osmInfoText"
+        android:gravity="center_horizontal" />
+
+    <TextView
+        android:layout_width="@dimen/dashboard_info_text_max_width"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/dashoard_txt_empty"
+        android:id="@+id/dashboardGpsText"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignTop="@+id/videoView"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="130dp"
+        android:gravity="center_horizontal"
+        android:layout_toRightOf="@+id/videoView"
+        android:layout_alignRight="@+id/netStatusText" />
+
+    <TextView
+        android:layout_width="@dimen/dashboard_info_text_max_width"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/dashoard_txt_empty"
+        android:id="@+id/netStatusText"
+        android:layout_gravity="bottom"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="false"
+        android:layout_alignTop="@+id/videoView"
+        android:layout_marginTop="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/dashboard_info_text_padding"
+        android:gravity="center_horizontal" />
+
+    <VideoView
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:id="@+id/videoView"
+        android:layout_gravity="bottom"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="false" />
+
+    <TextView
+        android:layout_width="@dimen/dashboard_info_text_max_width"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/dashoard_txt_empty"
+        android:id="@+id/osmInfoText"
+        android:layout_alignParentBottom="false"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/dashboard_info_text_padding"
+        android:gravity="center_horizontal" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dashoard_btn_trip_start"
+        android:id="@+id/dashboardTripButton"
+        android:layout_alignTop="@+id/videoView"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="5dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:singleLine="true" />
+
+    <TextView
+        android:layout_width="@dimen/dashboard_info_text_max_width"
+        android:layout_height="wrap_content"
+        android:text="@string/dashoard_txt_empty"
+        android:id="@+id/dashboardTextTime"
+        android:layout_weight="1"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="@dimen/dashboard_info_text_padding"
+        android:layout_marginRight="@dimen/dashboard_info_text_padding"
+        android:gravity="right" />
+
+
+</RelativeLayout>
