@@ -8,6 +8,7 @@ public class MasterController {
 
     // singleton pattern
     private static final MasterController INSTANCE = new MasterController();
+
     public static MasterController getInstance(){
         return INSTANCE;
     }

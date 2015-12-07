@@ -7,14 +7,13 @@ import android.widget.Button;
 import net.engio.mbassy.listener.Handler;
 
 import cz.meteocar.unit.R;
-import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.model.FileObject;
-import cz.meteocar.unit.engine.storage.model.TripDetailObject;
+import cz.meteocar.unit.ui.UIManager;
 
 /**
  * Created by Toms, 2014.
@@ -33,13 +32,14 @@ public class TripController {
 
     /**
      * Dotaz na aktivní jízdu
+     *
      * @return True pokud je jízda aktivní, False pokud ne
      */
-    public boolean isActive(){
+    public boolean isActive() {
         return tripActive;
     }
 
-    TripController(){
+    TripController() {
         tripActive = false;
 
         // přihlášení k odběru dat ze service busu
@@ -51,9 +51,10 @@ public class TripController {
 
     /**
      * Inicializace kontrolleru
+     *
      * @param btn Ovládací tlačíko na dashboardu
      */
-    public void init(Button btn){
+    public void init(Button btn) {
 
         //
         AppLog.i(AppLog.LOG_TAG_UI, "Trip Controller init()");
@@ -73,13 +74,13 @@ public class TripController {
     /**
      * Handler kliku na ovládací tlačítko
      */
-    private void handleButtonClick(){
+    private void handleButtonClick() {
 
         // zastavíme nebo rozjedeme trip, podle aktuálního stavu
-        if(isActive()){
+        if (isActive()) {
             stopTrip();
             ServiceManager.getInstance().video.stopVideo();
-        }else{
+        } else {
             startTrip();
             ServiceManager.getInstance().video.start();
         }
@@ -89,19 +90,19 @@ public class TripController {
     /**
      * Obnoví text na ovládacím tlačíku tak, aby odpovídalo jeho aktuální akci
      */
-    private void refreshButtonText(){
+    private void refreshButtonText() {
 
         // máme tlačítko?
-        if(button == null){
+        if (button == null) {
             AppLog.i(AppLog.LOG_TAG_UI, "Trip Controller - BUTTON NULL");
             return;
         }
 
         // nastavíme text podle toho, zda tlačítko jízdu ukončí nebo odstartuje
-        if(isActive()){
+        if (isActive()) {
             button.setText(
-                UIManager.getInstance().getMenuActivity().getResources()
-                    .getString(R.string.dashoard_btn_trip_end)
+                    UIManager.getInstance().getMenuActivity().getResources()
+                            .getString(R.string.dashoard_btn_trip_end)
             );
         } else {
             button.setText(
@@ -116,7 +117,7 @@ public class TripController {
     // -------------------------------------------------------------------------------------------
 
     @Handler
-    public void handleLocationUpdate(ServiceGPS.GPSPositionEvent msg){
+    public void handleLocationUpdate(ServiceGPS.GPSPositionEvent msg) {
         //AppLog.i(null, "Location delivered: ");
         /*line1gps = "LAT: "+msg.getLocation().getLatitude();
         line2gps = "LON: "+msg.getLocation().getLongitude();
@@ -125,7 +126,7 @@ public class TripController {
     }
 
     @Handler
-    public void handleOBDpid(OBDService.OBDEventPID evt){
+    public void handleOBDpid(OBDService.OBDEventPID evt) {
         /*line6obd_pid = "OBD status: "+evt.getValue();
         //AppLog.i(null, "Time delivered: " + line4time);
         postInvalidate();*/
@@ -139,7 +140,7 @@ public class TripController {
      * - aktivuje záznam do DB
      * - aktivuje videozáznam
      */
-    public void startTrip(){
+    public void startTrip() {
 
         // flag
         tripActive = true;
@@ -150,14 +151,15 @@ public class TripController {
         // změníme text na tlačítku
         refreshButtonText();
 
+        // TODO tohle určitě nechceme
         // smažeme předchozí záznamy
-        TripDetailObject.deleteAllRecords();
+//        TripDetailObject.deleteAllRecords();
     }
 
     /**
      * Ukončí trip
      */
-    public void stopTrip(){
+    public void stopTrip() {
 
         // flag
         tripActive = false;
@@ -169,9 +171,9 @@ public class TripController {
         refreshButtonText();
 
         // uložíme log do souboru
-        if(ServiceManager.getInstance().db.helper.saveToFile() != null){
-            TripDetailObject.deleteAllRecords();
-        };
+//        if(ServiceManager.getInstance().db.helper.saveToFile() != null){
+//            TripDetailObject.deleteAllRecords();
+//        };
 
         // updatujeme počet na panelu menu
         UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
@@ -186,24 +188,24 @@ public class TripController {
     /**
      * Odešle soubory na server
      */
-    public void syncFilesToServer(){
+    public void syncFilesToServer() {
 
         // uživatel žádá sync
         userRequestedSync = true;
 
         // máme internet?
-        if(ServiceManager.getInstance().network.getCurrentConnectionType() == NetworkService.STATUS_NONE){
+        if (ServiceManager.getInstance().network.getCurrentConnectionType() == NetworkService.STATUS_NONE) {
             UIManager.getInstance().getMenuActivity().dialogNoInternet.show();
-        }else{
+        } else {
             executeSync();
         }
     }
 
     public boolean userRequestedSync = false;
 
-    public void executeSync(){
+    public void executeSync() {
         //
-        for(FileObject file : FileObject.getAllOfType(FileObject.TYPE_TRIP_DETAILS)){
+        for (FileObject file : FileObject.getAllOfType(FileObject.TYPE_TRIP_DETAILS)) {
             ServiceManager.getInstance().network.sendFileToServer(file.getId());
         }
         //
@@ -214,42 +216,45 @@ public class TripController {
     /**
      * Handler stavu sítě (přístup k internetu)
      * - pokud je síť nedostupná, zobrazíme varování
+     *
      * @param evt
      */
     @Handler
-    public void handleNetworkStatusUpdate(final NetworkService.NetworkStatusEvent evt){
+    public void handleNetworkStatusUpdate(final NetworkService.NetworkStatusEvent evt) {
 
         // vyžádána synchronizace?
         // ne = budeme enevt ignorovat
-        if(!userRequestedSync){return;}
+        if (!userRequestedSync) {
+            return;
+        }
 
         UIManager.getInstance().getMenuActivity()
-            .runOnUiThread(new Runnable() {
-                public void run() {
-                AppLog.i(null, "Network conn type: " + evt.getConnectionType());
-                AppLog.i(null, "Network isConn?: " + evt.isConnected());
+                .runOnUiThread(new Runnable() {
+                    public void run() {
+                        AppLog.i(null, "Network conn type: " + evt.getConnectionType());
+                        AppLog.i(null, "Network isConn?: " + evt.isConnected());
 
-                // dialog
-                AlertDialog dialogNoInternet = UIManager.getInstance().getMenuActivity().dialogNoInternet;
+                        // dialog
+                        AlertDialog dialogNoInternet = UIManager.getInstance().getMenuActivity().dialogNoInternet;
 
-                // jsme připojeni?
-                if (!evt.isConnected()) {
+                        // jsme připojeni?
+                        if (!evt.isConnected()) {
 
-                    // ovetevřeme dialog
-                    //AppLog.i(null, "Network dialog show");
-                    dialogNoInternet.show();
+                            // ovetevřeme dialog
+                            //AppLog.i(null, "Network dialog show");
+                            dialogNoInternet.show();
 
-                } else {
+                        } else {
 
-                    // uzavřeme dialog, pokud je otevřený
-                    if (dialogNoInternet.isShowing()) {
-                        //AppLog.i(null, "Network dialog cancel");
-                        dialogNoInternet.cancel();
+                            // uzavřeme dialog, pokud je otevřený
+                            if (dialogNoInternet.isShowing()) {
+                                //AppLog.i(null, "Network dialog cancel");
+                                dialogNoInternet.cancel();
+                            }
+
+                        }
                     }
-
-                }
-                }
-            });
+                });
     }
 
 }

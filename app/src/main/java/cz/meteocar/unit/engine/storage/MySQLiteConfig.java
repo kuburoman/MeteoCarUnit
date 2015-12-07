@@ -12,6 +12,7 @@ public class MySQLiteConfig {
     public static final String TYPE_TEXT = " TEXT";
     public static final String TYPE_REAL = " REAL";
     public static final String TYPE_INTEGER = " INTEGER";
+    public static final String TYPE_BOOLEAN = " BOOLEAN";
     public static final String TYPE_AUTO_TIME = "  TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
 
     // oddělovač

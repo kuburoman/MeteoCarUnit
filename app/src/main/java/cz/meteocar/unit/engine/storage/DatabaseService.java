@@ -15,6 +15,8 @@ import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.storage.model.RecordEntity;
+import cz.meteocar.unit.engine.storage.service.RecordService;
 
 /**
  * Created by Toms, 2014.
@@ -32,7 +34,7 @@ public class DatabaseService extends Thread {
     private Context context;
 
     // helper
-    public DatabaseHelper helper;
+    private DatabaseHelper helper;
 
     public DatabaseService(Context ctx){
         context = ctx;
@@ -45,15 +47,6 @@ public class DatabaseService extends Thread {
 
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
-
-        //
-        /*if(false || (System.currentTimeMillis() < (Long.parseLong("1416869153244")+2*1000*60))){
-            trip.deleteAllRecords();
-        }
-        if(true){
-            trip.listAll();
-        }*/
-        //trip.saveToFileAndClear();
 
         // inicializujeme stav zaznamenávání jízdy
         initTripRecording();
@@ -215,7 +208,6 @@ public class DatabaseService extends Thread {
         // - nikde jej nepoužívám, je výhodnější používat odhad
         // - dotaz chvíli trvá
         count++;
-        //TripDetailObject.getNumberOfRecord();
 
         // odešleme event o přidání záznamu
         ServiceManager.getInstance().eventBus.post(

@@ -307,10 +307,6 @@ public class MenuActivity extends Activity {
         //
         if(instID == 0){return;}
 
-        // registrujeme v GCM a zkotrlujeme zda o registraci již ví server
-        registerGCM();
-        MasterController.getInstance().user.checkGCMRegistration();
-
         // odložíme check hardware, aby stihli doběhnout animace (kt. by se jinak zasekli)
         (new Handler()).postDelayed(new Runnable(){
             public void run(){
@@ -355,78 +351,10 @@ public class MenuActivity extends Activity {
 
 
     /**
-     * Pokusí se zaregistrovat apliakci do GCM
-     */
-    private void registerGCM() {
-
-        // máme již zaregistrováno?
-        if(DB.get().getBoolean(UserController.SETTINGS_KEY_APP_GCM_REG, false)){ return; }
-
-        //final Context ctx = getBaseContext();
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-
-                    //
-                    AppLog.i(AppLog.LOG_TAG_NETWORK, "GCM Reg will commence");
-
-                    // GCM registrace
-                    GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(MenuActivity.this);
-                    String regID = gcm.register(ServiceManager.GCM_SENDER_ID);
-
-                    // uložíme GCM id, pokud máme
-                    if(regID != null){
-                        if(!regID.equals("")){
-                            AppLog.i(AppLog.LOG_TAG_NETWORK, "GCM Reg success: "+regID);
-
-                            DB.set()
-                                    .putBoolean(UserController.SETTINGS_KEY_APP_GCM_REG, true)
-                                    .putString(UserController.SETTINGS_KEY_APP_GCM_REG_ID, regID)
-                                    .commit();
-                        }
-                    }
-
-                    // informujeme server
-                    MasterController.getInstance().user.checkGCMRegistration();
-
-
-                } catch (IOException ex) {
-                    AppLog.i(AppLog.LOG_TAG_NETWORK, "GCM Registration backup FAILED");
-                }
-            }
-        };
-        new Thread(runnable).start();
-    }
-
-    /**
      * Otevře action bar
      */
     public void showActionBar(){
-        /*if(actionBarView==null){return;}
-        TranslateAnimation anim = new TranslateAnimation(
-                - 3*getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset), 0,
-                //-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset)0, 0);*/
-        //-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset),
-        //-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset));
-        /*anim.setDuration(500);
-        anim.setInterpolator(new DecelerateInterpolator());
-        anim.setFillAfter( true );
-        actionBarView.startAnimation(anim);*/
-
-    //try {
-        /*ObjectAnimator animator = new ObjectAnimator();
-        animator.setTarget(actionBarBg);
-        animator.setValues(PropertyValuesHolder.ofInt("alpha", 255, 0));
-        animator.setDuration(500);
-        animator.start();*/
-    //}catch(Exception e){}
-        /*try {
-            ObjectAnimator.ofInt(actionBarBg, "alpha", 255).start();
-        }catch(Exception e){}*/
         try {
-            //actionBarBg.setAlpha(255);
             actionBarView.getBackground().setAlpha(128);
         }catch(Exception e){}
     }
@@ -435,25 +363,6 @@ public class MenuActivity extends Activity {
      * Schová action bar
      */
     private void hideActionBar(){
-
-       /* TranslateAnimation anim = new TranslateAnimation(
-                0, - 3*getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset),
-                0, /*-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset)0);*/
-                //-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset),
-                //-getResources().getDimensionPixelSize(R.dimen.action_bar_anim_offset));
-        /*anim.setDuration(500);
-        anim.setInterpolator(new DecelerateInterpolator());
-        anim.setFillAfter( true );
-        actionBarView.startAnimation(anim);*/
-
-            /*ObjectAnimator animator = ObjectAnimator.ofPropertyValuesHolder(
-                    actionBarBg, PropertyValuesHolder.ofInt("alpha", 0));
-            animator.setTarget(actionBarBg);
-            animator.setDuration(500);
-            animator.start();*/
-        /*try {
-            ObjectAnimator.ofInt(actionBarBg, "alpha", 0).start();
-        }catch(Exception e){}*/
         try {
             //actionBarBg.setAlpha(0);
             actionBarView.getBackground().setAlpha(128);

@@ -27,7 +27,6 @@ import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.FileSystem;
 import cz.meteocar.unit.engine.storage.model.FileObject;
 import cz.meteocar.unit.engine.storage.model.ObdPidObject;
-import cz.meteocar.unit.engine.storage.model.TripDetailObject;
 
 public class DebugFragment extends Fragment {
 
@@ -39,28 +38,30 @@ public class DebugFragment extends Fragment {
     /**
      * Prázdný kontruktor
      */
-	public DebugFragment(){
+    public DebugFragment() {
         buttons = new ArrayList();
     }
 
     /**
      * Test
      */
-    private void BUTTON_TEST(){
+    private void BUTTON_TEST() {
         AppLog.i(null, "Klik babe");
         textView1.setText("Kliknuto!");
         // pošle zkušební zprávu
-        ServiceManager.getInstance().network.sendRequest("myid", "test.php", new HashMap<String, String>(){
-                    HashMap<String, String> init(){
-                        put("test", "test"); return this;
-                    }}.init()
+        ServiceManager.getInstance().network.sendRequest("myid", "test.php", new HashMap<String, String>() {
+                    HashMap<String, String> init() {
+                        put("test", "test");
+                        return this;
+                    }
+                }.init()
         );
     }
 
     /**
      * Odhlášení uživatele
      */
-    private void BUTTON_LOG_OFF(){
+    private void BUTTON_LOG_OFF() {
         textView1.setText("Uživatel odhlášen");
         DB.set().putBoolean(UserController.SETTINGS_KEY_USER_LOGGED, false).commit();
     }
@@ -68,7 +69,7 @@ public class DebugFragment extends Fragment {
     /**
      * Smazání záznamu jízdy
      */
-    private void BUTTON_ERASE_TRIP_DETAILS(){
+    private void BUTTON_ERASE_TRIP_DETAILS() {
         ObdPidObject.deleteAll();
         textView1.setText("Záznamy vymazány");
     }
@@ -76,12 +77,12 @@ public class DebugFragment extends Fragment {
     /**
      * Zaloguje všechny pidy z databáze
      */
-    private void BUTTON_LOG_PIDS(){
+    private void BUTTON_LOG_PIDS() {
         ArrayList<ObdPidObject> arr = ObdPidObject.getAll();
         StringBuilder sb = new StringBuilder();
-        sb.append("OBD PIDs count: "+arr.size()+"\n");
-        for(ObdPidObject obj : arr){
-            sb.append("ID: " + obj.getId() + " tag: " + obj.getTag() + " code: " +obj.getPidCode() + " formula: " + obj.getFormula() + "\n");
+        sb.append("OBD PIDs count: " + arr.size() + "\n");
+        for (ObdPidObject obj : arr) {
+            sb.append("ID: " + obj.getId() + " tag: " + obj.getTag() + " code: " + obj.getPidCode() + " formula: " + obj.getFormula() + "\n");
         }
         textView1.setText(sb.toString());
     }
@@ -89,24 +90,24 @@ public class DebugFragment extends Fragment {
     /**
      * Uložení záznamu do souboru
      */
-    private void BUTTON_NUKE_TRIPS(){
+    private void BUTTON_NUKE_TRIPS() {
 
         // všechny aktuální záznamy
-        TripDetailObject.deleteAllRecords();
+//        TripDetailObject.deleteAllRecords();
 
         // všechny záznamy v souborech
         FileObject.deleteAllRecords();
 
         // všechny soubory
         File tripsDir = new File(FileSystem.getTripLogDir());
-        for(File file: tripsDir.listFiles()) file.delete();
+        for (File file : tripsDir.listFiles()) file.delete();
 
     }
 
     /**
      * Pošle uložený zaáznam na server
      */
-    private void BUTTON_SEND_FILE(){
+    private void BUTTON_SEND_FILE() {
         //DB.tripHelper.saveToFile();
         //DB.tripHelper.deleteAllRecords();
     }
@@ -114,7 +115,7 @@ public class DebugFragment extends Fragment {
     /**
      * Pošle uložený zaáznam na server
      */
-    private void BUTTON_ERASE_PIDS(){
+    private void BUTTON_ERASE_PIDS() {
         ObdPidObject.deleteAll();
         DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, false).commit();
         textView1.setText("PIDy smazány");
@@ -122,15 +123,16 @@ public class DebugFragment extends Fragment {
 
     /**
      * Vytvoření nebo obnovení view
+     *
      * @param inflater
      * @param container
      * @param savedInstanceState
      * @return
      */
-	@SuppressWarnings("ResourceType")
+    @SuppressWarnings("ResourceType")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                                Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
 
         // mezery
         final int PADDING = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
@@ -205,7 +207,7 @@ public class DebugFragment extends Fragment {
         super.onResume();
 
         // obnovíme text
-        if(textView1 != null) {
+        if (textView1 != null) {
             textView1.setText("Obrazovka ladění");
         }
 
@@ -218,10 +220,11 @@ public class DebugFragment extends Fragment {
 
     /**
      * Přidá tlačítko
+     *
      * @param buttonText
      * @param clickListener
      */
-    private void addButton(String buttonText, View.OnClickListener clickListener){
+    private void addButton(String buttonText, View.OnClickListener clickListener) {
 
         // padding - vzdálenost od předchozího řádku
         int PADDING = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
@@ -230,20 +233,20 @@ public class DebugFragment extends Fragment {
         Button btn = new Button(getActivity());
 
         // za  každým sudým nový řádek
-        if( buttons.size()%2 == 0){
+        if (buttons.size() % 2 == 0) {
 
             LinearLayout newLinLayout = new LinearLayout(getActivity());
-            newLinLayout.setId(buttons.size()+10);
+            newLinLayout.setId(buttons.size() + 10);
             fragmentLayout.addView(newLinLayout);
 
             // layout parametry pro řídek
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params.setMargins(0,PADDING,0,0);
+            params.setMargins(0, PADDING, 0, 0);
 
             // prvek pod, kt. se tlačítko vykreslí
-            if(buttons.size() == 0){
+            if (buttons.size() == 0) {
                 params.addRule(RelativeLayout.BELOW, textView1.getId());
-            }else{
+            } else {
                 params.addRule(RelativeLayout.BELOW, actualLinLayout.getId());
             }
 
@@ -256,18 +259,19 @@ public class DebugFragment extends Fragment {
 
         // layout parametry pro tlačítko
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        if(buttons.size()%2 == 0){
+        if (buttons.size() % 2 == 0) {
             params.gravity = Gravity.LEFT;
             params.weight = 0.5f;
-        }else{
+        } else {
             params.gravity = Gravity.RIGHT;
             params.weight = 0.5f;
         }
-        params.setMargins(0,0,0,0); btn.setLayoutParams(params);
+        params.setMargins(0, 0, 0, 0);
+        btn.setLayoutParams(params);
 
         // přidáme tlačítko a nastavíme jeho parametry
         actualLinLayout.addView(btn);
-        btn.setId(buttons.size()+2);
+        btn.setId(buttons.size() + 2);
         btn.setText(buttonText);
         btn.setOnClickListener(clickListener);
 
@@ -276,7 +280,7 @@ public class DebugFragment extends Fragment {
     }
 
     @Handler    //(delivery = Invoke.Asynchronously, rejectSubtypes = false)
-    public void handleLocationUpdate(final NetworkService.NetworkRequestEvent evt){
+    public void handleLocationUpdate(final NetworkService.NetworkRequestEvent evt) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 /*AppLog.i(null, "Server event delivered: " + evt.getResponse().toString());

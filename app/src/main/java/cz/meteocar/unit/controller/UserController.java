@@ -43,20 +43,6 @@ public class UserController {
     // gps
     public static final String SETTINGS_KEY_GPS_ENABLED = "key_gps_enabled";
 
-    // gcm
-    /**
-     * Je aplikace registrovaná pro GCM
-     */
-    public static final String SETTINGS_KEY_APP_GCM_REG = "key_app_gcm_reg";
-    /**
-     * Je GCM id uloženo také na serveru?
-     */
-    public static final String SETTINGS_KEY_APP_GCM_REG_SRV = "key_app_gcm_reg_srv";
-    /**
-     * GCM registarční ID, to potřebuje server aby mohl doručit zprávu přes GCM do zařízení
-     */
-    public static final String SETTINGS_KEY_APP_GCM_REG_ID = "key_app_gcm_reg_id";
-
     // ID k dotazům na server
     public static final String NETWORK_PIDS_RESPONSE = "network_get_pids";
     public static final String NETWORK_GCM_REG_RESPONSE = "gcm";
@@ -73,9 +59,6 @@ public class UserController {
      * Inicializuje
      */
     public void init(){
-
-        //
-        //ServiceManager.getInstance().db.eraseSettings();
 
         // první spuštění?
         if(!ServiceManager.getInstance().db.getSettings().getBoolean("appInit", false)){
@@ -100,9 +83,6 @@ public class UserController {
 
         }
 
-        // geistrujeme u GCM pokud je potřeba
-        //checkGCMRegistration(); - nelze bez aktuálního kontextu
-
         // nastavíme uživatele v síťové službě
         ServiceManager.getInstance().network.setUser(getUserID(), getUploadKey());
 
@@ -110,93 +90,6 @@ public class UserController {
         updateGPSstate();
         updateOBDstate();
     }
-
-    // ---------- Gegistrace GCM -----------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    private Context context;
-
-    /**
-     * Zkontroluje, zda je o GCM registraci aplikace informován server
-     */
-    public void checkGCMRegistration(){
-
-        // je již zaregistrováno
-        if(DB.get().getBoolean(SETTINGS_KEY_APP_GCM_REG, false)){
-
-            // pokud není o registraci informován server
-            if(!DB.get().getBoolean(SETTINGS_KEY_APP_GCM_REG_SRV, false)){
-
-                // informujeme server
-                ServiceManager.getInstance().network.sendRequest(NETWORK_GCM_REG_RESPONSE,
-                    "gcmRegisterApp.php", new HashMap<String, String>() {
-                        HashMap<String, String> init() {
-                            try{
-                                put("model", new JSONObject()
-                                    .put("id", getUserID())
-                                    .put("key", getUploadKey())
-                                    .put("gcm_id", DB.get().getString(SETTINGS_KEY_APP_GCM_REG_ID, ""))
-                                    .toString()
-                                );
-                            }catch(Exception e){/* vždy se povede */}
-                            return this;
-                        }
-                    }.init());
-            }
-        }
-    }
-
-    /**
-     * Zpracování příchozí odpovědi na GCM registraci
-     * - NETWORK_GCM_REG_RESPONSE: byla provedena GCM registrace
-     * - NETWORK_GCM_REG_SRV_RESPONSE: server odpovídá na ohlášení registrace
-     * @param evt Síťová událost - odpověď
-     */
-    @Handler
-    public void handleNetworkGCMRegResponse(final NetworkService.NetworkRequestEvent evt) {
-
-        // je to naše zpráva?
-        if (evt.getID() == NETWORK_GCM_REG_SRV_RESPONSE) {
-
-            // přečteme odpověď
-            try{
-
-                // je odpověď OK?
-                if(evt.getResponse().getString("status").equals("ok")){
-
-                    // nastavíme flag
-                    DB.set().putBoolean(SETTINGS_KEY_APP_GCM_REG_SRV, true).commit();
-                }else{
-
-                    // došlo k chybě na serveru - ohlášení nebylo přijato
-                }
-            }catch(Exception e){
-                AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: C");
-                e.printStackTrace();
-            }
-
-            return;
-        }
-    }
-
-    /**
-     * Anuluje existující GCM registraci
-     */
-    public void removeGCMregistration(){
-
-        // je již zaregistrováno
-        if(!DB.get().getBoolean(SETTINGS_KEY_APP_GCM_REG, false)){
-
-            // smažeme pers. proměnné
-            DB.set()
-                    .putString(SETTINGS_KEY_APP_GCM_REG_ID, "")
-                    .putBoolean(SETTINGS_KEY_APP_GCM_REG, false)
-                    .commit();
-
-        }
-    }
-
-
 
     // ---------- Status OBD ---------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
