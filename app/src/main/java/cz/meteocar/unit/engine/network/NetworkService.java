@@ -7,8 +7,6 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.WakefulBroadcastReceiver;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -62,9 +60,6 @@ public class NetworkService extends Thread {
     private boolean threadRun = true;
     private Context context;
 
-    // gcm
-    private boolean regGCMFlag;
-
     // proměnné pro sledování stavu připojování
     private boolean checkConnectingStatusFlag;
     private int checkConnectingStatusRetries;
@@ -80,8 +75,6 @@ public class NetworkService extends Thread {
         fileQueue = new ArrayList();
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
-        regGCMFlag = false;
-        //sendFileToServer(null, "MySuperSpecialTypeX");
         start();
     }
 
@@ -373,28 +366,6 @@ public class NetworkService extends Thread {
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }
 
-                // flag pro registraci GCM
-                if (regGCMFlag) {
-
-                    // pokusíme se registrovat
-                    String regID = regAtGCM();
-
-                    // máme odpověď?
-                    if (regID != null) {
-                        if (!regID.equals("")) {
-
-                            // zrušíme flag
-                            regGCMFlag = false;
-                            ServiceManager.getInstance().eventBus.post(
-                                    new NetworkRequestEvent("gcm", new JSONObject("{gcm:'" + regID + "'}"))
-                            ).asynchronously();
-                        }
-                    }
-
-                    // nenecháme thread usnout
-                    continue;
-                }
-
                 // požadavky na upload souboru
                 if (!fileQueue.isEmpty()) {
                     AppLog.i("Will exec upload");
@@ -460,79 +431,6 @@ public class NetworkService extends Thread {
         @Override
         public int getType() {
             return ServiceManager.AppEvent.EVENT_NETWORK;
-        }
-    }
-
-    // ---------- GCM ----------------------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    /**
-     * Vyvolá zahájení registrace aplikace do GCM v síťovém threadu
-     *
-     * @param ctx Aktuální kontext aktivity
-     */
-    public synchronized void registerGCM(Context ctx) {
-        regGCMFlag = true;
-        context = ctx;
-        this.notifyAll();
-    }
-
-    /**
-     * Zaregistruje aplikaci u GCM pro příjem zpráv ze serveru
-     * - vrací ID, které musí být předáno serveru
-     *
-     * @return Registration ID, pro identifikace adresáta GCM zprávy
-     */
-    private String regAtGCM() {
-
-        // získáme GCM instanci
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this.context);
-
-        // registrujeme, tím bychom měli získat ID
-        String regID = null;
-        try {
-            regID = gcm.register(ServiceManager.GCM_SENDER_ID);
-        } catch (Exception e) {
-
-            //
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "GCM Registration FAILED");
-            e.printStackTrace();
-        }
-
-        //ok
-        return regID;
-    }
-
-    /**
-     * Zruší registraci v GCM
-     */
-    public void unregAtGCM() {
-
-        // získáme GCM instanci
-        GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this.context);
-
-        // zrušíme registraci
-        try {
-            gcm.unregister();
-        } catch (Exception e) {
-        }
-
-    }
-
-    public static class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Receiving GCM intent (1)");
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Extras: " + intent.getExtras().toString());
-
-            String msg = intent.getExtras().getString("msg");
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Msg: " + msg);
-
-            /*final Intent notificationIntent = new Intent(context, YourActivity.class);
-            notificationIntent.setAction(Intent.ACTION_MAIN);
-            notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER);*/
-
         }
     }
 

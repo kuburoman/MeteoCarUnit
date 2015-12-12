@@ -45,8 +45,6 @@ public class UserController {
 
     // ID k dotazům na server
     public static final String NETWORK_PIDS_RESPONSE = "network_get_pids";
-    public static final String NETWORK_GCM_REG_RESPONSE = "gcm";
-    public static final String NETWORK_GCM_REG_SRV_RESPONSE = "network_reg_srv_gcm";
 
 
     UserController(){

@@ -20,7 +20,6 @@ public class ServiceManager {
 
     // verze
     public final String version = "1.15";
-    public static final String GCM_SENDER_ID = "25848899819"; // id projektu na GCM serveru
 
     // singleton pattern
     private static final ServiceManager MY_SERVICE_MANAGER = new ServiceManager();

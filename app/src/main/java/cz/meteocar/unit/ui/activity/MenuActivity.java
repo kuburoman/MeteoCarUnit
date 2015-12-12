@@ -32,8 +32,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import java.io.IOException;
 
 import cz.meteocar.unit.R;
