@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Nell on 7.12.2015.
+ * User entity
  */
 public class UserEntity {
 
@@ -21,6 +21,7 @@ public class UserEntity {
     public String getUsername() {
         return username;
     }
+
 
     public void setUsername(String username) {
         this.username = username;

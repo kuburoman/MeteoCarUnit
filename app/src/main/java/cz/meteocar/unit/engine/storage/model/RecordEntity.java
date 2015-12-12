@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Nell on 7.12.2015.
+ * Entita drzici zaznamy o jizde.
  */
 public class RecordEntity {
 
