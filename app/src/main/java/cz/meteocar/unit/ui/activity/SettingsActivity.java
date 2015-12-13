@@ -197,7 +197,7 @@ public class SettingsActivity extends PreferenceActivity
 
         // přidáme PID, jen pokud se aktuálně nepřidává
         if(!obdPidDialog.isShowing()){
-            int newID = ObdPidObject.addOneByCopying(1, "Nový PID");
+            int newID = DB.obdPidHelper.addOneByCopying(1, "Nový PID");
             createObdPIDScreen();
         }
     }
@@ -272,7 +272,7 @@ public class SettingsActivity extends PreferenceActivity
         //checkBoxPreference.setChecked(true);
         //targetCategory.addPreference(checkBoxPreference);
 
-        ArrayList<ObdPidObject> arr = ObdPidObject.getAll();
+        ArrayList<ObdPidObject> arr = DB.obdPidHelper.getAll();
         int index = 0;
         for(ObdPidObject pid : arr){
 
@@ -320,7 +320,7 @@ public class SettingsActivity extends PreferenceActivity
         //txt.setText("Showing menu item: " + i);
 
         // načteme z DB PID
-        ObdPidObject pid = ObdPidObject.get(id);
+        ObdPidObject pid = DB.obdPidHelper.get(id);
 
         // pokud nebyl PID nalezen
         if(pid == null){
@@ -442,7 +442,7 @@ public class SettingsActivity extends PreferenceActivity
                         }
 
                         // uložíme
-                        if(ObdPidObject.save(obj) == 1){
+                        if(DB.obdPidHelper.save(obj) == 1){
                             dialog.dismiss();
                         } else {
                             AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
@@ -456,13 +456,13 @@ public class SettingsActivity extends PreferenceActivity
                         dialog.dismiss();
 
                         // locked - nebudeme mazat
-                        if( ObdPidObject.get(dialogDataID).getLocked() == 1 ){
+                        if( DB.obdPidHelper.get(dialogDataID).getLocked() == 1 ){
                             return;
                         }
 
                         // vymažeme
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
-                        ObdPidObject.delete(dialogDataID);
+                        DB.obdPidHelper.delete(dialogDataID);
                         createObdPIDScreen();
 
 

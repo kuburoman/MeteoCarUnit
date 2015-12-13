@@ -95,7 +95,7 @@ public class ConvertService extends Thread {
                 } else {
 
                     try {
-                        this.wait(1000);
+                        this.wait(60000);
                     } catch (Exception e) {
                         // nevadí
                     }

@@ -31,6 +31,13 @@ public class UserHelper {
                     COLUMN_NAME_LOGGED + MySQLiteConfig.TYPE_BOOLEAN + " DEFAULT ''" +
                     " )";
 
+    public static final String CREATE_DEFAULT_USER = "INSERT INTO " + TABLE_NAME + " (" +
+            COLUMN_NAME_ID + MySQLiteConfig.COMMA_SEP +
+            COLUMN_NAME_USERNAME + MySQLiteConfig.COMMA_SEP +
+            COLUMN_NAME_PASSWORD + MySQLiteConfig.COMMA_SEP +
+            COLUMN_NAME_LOGGED + ") VALUES(" +
+            "1, 'Franta', 'Franta147', 1)";
+
     /* SQL statement pro smazání tabulky */
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
@@ -73,7 +80,7 @@ public class UserHelper {
      * @param obj Vkládaný objekt
      * @return Počet ovlivněných řádek
      */
-    public static int save(UserEntity obj) {
+    public UserEntity save(UserEntity obj) {
 
         // nové values
         ContentValues values = new ContentValues();
@@ -91,13 +98,44 @@ public class UserHelper {
 
             // máme id, provedeme update
             values.put(COLUMN_NAME_ID, obj.getId());
-            return (int) db.update(TABLE_NAME, values, "id = ?", new String[]{"" + obj.getId()});
+            int id = db.update(TABLE_NAME, values, "id = ?", new String[]{"" + obj.getId()});
+            obj.setId(id);
+            return obj;
         } else {
-
-            // nemáme íd, vložíme nový záznam
-            return (int) db.insert(TABLE_NAME, null, values);    // nepředpokládáme přetečení int
+            int id = (int) db.insert(TABLE_NAME, null, values);
+            obj.setId(id);
+            return obj;
         }
     }
+
+    public void logUser(UserEntity userEntity) {
+
+        // otevřeme DB
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+
+        // nastavíme kurzor k požadovanému řádku
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null);
+
+        UserEntity obj;
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+
+                obj = new UserEntity();
+                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+                obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
+                obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
+                obj.setLogged(false);
+                save(obj);
+
+                // další
+                cursor.moveToNext();
+            }
+        }
+
+        userEntity.setLogged(true);
+        save(userEntity);
+    }
+
 
     /**
      * Získání objektu z DB dle ID
@@ -105,7 +143,7 @@ public class UserHelper {
      * @param id ID objektu
      * @return True - pokud se podařilo objekt nalézt, False - pokud ne
      */
-    public static UserEntity get(int id) {
+    public UserEntity get(int id) {
 
         // otevřeme DB
         SQLiteDatabase db = DB.helper.getReadableDatabase();
@@ -131,12 +169,37 @@ public class UserHelper {
         }
     }
 
+    public UserEntity getUser(String username, String password) {
+        // otevřeme DB
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+
+        // nastavíme kurzor k požadovanému řádku
+        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ? and " + COLUMN_NAME_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
+
+        // pokud máme výsledek zkopírujeme hodnoty
+        ContentValues values = new ContentValues();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            // přečeteme hodnoty a vrátíme
+            UserEntity obj = new UserEntity();
+            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
+            obj.setUsername(c.getString(c.getColumnIndex(COLUMN_NAME_USERNAME)));
+            obj.setPassword(c.getString(c.getColumnIndex(COLUMN_NAME_PASSWORD)));
+            obj.setLogged(c.getInt(c.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
+            return obj;
+
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Vrátí počet řádků tabulky
      *
      * @return Počet řádků
      */
-    public static int getNumberOfRecord() {
+    public int getNumberOfRecord() {
 
         // připravíme sql query na všechny řádky
         String countQuery = "SELECT  * FROM " + TABLE_NAME;
@@ -156,7 +219,7 @@ public class UserHelper {
     /**
      * Smaže všechny záznamy z tabulky
      */
-    public static void deleteAllRecords() {
+    public void deleteAllRecords() {
         SQLiteDatabase db = DB.helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
     }

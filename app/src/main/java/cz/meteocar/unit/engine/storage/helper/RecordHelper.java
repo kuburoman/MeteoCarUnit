@@ -18,7 +18,6 @@ import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -202,7 +201,7 @@ public class RecordHelper {
         db.delete(TABLE_NAME, null, null);
     }
 
-    public void deleteRecords(List<Integer> id){
+    public void deleteRecords(List<Integer> id) {
         String[] array = new String[id.size()];
 
         for (int i = 0; i < id.size(); i++) {
@@ -210,7 +209,21 @@ public class RecordHelper {
         }
 
         SQLiteDatabase db = DB.helper.getReadableDatabase();
-        db.delete(TABLE_NAME, "id = ?", array);
+        db.delete(TABLE_NAME, "id IN (" + makePlaceholders(id.size()) + ")", array);
+    }
+
+    String makePlaceholders(int len) {
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
     }
 
     public List<String> getUserIdStored() {
@@ -297,7 +310,7 @@ public class RecordHelper {
             obj.setJson(jsonObj.toString());
 
             // inkremetujeme
-            if (obdEvent.getMessage().getID() == ObdPidObject.OBD_PID_ID_SPEED) {
+            if (obdEvent.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
                 ServiceManager.getInstance().db.incrementObdDistance(obdEvent);
             }
         }

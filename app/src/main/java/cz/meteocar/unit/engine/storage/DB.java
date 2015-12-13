@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
+import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.helper.UserHelper;
@@ -21,6 +22,7 @@ public class DB {
     public static RecordHelper recordHelper;
     public static TripHelper tripHelper;
     public static UserHelper userHelper;
+    public static ObdPidHelper obdPidHelper;
 
     // persistence key-value
     public static SharedPreferences get(){

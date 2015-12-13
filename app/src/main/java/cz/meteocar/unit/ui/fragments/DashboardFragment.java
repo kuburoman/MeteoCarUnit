@@ -10,8 +10,12 @@ import android.widget.TextView;
 
 import net.engio.mbassy.listener.Handler;
 
+import java.util.ArrayList;
+
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
+import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.view.SpeedMeterView;
 import cz.meteocar.unit.engine.ServiceManager;
@@ -96,8 +100,11 @@ public class DashboardFragment extends Fragment {
         UIManager.getInstance().showActionBarFor(UIManager.FRAGMENT_DASHBOARD);
 
         // získáme min a max hodnoty pro tachometry
-        ObdPidObject speed = ObdPidObject.get(ObdPidObject.OBD_PID_ID_SPEED);
-        ObdPidObject rpm = ObdPidObject.get(ObdPidObject.OBD_PID_ID_RPM);
+
+        ArrayList<ObdPidObject> all = DB.obdPidHelper.getAll();
+
+        ObdPidObject speed = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_SPEED);
+        ObdPidObject rpm = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_RPM);
 
         // nastavíme je do tachometrů
         speedGauge.setMinMax(speed.getMin(), speed.getMax());
@@ -201,7 +208,7 @@ public class DashboardFragment extends Fragment {
             public void run() {
 
                 // speed
-                if(evt.getMessage().getID() == ObdPidObject.OBD_PID_ID_SPEED){
+                if(evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED){
                     //line6obd_speed = "S: "+evt.getValue()   + "   [ "+evt.getRawResponse()+" ]";
 
                     int value = (int) Math.round(evt.getValue());
@@ -214,7 +221,7 @@ public class DashboardFragment extends Fragment {
 
                     //AppLog.i("SPEED");
                 }
-                if(evt.getMessage().getID() == ObdPidObject.OBD_PID_ID_RPM){
+                if(evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_RPM){
                     //line6obd_rpm = "R: "+evt.getValue()       + "   [ "+evt.getRawResponse()+" ]";
                     int value = (int) Math.round(evt.getValue());
                     rpmGauge.setValue(value);

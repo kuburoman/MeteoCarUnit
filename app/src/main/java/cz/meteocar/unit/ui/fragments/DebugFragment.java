@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import net.engio.mbassy.listener.Handler;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,8 +23,6 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.FileSystem;
-import cz.meteocar.unit.engine.storage.model.FileObject;
 import cz.meteocar.unit.engine.storage.model.ObdPidObject;
 
 public class DebugFragment extends Fragment {
@@ -70,7 +67,7 @@ public class DebugFragment extends Fragment {
      * Smazání záznamu jízdy
      */
     private void BUTTON_ERASE_TRIP_DETAILS() {
-        ObdPidObject.deleteAll();
+        DB.obdPidHelper.deleteAll();
         textView1.setText("Záznamy vymazány");
     }
 
@@ -78,7 +75,7 @@ public class DebugFragment extends Fragment {
      * Zaloguje všechny pidy z databáze
      */
     private void BUTTON_LOG_PIDS() {
-        ArrayList<ObdPidObject> arr = ObdPidObject.getAll();
+        ArrayList<ObdPidObject> arr = DB.obdPidHelper.getAll();
         StringBuilder sb = new StringBuilder();
         sb.append("OBD PIDs count: " + arr.size() + "\n");
         for (ObdPidObject obj : arr) {
@@ -96,11 +93,11 @@ public class DebugFragment extends Fragment {
 //        TripDetailObject.deleteAllRecords();
 
         // všechny záznamy v souborech
-        FileObject.deleteAllRecords();
-
-        // všechny soubory
-        File tripsDir = new File(FileSystem.getTripLogDir());
-        for (File file : tripsDir.listFiles()) file.delete();
+//        FileObject.deleteAllRecords();
+//
+//        // všechny soubory
+//        File tripsDir = new File(FileSystem.getTripLogDir());
+//        for (File file : tripsDir.listFiles()) file.delete();
 
     }
 
@@ -116,7 +113,7 @@ public class DebugFragment extends Fragment {
      * Pošle uložený zaáznam na server
      */
     private void BUTTON_ERASE_PIDS() {
-        ObdPidObject.deleteAll();
+        DB.obdPidHelper.deleteAll();
         DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, false).commit();
         textView1.setText("PIDy smazány");
     }

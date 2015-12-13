@@ -58,6 +58,10 @@ public class NetworkService extends Thread {
 
     private ArrayList<PostTripRecord> postTripRecordsQueue;
 
+    public boolean isConnected(){
+        return checkConnectingStatusFlag;
+    }
+
     /**
      * Konstr., předává aplikační kontext, inicializuje fronty síťových požadavků
      *

@@ -5,23 +5,21 @@ import android.content.Context;
 import net.engio.mbassy.listener.Handler;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.model.FileObject;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.UserEntity;
+import cz.meteocar.unit.ui.UIManager;
 
 /**
  * Kontroller představující uživatele
  * - stará se o stav přihlášení uživatele
  * - a o uživatelská nastavení (definuje klíče pro jejich persistenci)
- *
+ * <p/>
  * Created by Toms, 2014.
  */
 public class UserController {
@@ -47,7 +45,7 @@ public class UserController {
     public static final String NETWORK_PIDS_RESPONSE = "network_get_pids";
 
 
-    UserController(){
+    UserController() {
 
         // registrace na bus
         ServiceManager.getInstance().eventBus.subscribe(this);
@@ -56,10 +54,10 @@ public class UserController {
     /**
      * Inicializuje
      */
-    public void init(){
+    public void init() {
 
         // první spuštění?
-        if(!ServiceManager.getInstance().db.getSettings().getBoolean("appInit", false)){
+        if (!ServiceManager.getInstance().db.getSettings().getBoolean("appInit", false)) {
 
             // inicializujeme
             ServiceManager.getInstance().db.editSettings()
@@ -67,15 +65,15 @@ public class UserController {
                     // uživatel
                     .putBoolean("userLogged", false)
 
-                    // nastavení OBD
+                            // nastavení OBD
                     .putBoolean(SETTINGS_KEY_OBD_IS_ENABLED, true)
                     .putBoolean(SETTINGS_KEY_OBD_IS_SET, false)
                     .putBoolean(SETTINGS_KEY_OBD_PIDS_SET, false)
 
-                    // GPS
+                            // GPS
                     .putBoolean(SETTINGS_KEY_GPS_ENABLED, true)
 
-                    //
+                            //
                     .putBoolean("appInit", true)
                     .commit();
 
@@ -94,13 +92,14 @@ public class UserController {
 
     /**
      * Updatujeme stav obd služby a vyždáme restart, je-li potřeba
+     *
      * @param ctx Kontext odkud vyšel požadavek
      */
-    public void updateOBDstateAndRestart(Context ctx){
-        if(updateOBDstate()){
+    public void updateOBDstateAndRestart(Context ctx) {
+        if (updateOBDstate()) {
 
             // pokud máme kontext vyžádáme restart
-            if(ctx != null){
+            if (ctx != null) {
                 UIManager.getInstance().restartApp(ctx);
             }
         }
@@ -108,9 +107,10 @@ public class UserController {
 
     /**
      * Updatuje stav OBD v závislosti na aktuálním nastavení
+     *
      * @return Je potřeba restart aplikace? True pokud ano, False pokud ne
      */
-    public boolean updateOBDstate(){
+    public boolean updateOBDstate() {
 
         // potřebujeme restart aplikace?
         // - služba se totiž může jen zapnout a pak vypnout
@@ -120,30 +120,30 @@ public class UserController {
         //obd - thread
         AppLog.i(AppLog.LOG_TAG_OBD,
                 "UserController.SETTINGS_KEY_OBD_IS_ENABLED: "
-                +DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false));
+                        + DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false));
         AppLog.i(AppLog.LOG_TAG_OBD,
-                "obd.isRunning(): "+ServiceManager.getInstance().obd.isRunning());
-        if( DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false) !=
-                ServiceManager.getInstance().obd.isRunning()){
+                "obd.isRunning(): " + ServiceManager.getInstance().obd.isRunning());
+        if (DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false) !=
+                ServiceManager.getInstance().obd.isRunning()) {
 
             // stojí?
-            if(!ServiceManager.getInstance().obd.isRunning()){
+            if (!ServiceManager.getInstance().obd.isRunning()) {
                 AppLog.i(AppLog.LOG_TAG_OBD, "OBD not running");
 
                 // stojí, neběžela už jednou?
-                if(!ServiceManager.getInstance().obd.isFinalized()){
+                if (!ServiceManager.getInstance().obd.isFinalized()) {
                     AppLog.i(AppLog.LOG_TAG_OBD, "OBD not finalized");
 
                     // ještě neběžela, máme vybrané zařízení?
                     // - pokud ne, nemůžeme nic dělat
-                    if(DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, false)){
+                    if (DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, false)) {
                         AppLog.i(AppLog.LOG_TAG_OBD, "OBD device is SET");
 
                         // vše OK, spustíme s vybranným zařízením (default OBDII v př. chyby)
                         ServiceManager.getInstance().obd.setDeviceAndStart(
-                            DB.get().getString(UserController.SETTINGS_KEY_OBD_DEVICE_NAME, "OBDII")
+                                DB.get().getString(UserController.SETTINGS_KEY_OBD_DEVICE_NAME, "OBDII")
                         );
-                    }else{
+                    } else {
 
                         // vše ok, jen není vybrané žádné zařízení
                         AppLog.i(AppLog.LOG_TAG_OBD, "No OBD device set");
@@ -153,14 +153,14 @@ public class UserController {
                         //   fungovat vrácení seznamu spárovaných zařízení
                         ServiceManager.getInstance().obd.checkAndEnableBluetoothAsynchronously();
                     }
-                }else{
+                } else {
 
                     // už běžela, na tuhle prácičku bude potřeba restart
                     //restartRequired = true;
                     AppLog.i(AppLog.LOG_TAG_OBD, "Restart required by OBD");
                     return true;
                 }
-            }else{
+            } else {
 
                 // nestojí, zastavíme
                 ServiceManager.getInstance().obd.exit();
@@ -173,11 +173,11 @@ public class UserController {
     // ---------- Defaultní PIDy -----------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
-    public void checkDefaultPIDs(){
+    public void checkDefaultPIDs() {
 
         // obd - nastavení
         // máme nastavené PIDy? pokud ne, nejprve je musíme načíst a až poté startovat OBD
-        if(!DB.get().getBoolean(SETTINGS_KEY_OBD_PIDS_SET, false)){
+        if (!DB.get().getBoolean(SETTINGS_KEY_OBD_PIDS_SET, false)) {
             AppLog.i(AppLog.LOG_TAG_OBD, "OBD PIDs not set, requesting");
 
             // odešleme požadavek
@@ -190,7 +190,7 @@ public class UserController {
                         }
                     }.init()
             );
-        }else{
+        } else {
             AppLog.i(AppLog.LOG_TAG_OBD, "OBD PIDs OK");
 
             //
@@ -201,6 +201,7 @@ public class UserController {
 
     /**
      * Zpracování příchozí odpovědi na JSON dotaz
+     *
      * @param evt
      */
     @Handler
@@ -216,16 +217,16 @@ public class UserController {
         // přečteme odpověď
         boolean jsonError = false; // došlo k chybě při parsování?
         JSONArray containingArray;
-        try{
+        try {
             AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: A");
             containingArray = evt.getResponse().getJSONArray("pids");
 
             // načteme pidy do DB
-            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(0));
-            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(1));
-            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(2));
-            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(3));
-            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(4));
+//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(0));
+//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(1));
+//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(2));
+//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(3));
+//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(4));
 
             // ok
             DB.set().putBoolean(SETTINGS_KEY_OBD_PIDS_SET, true).commit();
@@ -237,12 +238,12 @@ public class UserController {
             //updateOBDstate();
 
             AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: B");
-        }catch(Exception e){
+        } catch (Exception e) {
             AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: C");
             e.printStackTrace();
 
             // chyba, vše smažeme
-            ObdPidObject.deleteAll();
+//            ObdPidObject.deleteAll();
             jsonError = true;
             AppLog.i(AppLog.LOG_TAG_DB, "Error while saving pids!");
 
@@ -252,19 +253,19 @@ public class UserController {
     }
 
 
-
     // ---------- Status GPS ---------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
     /**
      * Updatujeme stav GPS služby a vyžádáme restart, je-li potřeba
+     *
      * @param ctx Kontext odkud vyšel požadavek
      */
-    public void updateGPSstateAndRestart(Context ctx){
-        if(updateGPSstate()){
+    public void updateGPSstateAndRestart(Context ctx) {
+        if (updateGPSstate()) {
 
             // pokud máme kontext vyžádáme restart
-            if(ctx != null){
+            if (ctx != null) {
                 UIManager.getInstance().restartApp(ctx);
             }
         }
@@ -272,30 +273,31 @@ public class UserController {
 
     /**
      * Updatuje stav GPS v závislosti na aktuálním nastavení
+     *
      * @return Je potřeba restart aplikace? True pokud ano, False pokud ne
      */
-    public boolean updateGPSstate(){
+    public boolean updateGPSstate() {
 
         // je rozdíl mezi požadovaným a aktuálním stavem služby?
-        if( DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false) !=
-                ServiceManager.getInstance().gps.isRunning()){
+        if (DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false) !=
+                ServiceManager.getInstance().gps.isRunning()) {
 
             // stojí?
-            if(!ServiceManager.getInstance().gps.isRunning()){
+            if (!ServiceManager.getInstance().gps.isRunning()) {
 
                 // stojí, neběžela už jednou?
-                if(!ServiceManager.getInstance().gps.isFinalized()){
+                if (!ServiceManager.getInstance().gps.isFinalized()) {
 
                     // ještě neběžela, nastartujeme
                     ServiceManager.getInstance().gps.start();
-                }else{
+                } else {
 
                     // už běžela, na tuhle prácičku bude potřeba restart
                     // restartRequired = true;
                     AppLog.i("Restart required by GPS");
                     return true;
                 }
-            }else{
+            } else {
 
                 // nestojí, zastavíme
                 ServiceManager.getInstance().gps.exit();
@@ -308,53 +310,46 @@ public class UserController {
     // ---------- Data přihlášeného uživatele ----------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
-    /**
-     * Přihlásí uživatele
-     * - nastaví do persistence storu identifikační údaje potřebné pro komunikaci se serverem
-     * @param id
-     * @param name
-     * @param email
-     * @param key
-     */
-    public void logUser(int id, String name, String email, String key){
-        DB.set()
-                .putBoolean(SETTINGS_KEY_USER_LOGGED, true)
-                .putInt(SETTINGS_KEY_USER_ID, id)
-                .putString(SETTINGS_KEY_USER_NAME, name)
-                .putString(SETTINGS_KEY_USER_EMAIL, email)
-                .putString(SETTINGS_KEY_USER_UPLOAD_KEY, key)
-                .commit();
+    public boolean logUser(String userName, String password) {
+        UserEntity user = DB.userHelper.getUser(userName, password);
+        if (user == null) {
+            return false;
+        } else {
+            DB.userHelper.logUser(user);
+            return true;
+        }
     }
 
     /**
      * Vrátí ID přihlášeného uživatele
      */
-    public int getUserID(){
+    public int getUserID() {
         return DB.get().getInt(SETTINGS_KEY_USER_ID, -1);
     }
 
     /**
      * Vrátí uplaod key přihlášeného uživatele
      */
-    public String getUploadKey(){
+    public String getUploadKey() {
         return DB.get().getString(SETTINGS_KEY_USER_UPLOAD_KEY, null);
     }
 
     /**
      * Zjistí stav přihlášení uživatele
+     *
      * @return True pokud je uživatel přihlášený, False pokdu ne
      */
-    public boolean isLogged(){
+    public boolean isLogged() {
 
         // zjistíme z pers. DB
-        AppLog.i(AppLog.LOG_TAG_UI, "User isLogged: "+DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false));
+        AppLog.i(AppLog.LOG_TAG_UI, "User isLogged: " + DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false));
         return DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false);
     }
 
     /**
      * Odhlásí uživatele
      */
-    public void logOutUser(){
+    public void logOutUser() {
         DB.set().putBoolean(SETTINGS_KEY_USER_LOGGED, false).commit();
     }
 
@@ -363,9 +358,11 @@ public class UserController {
 
     /**
      * Počet objektů k synchronizaci
+     *
      * @return
      */
-    public int getNumberOfSyncObjects(){
-        return FileObject.getNumberOfRecord();
+    public int getNumberOfSyncObjects() {
+//        return FileObject.getNumberOfRecord();
+        return 0;
     }
 }

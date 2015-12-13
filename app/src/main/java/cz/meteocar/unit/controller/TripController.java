@@ -12,7 +12,6 @@ import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
-import cz.meteocar.unit.engine.storage.model.FileObject;
 import cz.meteocar.unit.ui.UIManager;
 
 /**

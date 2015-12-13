@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.model.ObdPidObject;
 
 /**
@@ -531,7 +532,7 @@ public class OBDService extends Thread {
     private void initPIDQueue() {
 
         // přidáme všechny aktivní z DB
-        for (ObdPidObject pid : ObdPidObject.getAllActive()) {
+        for (ObdPidObject pid : DB.obdPidHelper.getAllActive()) {
             queue.add(new OBDMessage(
                     pid.getPidCode(),
                     pid.getFormula(),
