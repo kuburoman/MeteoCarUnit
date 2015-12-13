@@ -3,6 +3,10 @@ package cz.meteocar.unit.engine.storage;
 import android.content.SharedPreferences;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
+import cz.meteocar.unit.engine.storage.helper.RecordHelper;
+import cz.meteocar.unit.engine.storage.helper.TripHelper;
+import cz.meteocar.unit.engine.storage.helper.UserHelper;
 
 /**
  * Třída s duplicitními referencemi k objektům a metodám DB
@@ -14,6 +18,9 @@ public class DB {
 
     // DB helpery
     public static DatabaseHelper helper;
+    public static RecordHelper recordHelper;
+    public static TripHelper tripHelper;
+    public static UserHelper userHelper;
 
     // persistence key-value
     public static SharedPreferences get(){

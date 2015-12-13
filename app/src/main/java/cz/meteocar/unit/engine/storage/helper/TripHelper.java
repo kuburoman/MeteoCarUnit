@@ -1,41 +1,31 @@
-package cz.meteocar.unit.engine.storage.service;
+package cz.meteocar.unit.engine.storage.helper;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
+import java.util.List;
 
-import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
+import cz.meteocar.unit.engine.storage.model.TripEntity;
 
 /**
  * Servisa starajici se o vsechny zaznamy z jizdy
  */
-public class RecordService {
+public class TripHelper {
 
     /* Definice obsahu DB tabulky */
     public static final String TABLE_NAME = "trip_details";
     public static final String COLUMN_NAME_ID = "id";
-    public static final String COLUMN_NAME_TIME = "time";
-    public static final String COLUMN_NAME_USER_ID = "user_id";
-    public static final String COLUMN_NAME_TRIP_ID = "trip_id";
-    public static final String COLUMN_NAME_TYPE = "type";
     public static final String COLUMN_NAME_JSON = "json";
 
     /* SQL statement pro vytvoreni tabulky */
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + MySQLiteConfig.TYPE_ID + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_TIME + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_USER_ID + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_TRIP_ID + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_TYPE + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_JSON + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" +
                     " )";
 
@@ -48,24 +38,22 @@ public class RecordService {
      * Nacte vsechny zaznamy
      * @return ArrayList vsech objektu
      */
-    public static ArrayList<RecordEntity> getAll(){
+    public ArrayList<TripEntity> getAll(){
 
         //
-        ArrayList<RecordEntity> arr = new ArrayList<>();
+        ArrayList<TripEntity> arr = new ArrayList<>();
 
         // pripravime kurzor k DB
         SQLiteDatabase db = DB.helper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
 
         // projdeme po radcich
-        RecordEntity obj;
+        TripEntity obj;
         if(cursor.moveToFirst()){
             while(cursor.isAfterLast() == false){
 
-                obj = new RecordEntity();
+                obj = new TripEntity();
                 obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setTime(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_TIME)));
-                obj.setType(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TYPE)));
                 obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
                 arr.add(obj);
 
@@ -83,14 +71,12 @@ public class RecordService {
      * @param obj Vkladany objekt
      * @return Pocet ovlivnenych radek
      */
-    public static int save(RecordEntity obj){
+    public int save(TripEntity obj){
 
         // nové values
         ContentValues values = new ContentValues();
 
         // nastavíme hodnoty
-        values.put(COLUMN_NAME_TIME, obj.getTime());
-        values.put(COLUMN_NAME_TYPE, obj.getType());
         values.put(COLUMN_NAME_JSON, obj.getJson());
 
         // db
@@ -114,7 +100,7 @@ public class RecordService {
      * @param id ID objektu
      * @return True - pokud se podarilo objekt nalazt, False - pokud ne
      */
-    public static RecordEntity get(int id){
+    public TripEntity get(int id){
 
         SQLiteDatabase db = DB.helper.getReadableDatabase();
 
@@ -123,11 +109,9 @@ public class RecordService {
         if(c.getCount() > 0){
             c.moveToFirst();
 
-            RecordEntity obj = new RecordEntity();
+            TripEntity obj = new TripEntity();
             obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setTime(c.getInt(c.getColumnIndex(COLUMN_NAME_TIME)));
-            obj.setType(c.getString(c.getColumnIndex(COLUMN_NAME_TYPE)));
-            obj.setType(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
+            obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
             return obj;
 
         }else{
@@ -139,7 +123,7 @@ public class RecordService {
      * Vrati pocet radku tabulky
      * @return Pocet radku
      */
-    public static int getNumberOfRecord() {
+    public int getNumberOfRecord() {
 
         SQLiteDatabase db = DB.helper.getReadableDatabase();
 
@@ -154,7 +138,7 @@ public class RecordService {
     /**
      * Smaze vsechny zaznamy z tabulky
      */
-    public static void deleteAllRecords(){
+    public void deleteAllRecords(){
         SQLiteDatabase db = DB.helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
     }

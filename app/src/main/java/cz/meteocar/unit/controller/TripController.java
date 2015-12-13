@@ -205,12 +205,12 @@ public class TripController {
 
     public void executeSync() {
         //
-        for (FileObject file : FileObject.getAllOfType(FileObject.TYPE_TRIP_DETAILS)) {
-            ServiceManager.getInstance().network.sendFileToServer(file.getId());
-        }
+//        for (FileObject file : FileObject.getAllOfType(FileObject.TYPE_TRIP_DETAILS)) {
+//            ServiceManager.getInstance().network.sendFileToServer(file.getId());
+//        }
         //
-        userRequestedSync = false;
-        UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
+//        userRequestedSync = false;
+//        UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
     }
 
     /**

@@ -1,36 +1,26 @@
 package cz.meteocar.unit.engine.network;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.support.v4.content.WakefulBroadcastReceiver;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,8 +28,9 @@ import java.util.List;
 import java.util.Map;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.enums.NetworkRequestResultEnum;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.storage.model.FileObject;
+import cz.meteocar.unit.engine.network.event.PostTripRecordsResultEvent;
 
 /**
  * Created by Toms, 2014.
@@ -54,7 +45,7 @@ public class NetworkService extends Thread {
 
     // upload
     public static final String baseURL = "http://www.jezdito.cz/api/";
-    public static final String fileUploadURL = "upload.php";
+    public static final String dataURL = "data";
 
     // thread
     private boolean threadRun = true;
@@ -65,6 +56,8 @@ public class NetworkService extends Thread {
     private int checkConnectingStatusRetries;
     private final int MAX_CONN_CHECK_RETRIES = 10; // 10s
 
+    private ArrayList<PostTripRecord> postTripRecordsQueue;
+
     /**
      * Konstr., předává aplikační kontext, inicializuje fronty síťových požadavků
      *
@@ -72,33 +65,31 @@ public class NetworkService extends Thread {
      */
     public NetworkService(Context ctx) {
         context = ctx;
-        fileQueue = new ArrayList();
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
         start();
     }
 
-    public void upload() {
+    public void postTripRecords(PostTripRecord postTripRecord) {
         try {
             HttpClient client = new DefaultHttpClient();
             HttpPost post = new HttpPost("REST API url");
+            post.setHeader("Accept", "application/json");
             post.setHeader("Content-type", "application/json");
 
-            JSONObject obj = new JSONObject();
-            obj.put("username", "un");
-            obj.put("pwd", "password");
-            obj.put("key", "123456");
-
-
-            post.setEntity(new StringEntity(obj.toString(), "UTF-8"));
+            post.setEntity(new StringEntity(postTripRecord.getTripRecordsJson().toString(), "UTF-8"));
 
             HttpResponse response = client.execute(post);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords successful");
+                PostTripRecordsResultEvent event = new PostTripRecordsResultEvent(NetworkRequestResultEnum.OK, postTripRecord.getTripRecordIds());
+                ServiceManager.getInstance().eventBus.post(event).asynchronously();
+            }else{
+                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords failed");
+                PostTripRecordsResultEvent event = new PostTripRecordsResultEvent(NetworkRequestResultEnum.OK, postTripRecord.getTripRecordIds());
+                ServiceManager.getInstance().eventBus.post(event).asynchronously();
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -116,154 +107,6 @@ public class NetworkService extends Thread {
         userKey = key;
     }
 
-
-    // ---------- Upload souborů -----------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    // fronta souborů k uploadu
-    private ArrayList<FileUpload> fileQueue;
-
-    private class FileUpload {
-        FileUpload(int id) {
-            this.id = id;
-        }
-
-        public int id;
-    }
-
-    public synchronized void sendFileToServer(int id) {
-        fileQueue.add(new FileUpload(id));
-        this.notifyAll();
-    }
-
-    /**
-     * TODO - uklidit upload file
-     *
-     * @param upload
-     * @return
-     */
-    public boolean executeUpload(FileUpload upload) {
-
-        // získáme z db objekt
-        FileObject obj = FileObject.get(upload.id);
-        if (obj == null) {
-            return false;
-        }
-
-        // připravíme na http spojení
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(baseURL + fileUploadURL);
-        HttpURLConnection conn;
-
-
-        AppLog.i("Starting file upload");
-        File file = new File(obj.getFilename());
-
-        try {
-
-
-            String lineEnd = "\r\n";
-            String twoHyphens = "--";
-            String boundary = "*****";
-
-            // ------------------ CLIENT REQUEST
-
-            FileInputStream fileInputStream = new FileInputStream(file);
-
-            // HEADERS
-            // open a URL connection to the Servlet
-            URL url = new URL(baseURL + fileUploadURL);
-            conn = (HttpURLConnection) url.openConnection();// Open a HTTP connection to the URL
-            conn.setDoInput(true);// Allow Inputs
-            conn.setDoOutput(true);// Allow Outputs
-            conn.setUseCaches(false);// Don't use a cached copy.
-            conn.setRequestMethod("POST");// Use a post method.
-            conn.setRequestProperty("Connection", "Keep-Alive");
-            conn.setRequestProperty("Content-Type",
-                    "multipart/form-data;boundary=" + boundary);
-
-            // streamy
-            DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
-
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: post-data; name=uploadedfile;filename="
-                    + file.getName() + "" + lineEnd);
-            dos.writeBytes(lineEnd);
-
-
-            // create a buffer of maximum size
-            int bytesAvailable = fileInputStream.available();
-            int maxBufferSize = 1024;
-            // int bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            byte[] buffer = new byte[maxBufferSize];
-
-            // read file and write it into form...
-            int bytesRead = fileInputStream.read(buffer, 0, Math.min(maxBufferSize, bytesAvailable));
-            while (bytesRead > 0) {
-                dos.write(buffer, 0, Math.min(maxBufferSize, bytesAvailable));
-                bytesAvailable = fileInputStream.available();
-                bytesAvailable = Math.min(bytesAvailable, maxBufferSize);
-                bytesRead = fileInputStream.read(buffer, 0, Math.min(maxBufferSize, bytesAvailable));
-            }
-
-            // send multipart form data necesssary after file data...
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary /*+ twoHyphens*/ + lineEnd); // dvojitá čárka na konci = konec zprávy
-
-            // ------ post variables
-            dos.writeBytes("Content-Disposition: form-data; name=type" + lineEnd + lineEnd);
-            dos.writeBytes(obj.getType());
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=uid" + lineEnd + lineEnd);
-            dos.writeBytes("" + userID);
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes("Content-Disposition: form-data; name=key" + lineEnd + lineEnd);
-            dos.writeBytes("" + userKey);
-            dos.writeBytes(lineEnd);
-            dos.writeBytes(twoHyphens + boundary + lineEnd);
-            dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-            //
-            dos.flush();
-
-            //read
-            DataInputStream dis = new DataInputStream(conn.getInputStream());
-            StringBuilder sb = new StringBuilder();
-            //bytesRead = dis.write
-            bytesRead = dis.read(buffer, 0, maxBufferSize);
-            while (bytesRead > 0) {
-                sb.append(new String(buffer, 0, bytesRead));
-                AppLog.i("SB: " + sb.toString());
-                if (sb.length() > 1000) {
-                    break;
-                }
-                bytesRead = dis.read(buffer, 0, maxBufferSize);
-            }
-            AppLog.i("Server says: " + sb.toString());
-
-
-            // close streams
-            fileInputStream.close();
-            dos.close();
-            dis.close();
-
-            // ok
-
-            //můžeme smazat soubor
-            if (file.delete()) {
-                FileObject.delete(obj.getId());
-            }
-
-            return true;
-
-        } catch (Exception e) {
-            //fileQueue.add(upload);
-            AppLog.p("File upload failed");
-            e.printStackTrace();
-            return false;
-        }
-    }
 
     // ---------- JSON požadavky -----------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
@@ -366,13 +209,6 @@ public class NetworkService extends Thread {
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }
 
-                // požadavky na upload souboru
-                if (!fileQueue.isEmpty()) {
-                    AppLog.i("Will exec upload");
-                    executeUpload(fileQueue.remove(0));
-                    continue;
-                }
-
                 // požadavky na POST/JSON komunikaci
                 if (!requestQueue.isEmpty()) {
                     AppLog.i("Will exec request");
@@ -388,25 +224,6 @@ public class NetworkService extends Thread {
         }
     }
 
-    /**
-     * Událost - dokončení uploadu souboru
-     */
-    public static class NetworkFileUploadEvent extends ServiceManager.AppEvent {
-        private String id;
-
-        public NetworkFileUploadEvent(String myid) {
-            id = myid;
-        }
-
-        public String getID() {
-            return id;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_NETWORK;
-        }
-    }
 
     /**
      * Událost - načtení odpovědi na JSON požadavek
@@ -530,15 +347,6 @@ public class NetworkService extends Thread {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) type = STATUS_MOBILE;
             isConnected = activeNetwork.isConnected();
 
-            // probíhá připojování
-            /*if(!isConnected && activeNetwork.isConnectedOrConnecting()){
-
-                // ano probíhá připojování, vzbudíme vlákno a budeme jej pravidelně kontrolovat
-                checkConnectingStatusFlag = true;
-                notifyAll();
-            }*/
-            // nefunguje, pokud se adaptér připojuje, není vrácen jako aktivni, activeNetwork ju null
-
         }
 
         //
@@ -559,15 +367,6 @@ public class NetworkService extends Thread {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) type = STATUS_WIFI;
             if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) type = STATUS_MOBILE;
             isConnected = activeNetwork.isConnected();
-
-            // probíhá připojování
-            /*if(!isConnected && activeNetwork.isConnectedOrConnecting()){
-
-                // ano probíhá připojování, vzbudíme vlákno a budeme jej pravidelně kontrolovat
-                checkConnectingStatusFlag = true;
-                notifyAll();
-            }*/
-            // nefunguje, pokud se adaptér připojuje, není vrácen jako aktivni, activeNetwork ju null
 
         }
         return type;

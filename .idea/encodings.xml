@@ -2,10 +2,10 @@
 <project version="4">
   <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/enums/RecordTypeEnum.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/RecordHelper.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/UserHelper.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/model/RecordEntity.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/model/UserEntity.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/service/RecordService.java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/service/UserService.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

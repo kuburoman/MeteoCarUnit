@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.storage.service;
+package cz.meteocar.unit.engine.storage.helper;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -13,7 +13,7 @@ import cz.meteocar.unit.engine.storage.model.UserEntity;
 /**
  * Servisa starající se o ukládání a načítání usera z databáze.
  */
-public class UserService {
+public class UserHelper {
 
     /* Definice obsahu DB tabulky */
     public static final String TABLE_NAME = "meteocar_users";

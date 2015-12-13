@@ -39,7 +39,7 @@ public class OBDService extends Thread {
             "OBD_STATE_CONNECTING",
             "OBD_STATE_RECONNECTING",
             "OBD_STATE_CONNECTED",
-            "OBD_STATE_ERROR" };
+            "OBD_STATE_ERROR"};
 
     // obd error codes - chybové kódy - identifikují k jaké došlo chybě
     public static final int OBD_ERROR_ALL_OK = 0;
@@ -52,7 +52,7 @@ public class OBDService extends Thread {
             "OBD_ERROR_NO_ADAPTER",
             "OBD_ERROR_ADAPTER_ENABLE_FAILED",
             "OBD_ERROR_NO_DEVICE",
-            "OBD_ERROR_DEV_INIT_FAILED" };
+            "OBD_ERROR_DEV_INIT_FAILED"};
 
     // obd event codes - kódy událostí komponenty - co se v komponentě právě stalo
     public static final int OBD_EVENT_ERROR = 10;
@@ -94,7 +94,7 @@ public class OBDService extends Thread {
     /**
      * Vytvoří novou prázdnou službu
      */
-    public OBDService(Context appContext){
+    public OBDService(Context appContext) {
         context = appContext;
 
         // BT
@@ -116,15 +116,15 @@ public class OBDService extends Thread {
     /**
      * Incializuje proměnnou adaptéru pro přístup k BT hardware
      * - tato metoda se volá z kontruktoru, neboť proměnná btAdapter je potřeba i pokud ještě
-     *   neběží hlavní vlákno, např. pro naplnění seznamu pro výběr BT zařízení
+     * neběží hlavní vlákno, např. pro naplnění seznamu pro výběr BT zařízení
      */
-    public void initAdapter(){
+    public void initAdapter() {
 
         // BT adaptér
         btAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // ověříme přítomnost BT adaptéru v zařízení
-        if(btAdapter == null){
+        if (btAdapter == null) {
             AppLog.p(AppLog.LOG_TAG_OBD, "Device bluetooth adapter NOT AVAILABLE");
             lastError = OBD_ERROR_NO_ADAPTER;
             return;
@@ -135,9 +135,10 @@ public class OBDService extends Thread {
 
     /**
      * Zjištění aktuálního stavu služby
+     *
      * @return Stav služby
      */
-    public int getStatus(){
+    public int getStatus() {
         return serviceStatus;
     }
 
@@ -145,8 +146,8 @@ public class OBDService extends Thread {
      * Ověří a zapne BT adaptér asynchronně vůči volajícímu threadu
      * - trvá to dlouho, UI thread nesmí být tak dlouho blokován
      */
-    public void checkAndEnableBluetoothAsynchronously(){
-        (new Runnable(){
+    public void checkAndEnableBluetoothAsynchronously() {
+        (new Runnable() {
             @Override
             public void run() {
                 checkAndEnableBT();
@@ -158,17 +159,17 @@ public class OBDService extends Thread {
     /**
      * Zkontroluje stav BT adaptéru, případně jej zapne
      */
-    private void checkAndEnableBT(){
+    private void checkAndEnableBT() {
 
         // ověříme jestli máme adaptér
-        if(btAdapter == null){
+        if (btAdapter == null) {
             lastError = OBD_ERROR_NO_ADAPTER;
             AppLog.p(AppLog.LOG_TAG_OBD, "btAdapter is NULL");
             return;
         }
 
         // ověříme stav BT adaptéru (vypnut/zapnut)
-        if(!btAdapter.isEnabled()){
+        if (!btAdapter.isEnabled()) {
             //Intent bluetoothEnableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             //bluetoothEnableIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //context.startActivity(bluetoothEnableIntent);
@@ -182,7 +183,7 @@ public class OBDService extends Thread {
         // počkáme až se bt připojí
         boolean waitForAdapter = true;
         int btAdapterState;
-        while(waitForAdapter){
+        while (waitForAdapter) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -191,20 +192,20 @@ public class OBDService extends Thread {
 
             // zkontrolujeme status
             btAdapterState = btAdapter.getState();
-            if(btAdapter.getState() != BluetoothAdapter.STATE_TURNING_ON){
+            if (btAdapter.getState() != BluetoothAdapter.STATE_TURNING_ON) {
                 waitForAdapter = false;
-                AppLog.i(AppLog.LOG_TAG_OBD, "BT loop ended to status: "+btAdapterState);
+                AppLog.i(AppLog.LOG_TAG_OBD, "BT loop ended to status: " + btAdapterState);
             }
         }
-        AppLog.i(AppLog.LOG_TAG_OBD, "BT state after loop: "+btAdapter.getState());
+        AppLog.i(AppLog.LOG_TAG_OBD, "BT state after loop: " + btAdapter.getState());
 
         // nyní by již měl být připojený
-        if(btAdapter.isEnabled()){
+        if (btAdapter.isEnabled()) {
             AppLog.i(AppLog.LOG_TAG_OBD, "BT Adapter is ENABLED");
-        }else{
+        } else {
             lastError = OBD_ERROR_ADAPTER_ENABLE_FAILED;
             AppLog.p(AppLog.LOG_TAG_OBD, "BT Adapter NOT ENABLED");
-            AppLog.p(AppLog.LOG_TAG_OBD, "BT Adapter status: "+btAdapter.getState());
+            AppLog.p(AppLog.LOG_TAG_OBD, "BT Adapter status: " + btAdapter.getState());
             return;
         }
 
@@ -212,25 +213,25 @@ public class OBDService extends Thread {
         // - tj. vyhledávací služba, skenující BT komunikační pásmo na dostupná zařízení
         // - budeme vždy používat spárované zařízení, tedy tuto službu nepotřebujeme
         // - navíc je velmi drahá z hlediska výkonu
-        if(btAdapter.isEnabled()) {
+        if (btAdapter.isEnabled()) {
 
             // příkaz k vypnutí discovery
             btAdapter.cancelDiscovery();
 
-            while (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE ) {
+            while (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE) {
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     // no problem
                 }
-                AppLog.p(AppLog.LOG_TAG_OBD, "BT Discovery state: "+btAdapter.getScanMode());
+                AppLog.p(AppLog.LOG_TAG_OBD, "BT Discovery state: " + btAdapter.getScanMode());
             }
         }
 
         // zkontrolujeme zda byla discovery service vypnuta
-        if(btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE ){
-            AppLog.p(AppLog.LOG_TAG_OBD, "BT Discovery failed to cancel, state: "+btAdapter.getScanMode());
-        }else{
+        if (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE) {
+            AppLog.p(AppLog.LOG_TAG_OBD, "BT Discovery failed to cancel, state: " + btAdapter.getScanMode());
+        } else {
             AppLog.i(AppLog.LOG_TAG_OBD, "BT Discovery OFFLINE");
         }
     }
@@ -238,16 +239,16 @@ public class OBDService extends Thread {
     /**
      * Automaticky zvolí bluetooth zařízení podle názvu
      */
-    private void setBTDevice(){
-        for(BluetoothDevice device : btAdapter.getBondedDevices()){
-            if(device.getName().equals(btDeviceName)){
+    private void setBTDevice() {
+        for (BluetoothDevice device : btAdapter.getBondedDevices()) {
+            if (device.getName().equals(btDeviceName)) {
                 btDevice = device;
-                AppLog.i(AppLog.LOG_TAG_OBD, "OBD BT Device selected: "+btDevice.getName());
+                AppLog.i(AppLog.LOG_TAG_OBD, "OBD BT Device selected: " + btDevice.getName());
             }
         }
 
         // bylo vybráno zařízení?
-        if(btDevice == null){
+        if (btDevice == null) {
             AppLog.i(AppLog.LOG_TAG_OBD, "No OBD BT Device selected!!");
         }
     }
@@ -255,33 +256,35 @@ public class OBDService extends Thread {
 
     /**
      * Vrátí seznam spárovaných BT zařízení nebo null, pokud není Bt adaptér přítomen
+     *
      * @return Spárovaná BT zařízení | null
      */
-    public Set<BluetoothDevice> getBluetoothDevices(){
+    public Set<BluetoothDevice> getBluetoothDevices() {
         return (btAdapter == null) ? null : btAdapter.getBondedDevices();
     }
 
     /**
      * Nastaví, které spárované bluetooth zařízení se má použít
+     *
      * @param index Index cílového zařízení v seznamu všech spárovaných zařízení
      */
-    public void setDeviceIndex(int index){
+    public void setDeviceIndex(int index) {
         btDevice = (BluetoothDevice) btAdapter.getBondedDevices().toArray()[index];
     }
 
     /**
      * Zaznamená do logu všechna spárovaná BT zařízení a jejich adresy
      */
-    public void debugLogBluetoothDevicesList(){
+    public void debugLogBluetoothDevicesList() {
 
         // zaznamená počet spárovaných zařízení
-        AppLog.i(AppLog.LOG_TAG_OBD, "paired devices: "+btAdapter.getBondedDevices().size());
+        AppLog.i(AppLog.LOG_TAG_OBD, "paired devices: " + btAdapter.getBondedDevices().size());
 
         // listujeme spárovaná zařízení
         int index = 0;
         for (BluetoothDevice dev : btAdapter.getBondedDevices()) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "device["+index+"]: "+dev.getName());
-            AppLog.i(AppLog.LOG_TAG_OBD, "device["+index+"]: "+dev.getAddress());
+            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + dev.getName());
+            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + dev.getAddress());
             index++;
         }
     }
@@ -289,7 +292,7 @@ public class OBDService extends Thread {
     /**
      * Počká na ukončen hlavní smyčky a potom ukončí (join-ne:) vlákno
      */
-    public void safelyKillAndJoin(){
+    public void safelyKillAndJoin() {
 
         // nastaví continue flag na false, což by mělo později ukončit cyklus vlákna
         threadRun = false;
@@ -307,12 +310,13 @@ public class OBDService extends Thread {
 
     /**
      * Pokusí se otevřít spojení s BT OBD2 adaptérem
+     *
      * @return True - pokud je spojení vytvořene, jinak False
      */
-    public boolean connect(){
+    public boolean connect() {
 
         // máme BT device, zařízení ke kterému se připojit?
-        if(btDevice == null){
+        if (btDevice == null) {
             // TODO - no device error
             return false;
         }
@@ -336,11 +340,20 @@ public class OBDService extends Thread {
     /**
      * Odpojí aktivní spojení a vymaže proměnné
      */
-    public void disconnectAndCleanup(){
+    public void disconnectAndCleanup() {
         try {
-            if(inStream != null){ inStream.close(); inStream = null; }
-            if(outStream != null){ outStream.close(); outStream = null; }
-            if(btSocket != null){ btSocket.close(); btSocket = null; }
+            if (inStream != null) {
+                inStream.close();
+                inStream = null;
+            }
+            if (outStream != null) {
+                outStream.close();
+                outStream = null;
+            }
+            if (btSocket != null) {
+                btSocket.close();
+                btSocket = null;
+            }
         } catch (IOException e) {
             AppLog.p(AppLog.LOG_TAG_OBD,
                     "IOException while OBD service disconnect");
@@ -350,9 +363,10 @@ public class OBDService extends Thread {
     /**
      * Odešle do OBD zařízení inicializační sekvenci
      * -
+     *
      * @return True - pokud bylo vče ok, False - pokud došlo k chybě
      */
-    private boolean sendInitialOBDSequence(){
+    private boolean sendInitialOBDSequence() {
 
         // vars
         boolean isOK = true;
@@ -361,22 +375,28 @@ public class OBDService extends Thread {
 
         //zahajovací sekvence
         msg = new OBDMessage("ATZ", "ELM327", false);
-        if(msgResolver.sendMessageToDeviceAndReadReply(msg)){
-            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand()+" reply: "+msgResolver.getLastResponse());
-        } else { isOK = false; }
+        if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
+            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " reply: " + msgResolver.getLastResponse());
+        } else {
+            isOK = false;
+        }
         msg = new OBDMessage("ATE0", "OK", false);
-        if(msgResolver.sendMessageToDeviceAndReadReply(msg)){
-            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand()+" reply: "+msgResolver.getLastResponse());
-        } else { isOK = false; }
+        if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
+            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " reply: " + msgResolver.getLastResponse());
+        } else {
+            isOK = false;
+        }
         msg = new OBDMessage("ATSP0", "OK", false);
-        if(msgResolver.sendMessageToDeviceAndReadReply(msg)){
-            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand()+" reply: "+msgResolver.getLastResponse());
-        } else { isOK = false; }
+        if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
+            AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " reply: " + msgResolver.getLastResponse());
+        } else {
+            isOK = false;
+        }
 
         // handling chybového stavu
-        if(!isOK){
+        if (!isOK) {
             AppLog.p(AppLog.LOG_TAG_OBD, "OBD Initial sequence FAILED");
-        }else{
+        } else {
             AppLog.p(AppLog.LOG_TAG_OBD, "OBD Initial sequence OK");
         }
 
@@ -396,21 +416,21 @@ public class OBDService extends Thread {
     /**
      * Běží služba?
      */
-    public boolean isRunning(){
+    public boolean isRunning() {
         return threadRun;
     }
 
     /**
      * Byla služba ukončena?
      */
-    public boolean isFinalized(){
+    public boolean isFinalized() {
         return threadFinalized;
     }
 
     /**
      * Ukončí thread bezpečně
      */
-    public void exit(){
+    public void exit() {
         threadRun = false;
     }
 
@@ -434,16 +454,16 @@ public class OBDService extends Thread {
 
         // otevře spojení
         threadRun = connect();
-        if(threadRun){
+        if (threadRun) {
             AppLog.i(AppLog.LOG_TAG_OBD, "AppConnected OK");
-        }else{
+        } else {
             AppLog.p(AppLog.LOG_TAG_OBD, "Connection FAILED");
             threadFinalized = true;
             return;
         }
 
         //zahajovací sekvence
-        if(sendInitialOBDSequence()){
+        if (sendInitialOBDSequence()) {
             setStatusAndFireEvent(OBD_STATE_CONNECTED);
         }
 
@@ -451,23 +471,23 @@ public class OBDService extends Thread {
         initPIDQueue();
 
         // hlavní cyklus
-        while(threadRun){
+        while (threadRun) {
             try {
 
                 // je vyžadováno opětovné připojení?
-                if(reconnectNeeded){
+                if (reconnectNeeded) {
 
                     // nastavíme status
                     setStatusAndFireEvent(OBD_STATE_RECONNECTING);
 
                     //zahajovací sekvence
-                    if(sendInitialOBDSequence()){
+                    if (sendInitialOBDSequence()) {
 
                         // připojení v pořádku
                         setStatusAndFireEvent(OBD_STATE_CONNECTED);
                         reconnectNeeded = false;
 
-                    }else{
+                    } else {
 
                         // připojení selhalo
                         Thread.sleep(1000);
@@ -476,15 +496,14 @@ public class OBDService extends Thread {
                 }
 
                 // zpracujeme celou frontu
-                for(OBDMessage msg : queue){
+                for (OBDMessage msg : queue) {
 
                     // odešleme obd zprávu
-                    if(msgResolver.sendMessageToDeviceAndReadReply(msg)){
-                        AppLog.i(AppLog.LOG_TAG_OBD,
-                               msg.getCommand()+" value: "+msgResolver.getLastInterpretedValue());
+                    if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
+                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value: " + msgResolver.getLastInterpretedValue());
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
-                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand()+" value not received :(");
+                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");
                         firePIDEvent(msg, -5.0, msgResolver.getLastResponse());
                     }
                 }
@@ -509,16 +528,16 @@ public class OBDService extends Thread {
     /**
      * Inicializuje frontu PID kódů
      */
-    private void initPIDQueue(){
+    private void initPIDQueue() {
 
         // přidáme všechny aktivní z DB
-        for(ObdPidObject pid : ObdPidObject.getAllActive()){
+        for (ObdPidObject pid : ObdPidObject.getAllActive()) {
             queue.add(new OBDMessage(
-                pid.getPidCode(),
-                pid.getFormula(),
-                pid.getId(),
-                pid.getTag(),
-                pid.getName()
+                    pid.getPidCode(),
+                    pid.getFormula(),
+                    pid.getId(),
+                    pid.getTag(),
+                    pid.getName()
             ));
         }
 
@@ -549,29 +568,32 @@ public class OBDService extends Thread {
     /**
      * Metoda pro snadné nastavení nového stavu služby
      * - zároven pošle event na bus
+     *
      * @param newStatus Kód nového stavu
      */
-    private void setStatusAndFireEvent(int newStatus){
+    private void setStatusAndFireEvent(int newStatus) {
         serviceStatus = newStatus;
         fireStatusEvent(newStatus, OBD_STATE_TEXTS[serviceStatus]);
     }
 
     /**
      * Odešle pid event na bus
-     * @param msg Objekt PID dotazu
+     *
+     * @param msg   Objekt PID dotazu
      * @param value Naměřená hodnota
      */
-    private void firePIDEvent(OBDMessage msg, double value, String rawResponse){
+    private void firePIDEvent(OBDMessage msg, double value, String rawResponse) {
         ServiceManager.getInstance().eventBus.post(new OBDEventPID(msg, value, rawResponse)).asynchronously();
     }
 
     /**
      * Odešle status event na bus
      * - updatuje stav služby, měl by tedý být odesílám pokaždé kdy se stav služby mění
+     *
      * @param statusCode Nový kód stavu služby
-     * @param txt Text popisující nový stav (pro účely ladění)
+     * @param txt        Text popisující nový stav (pro účely ladění)
      */
-    private void fireStatusEvent(int statusCode, String txt){
+    private void fireStatusEvent(int statusCode, String txt) {
         ServiceManager.getInstance().eventBus.post(new OBDEventStatus(statusCode, txt)).asynchronously();
     }
 
@@ -579,22 +601,26 @@ public class OBDService extends Thread {
      * Vnitřní třída představující změnu hodnoty sledovaného ukazatele PID
      * - např. informuje o nové rychlosti vozidla
      */
-    public static class OBDEventPID extends ServiceManager.AppEvent{
+    public static class OBDEventPID extends ServiceManager.AppEvent {
         private OBDMessage msg;
         private double value;
         private String rawResponse;
+
         public OBDEventPID(OBDMessage msg, double val, String rawResp) {
             this.msg = msg;
             this.value = val;
             this.rawResponse = rawResp;
             rawResponse = rawResp;
         }
+
         public OBDMessage getMessage() {
             return msg;
         }
+
         public double getValue() {
             return value;
         }
+
         public String getRawResponse() {
             return rawResponse;
         }
@@ -608,15 +634,19 @@ public class OBDService extends Thread {
     /**
      * Vnitřní třída představující změnu stavu služby
      */
-    public static class OBDEventStatus extends ServiceManager.AppEvent{
+    public static class OBDEventStatus extends ServiceManager.AppEvent {
         private int statusCode;
         private String statusText;
+
         public OBDEventStatus(int statCode, String statText) {
-            statusCode = statCode; statusText = statText;
+            statusCode = statCode;
+            statusText = statText;
         }
+
         public int getStatusCode() {
             return statusCode;
         }
+
         public String getStatusText() {
             return statusText;
         }

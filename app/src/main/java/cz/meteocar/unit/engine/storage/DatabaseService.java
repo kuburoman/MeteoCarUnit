@@ -6,6 +6,7 @@ import android.location.Location;
 
 import net.engio.mbassy.listener.Handler;
 
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -15,8 +16,10 @@ import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
-import cz.meteocar.unit.engine.storage.model.RecordEntity;
-import cz.meteocar.unit.engine.storage.service.RecordService;
+import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
+import cz.meteocar.unit.engine.storage.helper.RecordHelper;
+import cz.meteocar.unit.engine.storage.helper.TripHelper;
+import cz.meteocar.unit.engine.storage.helper.UserHelper;
 
 /**
  * Created by Toms, 2014.
@@ -44,6 +47,9 @@ public class DatabaseService extends Thread {
 
         // helper
         helper = DB.helper = new DatabaseHelper(ctx);
+        DB.tripHelper = new TripHelper();
+        DB.recordHelper = new RecordHelper();
+        DB.userHelper = new UserHelper();
 
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
@@ -202,7 +208,7 @@ public class DatabaseService extends Thread {
     public void storeTripMessage(ServiceManager.AppEvent evt){
 
         // delegujeme na helper
-        helper.storeTripMessage(evt);
+        DB.recordHelper.save(evt);
 
         // nový počet záznam
         // - nikde jej nepoužívám, je výhodnější používat odhad
@@ -238,6 +244,7 @@ public class DatabaseService extends Thread {
                     AppLog.p(AppLog.LOG_TAG_DB, "Exception while reading msg from queue!");
                 }
             }else{
+
                 try{
                     this.wait();
                 } catch(Exception e){

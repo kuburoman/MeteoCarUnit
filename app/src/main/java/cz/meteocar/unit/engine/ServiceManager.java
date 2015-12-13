@@ -10,6 +10,7 @@ import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.storage.ConvertService;
 import cz.meteocar.unit.engine.storage.DatabaseService;
 import cz.meteocar.unit.engine.video.VideoService;
 
@@ -39,6 +40,7 @@ public class ServiceManager {
     public NetworkService network;
     public AccelService accel;
     public VideoService video;
+    public ConvertService convert;
 
     // bus
     public MBassador<AppEvent> eventBus;
@@ -62,6 +64,7 @@ public class ServiceManager {
         network = new NetworkService(context);
         accel = new AccelService(context);
         video = new VideoService();
+        convert = new ConvertService();
     }
 
     /**
@@ -75,6 +78,7 @@ public class ServiceManager {
         obd.exit();
         db.exit();
         network.exit();
+        convert.exit();
 
         // teď jen voláme na jejich vláknech joiny
         try{clock.join(500);      }catch(InterruptedException e){ /*nevadí*/}
@@ -88,7 +92,8 @@ public class ServiceManager {
         obd = null;
         db = null;
         network = null;
-        network = null;
+        convert = null;
+
     }
 
     /**
