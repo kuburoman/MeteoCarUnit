@@ -31,9 +31,12 @@ public class ConvertService extends Thread {
         threadRun = false;
     }
 
-    public JSONObject createJsonTrip(String userId, List<RecordEntity> recordList) throws JSONException {
+    public JSONObject createJsonTrip(List<RecordEntity> recordList) throws JSONException {
 
         JSONArray jsonArray = new JSONArray();
+
+        String userName = recordList.get(0).getUserName();
+        String tripId = recordList.get(0).getTripId();
 
         for (RecordEntity recordEntity : recordList) {
             JSONObject object = new JSONObject();
@@ -48,10 +51,10 @@ public class ConvertService extends Thread {
 
 
         JSONObject main = new JSONObject();
-        main.put("boardUnitId", "1");
+        main.put("boardUnitId", "android2");
         main.put("secretKey","Ninjahash");
-        main.put("trip", "hash19");
-        main.put("user", userId);
+        main.put("trip", tripId);
+        main.put("user", userName);
         main.put("records", jsonArray);
 
         return main;
@@ -66,7 +69,7 @@ public class ConvertService extends Thread {
                 if (entityList.size() < 1){
                     break;
                 }
-                JSONObject jsonTrip = createJsonTrip(userId, entityList);
+                JSONObject jsonTrip = createJsonTrip(entityList);
 
                 DB.tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
 
@@ -76,6 +79,7 @@ public class ConvertService extends Thread {
                 }
 
                 DB.recordHelper.deleteRecords(integers);
+                AppLog.i(AppLog.LOG_TAG_DB, "Successful creation of trip");
             }
 
         }
@@ -91,11 +95,10 @@ public class ConvertService extends Thread {
             while (threadRun) {
                 if (DB.recordHelper.getNumberOfRecord() > 0) {
                     createJsonRecords();
-
                 } else {
 
                     try {
-                        this.wait(60000);
+                        this.sleep(60000);
                     } catch (Exception e) {
                         // nevadí
                     }

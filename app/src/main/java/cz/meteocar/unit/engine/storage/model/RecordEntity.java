@@ -7,7 +7,7 @@ public class RecordEntity {
 
     private int id;
     private long time;
-    private String userId;
+    private String userName;
     private String tripId;
     private String type;
     private String json;
@@ -28,12 +28,12 @@ public class RecordEntity {
         this.time = time;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
     public String getTripId() {

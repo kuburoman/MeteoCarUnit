@@ -31,6 +31,8 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.NetworkRequestResultEnum;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.event.PostTripRecordsResultEvent;
+import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.model.TripEntity;
 
 /**
  * Created by Toms, 2014.
@@ -44,8 +46,8 @@ public class NetworkService extends Thread {
     public static final int STATUS_UNKNOWN = 3;
 
     // upload
-    public static final String baseURL = "http://www.jezdito.cz/api/";
-    public static final String dataURL = "data";
+    public static final String baseURL = "http://192.168.0.10:9000/";
+    public static final String dataURL = "data/accept";
 
     // thread
     private boolean threadRun = true;
@@ -72,31 +74,6 @@ public class NetworkService extends Thread {
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
         start();
-    }
-
-    public void postTripRecords(PostTripRecord postTripRecord) {
-        try {
-            HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost("REST API url");
-            post.setHeader("Accept", "application/json");
-            post.setHeader("Content-type", "application/json");
-
-            post.setEntity(new StringEntity(postTripRecord.getTripRecordsJson().toString(), "UTF-8"));
-
-            HttpResponse response = client.execute(post);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords successful");
-                PostTripRecordsResultEvent event = new PostTripRecordsResultEvent(NetworkRequestResultEnum.OK, postTripRecord.getTripRecordIds());
-                ServiceManager.getInstance().eventBus.post(event).asynchronously();
-            }else{
-                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords failed");
-                PostTripRecordsResultEvent event = new PostTripRecordsResultEvent(NetworkRequestResultEnum.OK, postTripRecord.getTripRecordIds());
-                ServiceManager.getInstance().eventBus.post(event).asynchronously();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
 
@@ -205,7 +182,7 @@ public class NetworkService extends Thread {
 
                     // usneme na půl vteřiny, bez internetu stejně nemůžeme probíhat jiná komunikace
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (Exception e) {
                         // no problem, pravděpodobně přišel nový požadavek na service
                         // a ten náš thread probudil
@@ -220,14 +197,53 @@ public class NetworkService extends Thread {
                     continue;
                 }
 
+                sendTripsToServer();
+
                 AppLog.i("Server thread will wait");
-                this.wait();
+                this.wait(60000);
             }
         } catch (Exception ex) {
             //
         }
     }
 
+    private void sendTripsToServer(){
+
+        while(DB.tripHelper.getNumberOfRecord() > 0){
+            TripEntity oneTrip = DB.tripHelper.getOneTrip();
+            if(postTripRecords(oneTrip)){
+                DB.tripHelper.delete(oneTrip.getId());
+            }else{
+                return;
+            }
+
+        }
+
+    }
+
+    public boolean postTripRecords(TripEntity postTripRecord) {
+        try {
+            HttpClient client = new DefaultHttpClient();
+            HttpPost post = new HttpPost(baseURL+dataURL);
+            post.setHeader("Accept", "application/json");
+            post.setHeader("Content-type", "application/json");
+
+            post.setEntity(new StringEntity(postTripRecord.getJson().toString(), "UTF-8"));
+
+            HttpResponse response = client.execute(post);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords successful");
+                return true;
+            }else{
+                AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords failed");
+                return false;
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Událost - načtení odpovědi na JSON požadavek

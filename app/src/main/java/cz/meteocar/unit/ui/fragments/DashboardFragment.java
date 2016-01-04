@@ -279,25 +279,4 @@ public class DashboardFragment extends Fragment {
         getView().postInvalidate();
     }
 
-    private double maxG = 0;
-
-    @Handler
-    public void handleAccelEvent(AccelService.AccelEvent evt){
-        //line7db = "DB count: "+evt.getCount();
-        // postInvalidate();
-
-        // zaokrouhlení
-        double value = Math.round(evt.getValue() * 100);
-        value = value / 100.0;
-
-        /*debugText.setText(
-            "Accel: "+value+"\n"+
-            "Max: "+maxG
-        );*/
-
-        // uložíme max hodnotu
-        if(value > maxG){
-            maxG = value;
-        }
-    }
 }

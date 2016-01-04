@@ -6,7 +6,6 @@ import android.location.Location;
 
 import net.engio.mbassy.listener.Handler;
 
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -75,6 +74,8 @@ public class DatabaseService extends Thread {
     private long tripStop; public long getTripStop(){ return tripStop; }
     private Location gpsLastLocation;
     private OBDService.OBDEventPID obdLastEvent;
+    private String userName;
+    private String tripId;
 
     /**
      * Mají být jízdní události zaznamenány
@@ -96,6 +97,8 @@ public class DatabaseService extends Thread {
         AppLog.i(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
         tripStart = System.currentTimeMillis();
+        userName = String.valueOf(DB.userHelper.getLoggedUser().getUsername());
+        tripId = String.valueOf(System.currentTimeMillis());
     }
 
     /**
@@ -145,7 +148,9 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleLocationUpdate(ServiceGPS.GPSPositionEvent evt){
-        //AppLog.i(AppLog.LOG_TAG_GPS, "DB got GPS event");
+
+        if(!tripRecordEnabled){ return; }
+
         queue.add(evt);
     }
 
@@ -169,7 +174,9 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleAccelEvent(AccelService.AccelEvent evt){
-        //AppLog.i(AppLog.LOG_TAG_GPS, "DB got GPS event");
+
+        if(!tripRecordEnabled){ return; }
+
         queue.add(evt);
     }
 
@@ -208,6 +215,9 @@ public class DatabaseService extends Thread {
      * @param evt Příchozí událost
      */
     public void storeTripMessage(ServiceManager.AppEvent evt){
+
+        evt.setUserId(userName);
+        evt.setTripId(tripId);
 
         // delegujeme na helper
         DB.recordHelper.save(evt);

@@ -36,7 +36,7 @@ public class UserHelper {
             COLUMN_NAME_USERNAME + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_PASSWORD + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_LOGGED + ") VALUES(" +
-            "1, 'Franta', 'Franta147', 1)";
+            "1, 'Johny', 'root', 0)";
 
     /* SQL statement pro smazání tabulky */
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
@@ -175,6 +175,31 @@ public class UserHelper {
 
         // nastavíme kurzor k požadovanému řádku
         Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ? and " + COLUMN_NAME_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
+
+        // pokud máme výsledek zkopírujeme hodnoty
+        ContentValues values = new ContentValues();
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+
+            // přečeteme hodnoty a vrátíme
+            UserEntity obj = new UserEntity();
+            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
+            obj.setUsername(c.getString(c.getColumnIndex(COLUMN_NAME_USERNAME)));
+            obj.setPassword(c.getString(c.getColumnIndex(COLUMN_NAME_PASSWORD)));
+            obj.setLogged(c.getInt(c.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
+            return obj;
+
+        } else {
+            return null;
+        }
+    }
+
+    public UserEntity getLoggedUser() {
+        // otevřeme DB
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+
+        // nastavíme kurzor k požadovanému řádku
+        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null, "1");
 
         // pokud máme výsledek zkopírujeme hodnoty
         ContentValues values = new ContentValues();

@@ -37,6 +37,7 @@ public class AppLog {
     public static final String LOG_TAG_GPS = "GPS";
     public static final String LOG_TAG_UI = "UI";
     public static final String LOG_TAG_VIDEO = "VID";
+    public static final String LOG_TAG_ACC = "ACC";
 
     // nastavení
     public boolean useAndroidLog = true;
@@ -48,10 +49,6 @@ public class AppLog {
         if(tag == null){
             tag = LOG_TAG_DEFAULT;
         }
-
-        // povolení / zakázání
-        //if(tag.equals(LOG_TAG_GPS)){return;}
-        //if(tag.equals(LOG_TAG_DB)){return;}
 
         // log do android konzole
         if(useAndroidLog){

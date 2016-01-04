@@ -120,6 +120,9 @@ public class ServiceManager {
         public static final int EVENT_DB = 9;
         public static final int EVENT_NETWORK = 10;
 
+        private String userId;
+        private String tripId;
+
         /**
          * Čas vytvoření eventu
          */
@@ -145,5 +148,22 @@ public class ServiceManager {
          * @return Typ eventu
          */
         abstract public int getType();
+
+        public String getUserId() {
+            return userId;
+        }
+
+        public void setUserId(String userId) {
+            this.userId = userId;
+        }
+
+        public String getTripId() {
+            return tripId;
+        }
+
+        public void setTripId(String tripId) {
+            this.tripId = tripId;
+        }
+
     }
 }

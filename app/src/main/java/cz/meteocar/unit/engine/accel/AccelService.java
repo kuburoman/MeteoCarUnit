@@ -14,7 +14,9 @@ import cz.meteocar.unit.engine.log.AppLog;
  */
 public class AccelService implements SensorEventListener {
 
-    public AccelService(Context ctx){
+    MeanFilterSmoothing filter;
+
+    public AccelService(Context ctx) {
         init(ctx);
     }
 
@@ -24,13 +26,19 @@ public class AccelService implements SensorEventListener {
         SensorManager sensorManager = (SensorManager) ctx.getSystemService(Context.SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        filter = new MeanFilterSmoothing();
     }
 
-    private int counter = 0;
-    private final int SUM_COUNT = 5;
-    double xSum = 0;
-    double ySum = 0;
-    double zSum = 0;
+    private long frequency = 200;
+    private int count = 0;
+
+    float xSum = 0;
+    float ySum = 0;
+    float zSum = 0;
+
+    long newTime = 0;
+    long oldTime = 0;
+
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -42,55 +50,34 @@ public class AccelService implements SensorEventListener {
             double y = sensorEvent.values[1];
             double z = sensorEvent.values[2];
 
-            // spočítáme celkové přetížení
-            double totalG = Math.sqrt(
-                    Math.pow(x, 2) +
-                            Math.pow(y, 2) +
-                            Math.pow(z, 2)
-            );
-
-            // velká rána, odešleme hned event
-            if(totalG > 40){
-
-                // odešleme událost
-                ServiceManager.getInstance().eventBus.post(
-                        new AccelEvent(x,y,z, totalG)
-                ).asynchronously();
-
-                AppLog.i(null, "Accel BIG CRUSH");
-                return;
-
-            }
+            newTime = System.currentTimeMillis();
 
             // přičteme hodnoty
             xSum += x;
             ySum += y;
             zSum += z;
-            counter++;
+            count++;
+
 
             // jednou za čas pošleme vyhlazený event
-            if(counter >= SUM_COUNT){
-                xSum /= SUM_COUNT;
-                ySum /= SUM_COUNT;
-                zSum /= SUM_COUNT;
+            if (newTime - oldTime >= frequency) {
+                xSum /= count;
+                ySum /= count;
+                zSum /= count;
 
-                double avgTotalG = Math.sqrt(
-                        Math.pow(xSum, 2) +
-                                Math.pow(ySum, 2) +
-                                Math.pow(zSum, 2)
-                );
+                float[] floats = filter.addSamples(new float[]{xSum,ySum,zSum});
 
                 // odešleme událost
                 ServiceManager.getInstance().eventBus.post(
-                        new AccelEvent(xSum,ySum,zSum, avgTotalG)
+                        new AccelEvent(floats[0], floats[1], floats[2])
                 ).asynchronously();
-               // AppLog.i(null, "Accel avg event: "+avgTotalG);
 
                 // vymažeme prům. hodnoty
                 xSum = 0;
                 ySum = 0;
                 zSum = 0;
-                counter = 0;
+                count = 0;
+                oldTime = newTime;
             }
         }
     }
@@ -103,25 +90,28 @@ public class AccelService implements SensorEventListener {
     /**
      * Událost akcelerometru
      */
-    public static class AccelEvent extends ServiceManager.AppEvent{
-        private double value;
+    public static class AccelEvent extends ServiceManager.AppEvent {
         private double x;
         private double y;
         private double z;
-        public AccelEvent(double x, double y, double z, double value) {
+
+        public AccelEvent(double x, double y, double z) {
             this.x = x;
             this.y = y;
             this.z = z;
-            this.value = value;
         }
-        public double getValue() {
-            return value;
-        }
+
         public double getX() {
             return x;
         }
-        public double getY() { return y; }
-        public double getZ() { return z; }
+
+        public double getY() {
+            return y;
+        }
+
+        public double getZ() {
+            return z;
+        }
 
 
         @Override

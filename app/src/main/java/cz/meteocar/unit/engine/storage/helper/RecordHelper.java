@@ -71,7 +71,9 @@ public class RecordHelper {
 
                 obj = new RecordEntity();
                 obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setTime(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_TIME)));
+                obj.setTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_TIME)));
+                obj.setTripId(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
+                obj.setUserName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
                 obj.setType(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TYPE)));
                 obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
                 arr.add(obj);
@@ -99,6 +101,8 @@ public class RecordHelper {
         // nastavíme hodnoty
         values.put(COLUMN_NAME_TIME, obj.getTime());
         values.put(COLUMN_NAME_TYPE, obj.getType());
+        values.put(COLUMN_NAME_USER_ID, obj.getUserName());
+        values.put(COLUMN_NAME_TRIP_ID, obj.getTripId());
         values.put(COLUMN_NAME_JSON, obj.getJson());
 
         // db
@@ -134,9 +138,9 @@ public class RecordHelper {
 
             RecordEntity obj = new RecordEntity();
             obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setTime(c.getInt(c.getColumnIndex(COLUMN_NAME_TIME)));
+            obj.setTime(c.getLong(c.getColumnIndex(COLUMN_NAME_TIME)));
             obj.setTripId(c.getString(c.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-            obj.setUserId(c.getString(c.getColumnIndex(COLUMN_NAME_USER_ID)));
+            obj.setUserName(c.getString(c.getColumnIndex(COLUMN_NAME_USER_ID)));
             obj.setType(c.getString(c.getColumnIndex(COLUMN_NAME_TYPE)));
             obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
             return obj;
@@ -160,9 +164,9 @@ public class RecordHelper {
 
                 obj = new RecordEntity();
                 obj.setId(cs.getInt(cs.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setTime(cs.getInt(cs.getColumnIndex(COLUMN_NAME_TIME)));
+                obj.setTime(cs.getLong(cs.getColumnIndex(COLUMN_NAME_TIME)));
                 obj.setTripId(cs.getString(cs.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-                obj.setUserId(cs.getString(cs.getColumnIndex(COLUMN_NAME_USER_ID)));
+                obj.setUserName(cs.getString(cs.getColumnIndex(COLUMN_NAME_USER_ID)));
                 obj.setType(cs.getString(cs.getColumnIndex(COLUMN_NAME_TYPE)));
                 obj.setJson(cs.getString(cs.getColumnIndex(COLUMN_NAME_JSON)));
                 arr.add(obj);
@@ -250,6 +254,9 @@ public class RecordHelper {
 
         // vložíme rovnou čas
         obj.setTime(evt.getTimeCreated());
+        obj.setUserName(evt.getUserId());
+        obj.setTripId(evt.getTripId());
+
 
         // připravíme JSON objekt na data
         JSONObject jsonObj = new JSONObject();
@@ -272,16 +279,18 @@ public class RecordHelper {
             double k = 1000.0;
             try {
                 jsonObj.put("lat", m * loc.getLatitude());
-                jsonObj.put("long", m * loc.getLongitude());
+                jsonObj.put("lng", m * loc.getLongitude());
                 jsonObj.put("alt", loc.getAltitude());
                 jsonObj.put("acc", loc.getAccuracy());
-                jsonObj.put("speed", 3.6 * loc.getSpeed());
+            // TODO - Až bude přidaná rychlost odkomentovat
+            //  jsonObj.put("speed", 3.6 * loc.getSpeed());
             } catch (Exception e) {
                 AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding GPS event data to JSON object");
             }
 
             // přidáme JSON objekt do DB záznamu
             obj.setJson(jsonObj.toString());
+
 
             // inkremetujeme
             ServiceManager.getInstance().db.incrementGpsDistance(loc);
@@ -330,7 +339,7 @@ public class RecordHelper {
                 jsonObj.put("x", accelEvent.getX());
                 jsonObj.put("y", accelEvent.getY());
                 jsonObj.put("z", accelEvent.getZ());
-                jsonObj.put("total", accelEvent.getValue());
+//                jsonObj.put("total", accelEvent.getValue());
             } catch (Exception e) {
                 AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
             }

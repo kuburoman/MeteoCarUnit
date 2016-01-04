@@ -119,6 +119,24 @@ public class TripHelper {
         }
     }
 
+    public TripEntity getOneTrip(){
+
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null, "1");
+
+        if(c.getCount() > 0){
+            c.moveToFirst();
+
+            TripEntity obj = new TripEntity();
+            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
+            obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
+            return obj;
+
+        }else{
+            return null;
+        }
+    }
     /**
      * Vrati pocet radku tabulky
      * @return Pocet radku
@@ -141,6 +159,11 @@ public class TripHelper {
     public void deleteAllRecords(){
         SQLiteDatabase db = DB.helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
+    }
+
+    public void delete(int id){
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        db.delete(TABLE_NAME, "id = ?", new String[]{"" + id});
     }
 
 }

@@ -71,7 +71,7 @@ public class LoginActivity extends Activity {
 
         // dialogy
         initWarningDialog();
-        initNoInternetDialog();
+//        initNoInternetDialog();
 
         // registrace na bus
         ServiceManager.getInstance().eventBus.subscribe(this);
@@ -295,29 +295,29 @@ public class LoginActivity extends Activity {
             }
         });*/
 
-        runOnUiThread(new Runnable() {
-            public void run() {
-                AppLog.i(null, "Network conn type: " + evt.getConnectionType());
-                AppLog.i(null, "Network isConn?: " + evt.isConnected());
-
-
-                // jsme připojeni?
-                if (!evt.isConnected()) {
-
-                    // ovetevřeme dialog
-                    AppLog.i(null, "Network dialog show");
-                    dialogNoInternet.show();
-                } else {
-
-                    // uzavřeme dialog, pokud je otevřený
-                    if (dialogNoInternet.isShowing()) {
-                        AppLog.i(null, "Network dialog cancel");
-                        dialogNoInternet.cancel();
-                    }
-
-                }
-            }
-        });
+//        runOnUiThread(new Runnable() {
+//            public void run() {
+//                AppLog.i(null, "Network conn type: " + evt.getConnectionType());
+//                AppLog.i(null, "Network isConn?: " + evt.isConnected());
+//
+//
+//                // jsme připojeni?
+//                if (!evt.isConnected()) {
+//
+//                    // ovetevřeme dialog
+//                    AppLog.i(null, "Network dialog show");
+//                    dialogNoInternet.show();
+//                } else {
+//
+//                    // uzavřeme dialog, pokud je otevřený
+//                    if (dialogNoInternet.isShowing()) {
+//                        AppLog.i(null, "Network dialog cancel");
+//                        dialogNoInternet.cancel();
+//                    }
+//
+//                }
+//            }
+//        });
     }
 
 
