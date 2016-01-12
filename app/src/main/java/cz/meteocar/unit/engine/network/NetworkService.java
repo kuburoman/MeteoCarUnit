@@ -46,12 +46,14 @@ public class NetworkService extends Thread {
     public static final int STATUS_UNKNOWN = 3;
 
     // upload
-    public static final String baseURL = "http://192.168.0.10:9000/";
-    public static final String dataURL = "data/accept";
+    public static final String baseURL = "http://";
+    public static final String dataURL = "/data/accept";
 
     // thread
     private boolean threadRun = true;
     private Context context;
+
+    private String address;
 
     // proměnné pro sledování stavu připojování
     private boolean checkConnectingStatusFlag;
@@ -73,11 +75,15 @@ public class NetworkService extends Thread {
         context = ctx;
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
+        address = DB.get().getString("networkAddress", "meteocar.herokuapp.com");
         start();
     }
 
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-    // ---------- Bezpečnost ---------------------------------------------------------------------
+// ---------- Bezpečnost ---------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
     private int userID;
@@ -224,7 +230,7 @@ public class NetworkService extends Thread {
     public boolean postTripRecords(TripEntity postTripRecord) {
         try {
             HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(baseURL+dataURL);
+            HttpPost post = new HttpPost(baseURL+address+dataURL);
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-type", "application/json");
 

@@ -310,7 +310,7 @@ public class RecordHelper {
             // přidáme hodnotu jako json
             try {
                 canWrite = true;
-                jsonObj.put(obdEvent.getMessage().getTag(), obdEvent.getValue());
+                jsonObj.put("value", obdEvent.getValue());
             } catch (Exception e) {
                 AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
             }

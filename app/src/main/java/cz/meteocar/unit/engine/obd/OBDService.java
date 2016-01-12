@@ -501,7 +501,7 @@ public class OBDService extends Thread {
 
                     // odešleme obd zprávu
                     if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
-                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value: " + msgResolver.getLastInterpretedValue());
+//                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value: " + msgResolver.getLastInterpretedValue());
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
                         AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");

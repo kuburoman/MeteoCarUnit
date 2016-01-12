@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Název aplikace  -->
-    <string name="app_name">Jezdíto.cz</string>
+    <string name="app_name">Meteocar</string>
     <string name="app_menu_title">menu</string>
     <string name="app_login_title">Přihlášení</string>
 
@@ -11,10 +11,10 @@
 
     <!-- Login - internet -->
     <string name="login_title">PŘIHLAŠTE SE</string>
-    <string name="login_email_hint">jan.novak@seznam.cz</string>
+    <string name="login_email_hint">username</string>
     <string name="login_password_hint">heslo</string>
     <string name="login_ok_button_text">Přihlásit</string>
-    <string name="login_note">Pokud ještě nemáte účet, registrovat se můžete na <a href="http://www.jezdito.cz">jezdito.cz</a></string>
+    <string name="login_note"></string>
 
     <!-- Login - internet -->
     <string name="login_net_offline"><![CDATA[
@@ -89,6 +89,8 @@
     <string name="settings_obd_enabled_summary">Povolte nebo zakažte použit bluetooth OBD adaptéru</string>
     <string name="settings_obd_devices">OBD Zařízení</string>
     <string name="settings_obd_devices_none">Žádné zařízení nevybráno</string>
+
+    <string name="settings_network_settings">OBD Nastavení sítě</string>
 
     <!-- Nastavení - OBD PIDs -->
     <string name="settings_obd_pids_title">OBD PID příkazy</string>

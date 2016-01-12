@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -35,7 +36,7 @@ import cz.meteocar.unit.engine.storage.model.ObdPidObject;
  * Created by Toms, 2014.
  */
 public class SettingsActivity extends PreferenceActivity
-        implements SharedPreferences.OnSharedPreferenceChangeListener{
+        implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     // id políček nastavení - pozor, musí se shodovat s těmi v příslušném XML (my_settings.xml)
     public static final String SETTINGS_ID_OBD_ENABLED = "checkbox_obd_enabled";
@@ -43,17 +44,18 @@ public class SettingsActivity extends PreferenceActivity
     public static final String SETTINGS_ID_GPS_ENABLED = "checkbox_gps_enabled";
     public static final String SETTINGS_ID_GPS_LIST = "button_gps_list";
     public static final String SETTINGS_ID_OBD_PID_CAT = "button_obd_pids_category";
+    public static final String NETWORK_ADDRESS = "network_address";
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
     private CheckBoxPreference gpsCheckBox;
+    private EditTextPreference networkEditText;
 
     @Override
     public void onContentChanged() {
         super.onContentChanged();
         AppLog.i("S changed");
     }
-
 
 
     @Override
@@ -82,8 +84,12 @@ public class SettingsActivity extends PreferenceActivity
                 UserController.SETTINGS_KEY_OBD_IS_ENABLED, false);
         obdCheckBox.setChecked(obdEnabled);
 
+        networkEditText = (EditTextPreference) findPreference(NETWORK_ADDRESS);
+        networkEditText.setText(DB.get().getString("networkAddress", "meteocar.herokuapp.com"));
+
+
         // načteme do listu obd zařízení data, pokud je OBD povoleno, jinak zakážeme
-        if(obdEnabled) {
+        if (obdEnabled) {
             setListPreferenceData(obdList);
             obdList.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -92,7 +98,7 @@ public class SettingsActivity extends PreferenceActivity
                     return false;
                 }
             });
-        }else{
+        } else {
             obdList.setEnabled(false);
         }
 
@@ -116,8 +122,9 @@ public class SettingsActivity extends PreferenceActivity
     /**
      * Handler kliknutí na položku v celé hierarchii nastavení
      * - použijeme k vytvoření menu
+     *
      * @param preferenceScreen Aktuální preference screen
-     * @param preference Preference na kterou bylo kliknuto
+     * @param preference       Preference na kterou bylo kliknuto
      * @return
      */
     @Override
@@ -129,12 +136,20 @@ public class SettingsActivity extends PreferenceActivity
         //invalidateOptionsMenu();
 
         // nemáme již inicializováno?
-        if(obdPidScreenOptionsInitialized){return false;}
+        if (obdPidScreenOptionsInitialized) {
+            return false;
+        }
 
         // menu budeme vytvářet jen pro obrazovku s PIDy
-        if(preference == null){return false;}
-        if(preference.getKey() == null){return false;}
-        if(!preference.getKey().equals(SETTINGS_ID_OBD_PID_CAT)){return false;}
+        if (preference == null) {
+            return false;
+        }
+        if (preference.getKey() == null) {
+            return false;
+        }
+        if (!preference.getKey().equals(SETTINGS_ID_OBD_PID_CAT)) {
+            return false;
+        }
 
         // vycastujeme preference na screen (bezpečné - známe key)
         PreferenceScreen myScreen = (PreferenceScreen) preference;
@@ -150,8 +165,8 @@ public class SettingsActivity extends PreferenceActivity
         btn.setText(getResources().getString(R.string.settings_obd_pids_add));
         btn.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ((RelativeLayout.LayoutParams)btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        ((RelativeLayout.LayoutParams)btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        ((RelativeLayout.LayoutParams) btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        ((RelativeLayout.LayoutParams) btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
         //((RelativeLayout.LayoutParams)btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_END);
         btn.setBackgroundColor(Color.TRANSPARENT);
         layout.addView(btn);
@@ -160,10 +175,10 @@ public class SettingsActivity extends PreferenceActivity
         txt.setTextAppearance(this, android.R.style.TextAppearance_Medium);
         txt.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        ((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
+        ((RelativeLayout.LayoutParams) txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        ((RelativeLayout.LayoutParams) txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
         int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
-        txt.setPadding(padding,padding*3/4,0,0);
+        txt.setPadding(padding, padding * 3 / 4, 0, 0);
         //((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.CENTER_HORIZONTAL);
         //((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.CENTER_IN_PARENT);
         layout.addView(txt);
@@ -172,7 +187,9 @@ public class SettingsActivity extends PreferenceActivity
         Dialog dialog = myScreen.getDialog();
 
         //
-        if(dialog == null){return false;}
+        if (dialog == null) {
+            return false;
+        }
         dialog.getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         dialog.getActionBar().setCustomView(layout);
 
@@ -192,11 +209,11 @@ public class SettingsActivity extends PreferenceActivity
     /**
      * Handler kliknutí na tlačítko přidat u OBD PID obrazovky
      */
-    private void onAddButtonClick(){
+    private void onAddButtonClick() {
         AppLog.i(AppLog.LOG_TAG_UI, "Add button clicked");
 
         // přidáme PID, jen pokud se aktuálně nepřidává
-        if(!obdPidDialog.isShowing()){
+        if (!obdPidDialog.isShowing()) {
             int newID = DB.obdPidHelper.addOneByCopying(1, "Nový PID");
             createObdPIDScreen();
         }
@@ -204,6 +221,7 @@ public class SettingsActivity extends PreferenceActivity
 
     /**
      * Naplní list obd zařízení
+     *
      * @param listPreference
      */
     protected void setListPreferenceData(ListPreference listPreference) {
@@ -211,23 +229,25 @@ public class SettingsActivity extends PreferenceActivity
 
         // získáme spárovaná BT zařízení
         Set<BluetoothDevice> devicesBT = ServiceManager.getInstance().obd.getBluetoothDevices();
-        if(devicesBT == null){AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices NULL");}
+        if (devicesBT == null) {
+            AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices NULL");
+        }
         CharSequence[] entries = new CharSequence[devicesBT.size()];
         CharSequence[] entryValues = new CharSequence[devicesBT.size()];
-        AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices to list: "+devicesBT.size());
+        AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices to list: " + devicesBT.size());
 
         // přečteme defaultní OBD zařízení, pokud jej máme
         boolean defaultEntryPresent = false;
         CharSequence defaultEntryValue = null;
-        if(DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, false)){
+        if (DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, false)) {
             defaultEntryValue = DB.get().getString(UserController.SETTINGS_KEY_OBD_DEVICE_NAME, "");
         }
 
         // projdeme všechna zařízení, přidáme do polí a ověříme defaultní volbu
         int index = 0;
         for (BluetoothDevice device : devicesBT) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "device["+index+"]: "+device.getName());
-            AppLog.i(AppLog.LOG_TAG_OBD, "device["+index+"]: "+device.getAddress());
+            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getName());
+            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getAddress());
 
             // připravíme položku
             entries[index] = device.getName();
@@ -235,8 +255,8 @@ public class SettingsActivity extends PreferenceActivity
             //entryValues[index] = device.getAddress(); // pokud bychom chtěli používat BT adresy jako ID
 
             // ověříme zda není naším defaultním adaptérem
-            if(defaultEntryValue != null){
-                if(defaultEntryValue.equals(entryValues[index])){
+            if (defaultEntryValue != null) {
+                if (defaultEntryValue.equals(entryValues[index])) {
                     defaultEntryPresent = true;
                 }
             }
@@ -251,7 +271,7 @@ public class SettingsActivity extends PreferenceActivity
 
         // nastvíme defaultní zařízení, pokud jej máme v nastavení a pokud je zároven přítomno
         // mezi spárovanými zařízeními
-        if(defaultEntryPresent) {
+        if (defaultEntryPresent) {
             listPreference.setDefaultValue(defaultEntryValue);
         }
     }
@@ -259,10 +279,10 @@ public class SettingsActivity extends PreferenceActivity
     /**
      * Vytvořé obsah obrazovky nastavení OBD PIDů načtením z databáze
      */
-    private void createObdPIDScreen(){
+    private void createObdPIDScreen() {
 
         // získáme a přemažeme kategorii
-        PreferenceScreen cat = (PreferenceScreen)findPreference(SETTINGS_ID_OBD_PID_CAT);
+        PreferenceScreen cat = (PreferenceScreen) findPreference(SETTINGS_ID_OBD_PID_CAT);
         cat.removeAll();
 
         //create one check box for each setting you need
@@ -274,7 +294,7 @@ public class SettingsActivity extends PreferenceActivity
 
         ArrayList<ObdPidObject> arr = DB.obdPidHelper.getAll();
         int index = 0;
-        for(ObdPidObject pid : arr){
+        for (ObdPidObject pid : arr) {
 
             //
             AppLog.i(AppLog.LOG_TAG_UI, "Adding obd pid button: " + pid.getName());
@@ -307,9 +327,10 @@ public class SettingsActivity extends PreferenceActivity
 
     /**
      * Zobrazí dialog k editaci OBD PIDu
+     *
      * @param id ID PIDu kt. editujeme
      */
-    private void showObdDialog(int id){
+    private void showObdDialog(int id) {
 
         // id kt. editujeme
         dialogDataID = id;
@@ -323,9 +344,12 @@ public class SettingsActivity extends PreferenceActivity
         ObdPidObject pid = DB.obdPidHelper.get(id);
 
         // pokud nebyl PID nalezen
-        if(pid == null){
+        if (pid == null) {
             TextView txt = (TextView) obdPidDialogView.findViewById(R.id.dialog_obd_name_title);
-            if(txt == null){ AppLog.p("UI - Prefs OBD dialog editor view is NULL"); return; }
+            if (txt == null) {
+                AppLog.p("UI - Prefs OBD dialog editor view is NULL");
+                return;
+            }
             txt.setText("PID not found, ID: " + id);
             obdPidDialog.show();
             return;
@@ -333,43 +357,55 @@ public class SettingsActivity extends PreferenceActivity
 
         // jméno PIDu
         EditText editName = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_name_edit);
-        if(editName!=null){editName.setText(pid.getName());}
+        if (editName != null) {
+            editName.setText(pid.getName());
+        }
 
         // JSON tag
         EditText editTag = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_tag_edit);
-        if(editTag!=null){editTag.setText(pid.getTag());}
-        if(pid.getLocked() == 1){
+        if (editTag != null) {
+            editTag.setText(pid.getTag());
+        }
+        if (pid.getLocked() == 1) {
             editTag.setEnabled(false);
-        }else{
+        } else {
             editTag.setEnabled(true);
         }
 
         // kód
         EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
-        if(editCode!=null){editCode.setText(pid.getPidCode());}
+        if (editCode != null) {
+            editCode.setText(pid.getPidCode());
+        }
 
         // vzorec
         EditText editFormula = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_formula_edit);
-        if(editFormula!=null){editFormula.setText(pid.getFormula());}
+        if (editFormula != null) {
+            editFormula.setText(pid.getFormula());
+        }
 
         // min
         EditText editMin = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_min_edit);
-        if(editMin != null){editMin.setText(""+pid.getMin());}
+        if (editMin != null) {
+            editMin.setText("" + pid.getMin());
+        }
 
         // max
         EditText editMax = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_max_edit);
-        if(editMax != null){editMax.setText(""+pid.getMax());}
+        if (editMax != null) {
+            editMax.setText("" + pid.getMax());
+        }
 
         // aktivní? - podle toho zda je zamčený nebo aktivovaný
         CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
-        if(pid.getLocked() == 1){
+        if (pid.getLocked() == 1) {
             active.setChecked(true);
             active.setEnabled(true);
-        }else{
+        } else {
             active.setEnabled(true);
-            if(pid.getActive() == 1){
+            if (pid.getActive() == 1) {
                 active.setChecked(true);
-            }else{
+            } else {
                 active.setChecked(false);
             }
         }
@@ -380,7 +416,7 @@ public class SettingsActivity extends PreferenceActivity
     /**
      * Připravíme dialog žádající uživatele o zapnutí GPS
      */
-    private void initObdPidDialog(){
+    private void initObdPidDialog() {
 
         // nacháme "nafouknout" view
         obdPidDialogView = getLayoutInflater().inflate(R.layout.obd_pid_editor, null);
@@ -391,15 +427,15 @@ public class SettingsActivity extends PreferenceActivity
         builder.setView(obdPidDialogView);
 
         obdPidDialog = builder
-            .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
 
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
 
 
-                }
-            }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                    }
+                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -413,36 +449,48 @@ public class SettingsActivity extends PreferenceActivity
 
                         // jméno PIDu
                         EditText editName = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_name_edit);
-                        if(editName!=null){ obj.setName(editName.getText().toString()); }
+                        if (editName != null) {
+                            obj.setName(editName.getText().toString());
+                        }
 
                         // tag
                         EditText editTag = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_tag_edit);
-                        if(editTag!=null){ obj.setTag(editTag.getText().toString()); }
+                        if (editTag != null) {
+                            obj.setTag(editTag.getText().toString());
+                        }
 
                         // kód
                         EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
-                        if(editCode!=null){ obj.setPidCode(editCode.getText().toString()); }
+                        if (editCode != null) {
+                            obj.setPidCode(editCode.getText().toString());
+                        }
 
                         // vzorec
                         EditText editFormula = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_formula_edit);
-                        if(editFormula!=null){ obj.setFormula(editFormula.getText().toString()); }
+                        if (editFormula != null) {
+                            obj.setFormula(editFormula.getText().toString());
+                        }
 
                         // min
                         EditText editMin = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_min_edit);
-                        if(editMin!=null){ obj.setMin( Integer.parseInt(editMin.getText().toString())); }
+                        if (editMin != null) {
+                            obj.setMin(Integer.parseInt(editMin.getText().toString()));
+                        }
 
                         // max
                         EditText editMax = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_max_edit);
-                        if(editMax!=null){ obj.setMax(Integer.parseInt(editMax.getText().toString()));}
+                        if (editMax != null) {
+                            obj.setMax(Integer.parseInt(editMax.getText().toString()));
+                        }
 
                         // active
                         CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
-                        if(active.isEnabled()){
+                        if (active.isEnabled()) {
                             obj.setActive(active.isChecked() ? 1 : 0);
                         }
 
                         // uložíme
-                        if(DB.obdPidHelper.save(obj) == 1){
+                        if (DB.obdPidHelper.save(obj) == 1) {
                             dialog.dismiss();
                         } else {
                             AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
@@ -456,7 +504,7 @@ public class SettingsActivity extends PreferenceActivity
                         dialog.dismiss();
 
                         // locked - nebudeme mazat
-                        if( DB.obdPidHelper.get(dialogDataID).getLocked() == 1 ){
+                        if (DB.obdPidHelper.get(dialogDataID).getLocked() == 1) {
                             return;
                         }
 
@@ -472,14 +520,15 @@ public class SettingsActivity extends PreferenceActivity
 
     /**
      * Handler změny nastavení
+     *
      * @param sharedPreferences Objekt sdílených nastavení do kt. se uložila nová hodnota
-     * @param key Klíč pro právě změněné hodnoty
+     * @param key               Klíč pro právě změněné hodnoty
      */
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         AppLog.i(null, "Key changed: " + key);
 
         // povolení / zakázání OBD
-        if(key.equals(SETTINGS_ID_OBD_ENABLED)){
+        if (key.equals(SETTINGS_ID_OBD_ENABLED)) {
             boolean isEnabled = sharedPreferences.getBoolean(key, false);
             obdList.setEnabled(isEnabled);
             DB.set()
@@ -490,8 +539,8 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         // nastavení bluetooth zařízení
-        if(key.equals(SETTINGS_ID_OBD_LIST)){
-            String newDeviceName = sharedPreferences.getString(key,"");
+        if (key.equals(SETTINGS_ID_OBD_LIST)) {
+            String newDeviceName = sharedPreferences.getString(key, "");
             obdList.setSummary(newDeviceName);
             DB.set()
                     .putBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, true)
@@ -502,12 +551,18 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         // povolení / zakázání GPS
-        if(key.equals(SETTINGS_ID_GPS_ENABLED)){
-            boolean isEnabled = sharedPreferences.getBoolean(key,false);
+        if (key.equals(SETTINGS_ID_GPS_ENABLED)) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, false);
             DB.set()
                     .putBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, isEnabled)
                     .commit();
             MasterController.getInstance().user.updateGPSstateAndRestart(getWindow().getContext());
+        }
+
+        if (key.equals(NETWORK_ADDRESS)) {
+            String address = sharedPreferences.getString(key, "meteocar.herokuapp.com");
+            DB.set().putString("networkAddress", address);
+            ServiceManager.getInstance().network.setAddress(address);
         }
     }
 }
