@@ -311,16 +311,7 @@ public class MenuActivity extends Activity {
                 checkHardware();
             }}, 150);
 
-        // odložíme spuštění videa
-        (new Handler()).postDelayed(new Runnable(){
-            public void run(){
-                /*ServiceManager.getInstance().video.startInView(
-                        (VideoView)findViewById(R.id.videoView),
-                        UIManager.getInstance().getMenuActivity());*/
-                ServiceManager.getInstance().video.updateVideoView(
-                        (VideoView)findViewById(R.id.videoView),
-                        UIManager.getInstance().getMenuActivity());
-            }}, 300);
+
     }
 
     @Override

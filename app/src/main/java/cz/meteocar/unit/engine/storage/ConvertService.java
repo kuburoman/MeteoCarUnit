@@ -19,19 +19,44 @@ public class ConvertService extends Thread {
     private boolean threadRun;
 
     public ConvertService() {
+        this(true);
+    }
+
+    public ConvertService(Boolean threadRun) {
         // start threadu
-        threadRun = true;
+        this.threadRun = threadRun;
         start();
     }
 
     /**
-     * Ukončí thread bezpečně
+     * Ukonci thread.
      */
     public void exit() {
         threadRun = false;
     }
 
-    public JSONObject createJsonTrip(List<RecordEntity> recordList) throws JSONException {
+    /**
+     * Hlavní cyklus vlákna
+     */
+    @Override
+    public void run() {
+        while (threadRun) {
+            if (DB.recordHelper.getNumberOfRecord() > 0) {
+                createJsonRecords();
+            } else {
+
+                try {
+                    this.sleep(30000);
+                } catch (Exception e) {
+                    // nevadí
+                }
+            }
+
+        }
+        AppLog.i(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
+    }
+
+    protected JSONObject createJsonTrip(List<RecordEntity> recordList) throws JSONException {
 
         JSONArray jsonArray = new JSONArray();
 
@@ -52,7 +77,7 @@ public class ConvertService extends Thread {
 
         JSONObject main = new JSONObject();
         main.put("boardUnitId", "android2");
-        main.put("secretKey","Ninjahash");
+        main.put("secretKey", "Ninjahash");
         main.put("trip", tripId);
         main.put("user", userName);
         main.put("records", jsonArray);
@@ -60,17 +85,24 @@ public class ConvertService extends Thread {
         return main;
     }
 
-    public void createJsonRecords() throws JSONException {
+    protected void createJsonRecords() {
         List<String> userIds = DB.recordHelper.getUserIdStored();
-        List<RecordEntity> recordEntityList = new ArrayList<>();
         for (String userId : userIds) {
             while (true) {
                 List<RecordEntity> entityList = DB.recordHelper.getByUserId(userId, 100);
-                if (entityList.size() < 1){
+                if (entityList.size() < 1) {
                     break;
                 }
-                JSONObject jsonTrip = createJsonTrip(entityList);
 
+                JSONObject jsonTrip = new JSONObject();
+                try {
+                    jsonTrip = createJsonTrip(entityList);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                // I po chybě chceme dále pokračovat, potřebujeme dostranit data z
+                // DB jinak by se tento cyklus opakoval do nekonečna.
                 DB.tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
 
                 List<Integer> integers = new ArrayList<>();
@@ -85,31 +117,5 @@ public class ConvertService extends Thread {
         }
     }
 
-    /**
-     * Hlavní cyklus vlákna
-     */
-    @Override
-    public void run() {
-        try {
 
-            while (threadRun) {
-                if (DB.recordHelper.getNumberOfRecord() > 0) {
-                    createJsonRecords();
-                } else {
-
-                    try {
-                        this.sleep(60000);
-                    } catch (Exception e) {
-                        // nevadí
-                    }
-                }
-
-            }
-            //
-            AppLog.i(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
 }

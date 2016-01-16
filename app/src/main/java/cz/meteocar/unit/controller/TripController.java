@@ -78,10 +78,8 @@ public class TripController {
         // zastavíme nebo rozjedeme trip, podle aktuálního stavu
         if (isActive()) {
             stopTrip();
-            ServiceManager.getInstance().video.stopVideo();
         } else {
             startTrip();
-            ServiceManager.getInstance().video.start();
         }
 
     }

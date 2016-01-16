@@ -42,7 +42,6 @@ public class DashboardFragment extends Fragment {
     TextView gpsText;
     TextView infoText;
 
-    //
     private static int instCount = 0;
 
     public DashboardFragment() {

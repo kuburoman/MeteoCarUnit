@@ -12,7 +12,6 @@ import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.ConvertService;
 import cz.meteocar.unit.engine.storage.DatabaseService;
-import cz.meteocar.unit.engine.video.VideoService;
 
 /**
  * Created by Toms, 2014.
@@ -39,7 +38,6 @@ public class ServiceManager {
     public DatabaseService db;
     public NetworkService network;
     public AccelService accel;
-    public VideoService video;
     public ConvertService convert;
 
     // bus
@@ -63,7 +61,6 @@ public class ServiceManager {
         db = new DatabaseService(context);
         network = new NetworkService(context);
         accel = new AccelService(context);
-        video = new VideoService();
         convert = new ConvertService();
     }
 
