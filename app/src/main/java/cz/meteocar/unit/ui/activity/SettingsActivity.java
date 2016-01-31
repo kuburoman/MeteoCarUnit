@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -30,6 +31,8 @@ import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
+import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.storage.model.ObdPidObject;
 
 /**
@@ -45,11 +48,19 @@ public class SettingsActivity extends PreferenceActivity
     public static final String SETTINGS_ID_GPS_LIST = "button_gps_list";
     public static final String SETTINGS_ID_OBD_PID_CAT = "button_obd_pids_category";
     public static final String NETWORK_ADDRESS = "network_address";
+    public static final String FILTER_SETTINGS = "filter_settings";
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
     private CheckBoxPreference gpsCheckBox;
     private EditTextPreference networkEditText;
+
+    private AlertDialog obdPidDialog;
+    private View obdPidDialogView;
+    private AlertDialog filterDialog;
+    private View filterDialogView;
+    private int dialogDataID;
+
 
     @Override
     public void onContentChanged() {
@@ -109,9 +120,11 @@ public class SettingsActivity extends PreferenceActivity
 
         // inicializujeme editovací dialog pro PIDy
         initObdPidDialog();
+        initFilterDialog();
 
         // vytvoříme kategorii OBD PIDů
         createObdPIDScreen();
+        createFilterSettingScreen();
     }
 
     /**
@@ -320,11 +333,6 @@ public class SettingsActivity extends PreferenceActivity
         }
     }
 
-    //
-    AlertDialog obdPidDialog;
-    View obdPidDialogView;
-    int dialogDataID;
-
     /**
      * Zobrazí dialog k editaci OBD PIDu
      *
@@ -411,6 +419,102 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         obdPidDialog.show();
+    }
+
+    /**
+     * Vytvořé obsah obrazovky nastavení OBD PIDů načtením z databáze
+     */
+    private void createFilterSettingScreen() {
+
+        PreferenceScreen cat = (PreferenceScreen) findPreference(FILTER_SETTINGS);
+        cat.removeAll();
+
+        ArrayList<FilterSettingEntity> arr = DB.filterSettingHelper.getAll();
+        int index = 0;
+        for (FilterSettingEntity pid : arr) {
+
+            //
+            AppLog.i(AppLog.LOG_TAG_UI, "Adding filter setting code: " + pid.getObdCode());
+
+            // vytvoříme tlačítko
+            final int myID = pid.getId();
+            Preference btn = new Preference(this);
+            btn.setTitle(pid.getObdCode());
+            btn.setIcon(R.drawable.icon_tacho);
+            btn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    showFilterDialog(myID);
+                    return false;
+                }
+            });
+
+            // přidáme do kategorie
+            cat.addPreference(btn);
+            index++;
+        }
+    }
+
+    /**
+     * Zobrazí dialog k editaci OBD PIDu
+     *
+     * @param id ID PIDu kt. editujeme
+     */
+    private void showFilterDialog(int id) {
+
+        // id kt. editujeme
+        dialogDataID = id;
+
+        // načteme z DB PID
+        FilterSettingEntity filter = DB.filterSettingHelper.getById(id);
+
+        if (filter == null) {
+            TextView txt = (TextView) filterDialogView.findViewById(R.id.dialog_obd_name_title);
+            if (txt == null) {
+                AppLog.p("UI - Prefs OBD dialog editor view is NULL");
+                return;
+            }
+            txt.setText("PID not found, ID: " + id);
+            obdPidDialog.show();
+            return;
+        }
+
+        EditText code = (EditText) filterDialogView.findViewById(R.id.dialog_02_filter_code_edit);
+        if (code != null) {
+            code.setText(filter.getObdCode());
+        }
+
+        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_06_filter_active_edit);
+        if (active != null) {
+            active.setChecked(filter.isActive());
+        }
+
+        ToggleButton reduceType = (ToggleButton) filterDialogView.findViewById(R.id.dialog_08_filter_reduce_type_edit);
+        if (reduceType != null) {
+            reduceType.setChecked(filter.getReduceType().getId() != 0);
+        }
+
+        EditText editFormula = (EditText) filterDialogView.findViewById(R.id.dialog_10_filter_reduce_value_edit);
+        if (editFormula != null) {
+            editFormula.setText(String.valueOf(filter.getReduceValue()));
+        }
+
+        ToggleButton rounding = (ToggleButton) filterDialogView.findViewById(R.id.dialog_12_filter_rounding_edit);
+        if (rounding != null) {
+            rounding.setChecked(filter.isRounding());
+        }
+
+        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_14_filter_rounding_decimal_edit);
+        if (roundingDecimal != null) {
+            roundingDecimal.setText(String.valueOf(filter.getRoundingDecimal()));
+        }
+
+        EditText editMax = (EditText) filterDialogView.findViewById(R.id.dialog_16_filter_max_time_edit);
+        if (editMax != null) {
+            editMax.setText(String.valueOf(filter.getMaxTime()));
+        }
+
+        filterDialog.show();
     }
 
     /**
@@ -517,6 +621,97 @@ public class SettingsActivity extends PreferenceActivity
                     }
                 }).setCancelable(true).create();
     }
+
+    private void initFilterDialog() {
+
+        // nacháme "nafouknout" view
+        filterDialogView = getLayoutInflater().inflate(R.layout.filter_setting, null);
+
+        // uděláme builder, nastavíme text a titulek
+        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
+        builder.setTitle(getResources().getString(R.string.settings_obd_edit_window_title));
+        builder.setView(filterDialogView);
+
+        filterDialog = builder
+                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+
+                    }
+                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                        // připravíme si objekt
+                        FilterSettingEntity obj = new FilterSettingEntity();
+
+                        // id
+                        obj.setId(dialogDataID);
+
+                        EditText code = (EditText) filterDialogView.findViewById(R.id.dialog_02_filter_code_edit);
+                        if (code != null) {
+                            obj.setObdCode(code.getText().toString());
+                        }
+
+                        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_06_filter_active_edit);
+                        if (active != null) {
+                            obj.setActive(active.isChecked());
+                        }
+
+                        ToggleButton reduceType = (ToggleButton) filterDialogView.findViewById(R.id.dialog_08_filter_reduce_type_edit);
+                        if (reduceType != null) {
+                            obj.setReduceType(ReducerType.fromId(reduceType.isChecked() == false ? 0 : 1));
+                        }
+
+                        EditText editFormula = (EditText) filterDialogView.findViewById(R.id.dialog_10_filter_reduce_value_edit);
+                        if (editFormula != null) {
+                            obj.setReduceValue(Double.valueOf(editFormula.getText().toString()));
+                        }
+
+                        ToggleButton rounding = (ToggleButton) filterDialogView.findViewById(R.id.dialog_12_filter_rounding_edit);
+                        if (rounding != null) {
+                            obj.setRounding(rounding.isChecked());
+                        }
+
+                        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_14_filter_rounding_decimal_edit);
+                        if (roundingDecimal != null) {
+                            obj.setRoundingDecimal(Integer.valueOf(roundingDecimal.getText().toString()));
+                        }
+
+                        EditText editMax = (EditText) filterDialogView.findViewById(R.id.dialog_16_filter_max_time_edit);
+                        if (editMax != null) {
+                            obj.setMaxTime(Long.valueOf(editMax.getText().toString()));
+                        }
+
+                        // uložíme
+                        if (DB.filterSettingHelper.save(obj) == 1) {
+                            dialog.dismiss();
+                        } else {
+                            AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
+                        }
+
+                    }
+                }).setNegativeButton(R.string.settings_obd_edit_btn_delete, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                        // vymažeme
+                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
+                        DB.filterSettingHelper.delete(dialogDataID);
+                        createObdPIDScreen();
+
+
+                    }
+                }).setCancelable(true).create();
+    }
+
 
     /**
      * Handler změny nastavení

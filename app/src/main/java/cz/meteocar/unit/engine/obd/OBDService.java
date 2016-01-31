@@ -612,6 +612,11 @@ public class OBDService extends Thread {
             this.value = val;
             this.rawResponse = rawResp;
             rawResponse = rawResp;
+
+        }
+
+        public void setTimeCreated(Long timeCreated) {
+            this.timeCreated = timeCreated;
         }
 
         public OBDMessage getMessage() {
@@ -625,6 +630,7 @@ public class OBDService extends Thread {
         public String getRawResponse() {
             return rawResponse;
         }
+
 
         @Override
         public int getType() {

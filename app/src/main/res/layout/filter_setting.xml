@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/fragment_padding">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/dialog_01_filter_code_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="@dimen/fragment_padding"
+            android:text="@string/settings_filter_code"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <EditText
+            android:id="@+id/dialog_02_filter_code_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_01_filter_code_title" />
+
+        <ToggleButton
+            android:id="@+id/dialog_06_filter_active_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_02_filter_code_edit"
+            android:textOff="@string/settings_filter_active_off"
+            android:textOn="@string/settings_filter_active_on" />
+
+        <ToggleButton
+            android:id="@+id/dialog_08_filter_reduce_type_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_06_filter_active_edit"
+            android:defaultValue="false"
+            android:textOff="@string/settings_filter_reduce_type_off"
+            android:textOn="@string/settings_filter_reduce_type_on" />
+
+        <TextView
+            android:id="@+id/dialog_09_filter_reduce_value_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_08_filter_reduce_type_edit"
+            android:layout_marginTop="@dimen/fragment_padding"
+            android:text="@string/settings_filter_code"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <EditText
+            android:id="@+id/dialog_10_filter_reduce_value_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_09_filter_reduce_value_title"
+            android:inputType="numberDecimal" />
+
+        <ToggleButton
+            android:id="@+id/dialog_12_filter_rounding_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_10_filter_reduce_value_edit"
+            android:defaultValue="false"
+            android:textOff="@string/settings_filter_rounding_off"
+            android:textOn="@string/settings_filter_rounding_on" />
+
+        <TextView
+            android:id="@+id/dialog_13_filter_rounding_decimal_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_12_filter_rounding_edit"
+            android:layout_marginTop="@dimen/fragment_padding"
+            android:text="@string/settings_filter_rounding_decimal"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <EditText
+            android:id="@+id/dialog_14_filter_rounding_decimal_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_13_filter_rounding_decimal_title"
+            android:inputType="number" />
+
+        <TextView
+            android:id="@+id/dialog_15_filter_max_time_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_14_filter_rounding_decimal_edit"
+            android:layout_marginTop="@dimen/fragment_padding"
+            android:text="@string/settings_filter_max_time"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <EditText
+            android:id="@+id/dialog_16_filter_max_time_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_15_filter_max_time_title"
+            android:inputType="number" />
+
+
+    </RelativeLayout>
+</ScrollView>

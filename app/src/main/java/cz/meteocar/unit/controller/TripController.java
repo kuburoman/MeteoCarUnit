@@ -167,14 +167,6 @@ public class TripController {
         // změníme text na tlačítku
         refreshButtonText();
 
-        // uložíme log do souboru
-//        if(ServiceManager.getInstance().db.helper.saveToFile() != null){
-//            TripDetailObject.deleteAllRecords();
-//        };
-
-        // updatujeme počet na panelu menu
-        UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
-
         // vymažeme zaznamenané statistiky
         ServiceManager.getInstance().db.resetTripRecording();
     }

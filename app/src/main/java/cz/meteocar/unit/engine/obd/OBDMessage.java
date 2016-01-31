@@ -22,6 +22,9 @@ public class OBDMessage {
     private FormulaInterpreter interpret = null;
     private String validationString = null;
 
+    public OBDMessage() {
+    }
+
     OBDMessage(String obdCommand, String formulaOrValidationString, boolean isFormula){
         setCommand(obdCommand);
         init(isFormula, formulaOrValidationString);

@@ -302,7 +302,7 @@ public class RecordHelper {
 
             // OBD event
             OBDService.OBDEventPID obdEvent = (OBDService.OBDEventPID) evt;
-            //AppLog.i(AppLog.LOG_TAG_DB, "DB OBD Event type is: "+obdEvent.getType());
+            //AppLog.i(AppLog.LOG_TAG_DB, "DB OBD Event type is: "+obdEvent.getObdCode());
 
             // vložíme type / tag
             obj.setType(obdEvent.getMessage().getTag());

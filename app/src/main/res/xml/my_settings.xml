@@ -26,6 +26,12 @@
 
     <PreferenceScreen
         android:icon="@null"
+        android:key="filter_settings"
+        android:persistent="false"
+        android:title="@string/filter_settings_title"/>
+
+    <PreferenceScreen
+        android:icon="@null"
         android:key="button_network_category"
         android:persistent="false"
         android:title="@string/settings_network_settings">

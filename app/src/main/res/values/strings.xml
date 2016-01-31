@@ -107,6 +107,25 @@
     <string name="settings_obd_edit_btn_save">Uložit</string>
     <string name="settings_obd_edit_btn_cancel">Zrušit</string>
 
+    <!-- Nastavení - Filter -->
+    <string name="settings_filter_title">Nastavení filtru</string>
+    <string name="settings_filter_code">Kód OBD příkazu</string>
+    <string name="settings_filter_active">Aktivní</string>
+    <string name="settings_filter_reduce_type">Typ ořezávání dat</string>
+    <string name="settings_filter_reduce_value">Hodnota ořezávání</string>
+    <string name="settings_filter_rounding">Zaokrouhlování</string>
+    <string name="settings_filter_rounding_decimal">Zaokrouhlování na počet desetinných míst</string>
+    <string name="settings_filter_max_time">Maximální čas</string>
+    <string name="settings_filter_update_time">Čas poslední změny</string>
+
+    <string name="settings_filter_rounding_on">Zaokrouhlovat</string>
+    <string name="settings_filter_rounding_off">Nezaokrouhlovat</string>
+
+    <string name="settings_filter_active_on">Aktivní filter</string>
+    <string name="settings_filter_active_off">Neaktivní filter</string>
+
+    <string name="settings_filter_reduce_type_off">Absolutní ořezávání</string>
+    <string name="settings_filter_reduce_type_on">Procentuální ořezávání</string>
 
     <!-- Nastavení - GPS -->
     <string name="settings_gps_settings">GPS Nastavení</string>
@@ -145,6 +164,9 @@
     <string name="menu_item_icon_desc">Ikona položky menu</string>
     <string name="menu_open">Otevřít menu</string>
     <string name="menu_close">Uzavřít menu</string>
+
+
+    <string name="filter_settings_title">OBD Nastavení filtru</string>
 
 
 </resources>

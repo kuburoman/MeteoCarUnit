@@ -6,7 +6,7 @@ package cz.meteocar.unit.engine.storage.model;
 public class RecordEntity {
 
     private int id;
-    private long time;
+    private Long time;
     private String userName;
     private String tripId;
     private String type;
@@ -20,11 +20,11 @@ public class RecordEntity {
         this.id = id;
     }
 
-    public long getTime() {
+    public Long getTime() {
         return time;
     }
 
-    public void setTime(long time) {
+    public void setTime(Long time) {
         this.time = time;
     }
 

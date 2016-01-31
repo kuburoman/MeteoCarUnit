@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
+import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
 /**
  * Created by Toms, 2014.
@@ -29,8 +30,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(ObdPidHelper.SQL_CREATE_ENTRIES);
         db.execSQL(TripHelper.SQL_CREATE_ENTRIES);
         db.execSQL(UserHelper.SQL_CREATE_ENTRIES);
+        db.execSQL(FilterSettingHelper.SQL_CREATE_ENTRIES);
 
         db.execSQL(ObdPidHelper.INSERT_INTO_ALL);
+        db.execSQL(FilterSettingHelper.INSERT_INTO_ALL);
         db.execSQL(UserHelper.CREATE_DEFAULT_USER);
     }
 
@@ -45,6 +48,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(ObdPidHelper.SQL_DELETE_ENTRIES);
         db.execSQL(TripHelper.SQL_DELETE_ENTRIES);
         db.execSQL(UserHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(FilterSettingHelper.SQL_DELETE_ENTRIES);
 
         onCreate(db);
     }

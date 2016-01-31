@@ -164,13 +164,6 @@ public class MenuActivity extends Activity {
                         R.array.array_menu_item_names)[position-1]);
 
                 //
-                if(position == UIManager.FRAGMENT_SYNC){
-                    syncTextView = txtTitle;
-                    syncTextViewBaseText = getResources().getStringArray(R.array.array_menu_item_names)[position-1];
-                    updateSyncCountMenuItem();
-                }
-
-                //
                 return convertView;
             }
         });
@@ -261,9 +254,6 @@ public class MenuActivity extends Activity {
                 fragmentBefore = UIManager.getInstance().getActualFragment();
                 actionBarStatusBefore = actionBar.isShowing();
                 initBefore = true;
-
-                // updatujeme počet položek k synchronizaci
-                UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
 
                 //
                 invalidateOptionsMenu();
@@ -652,15 +642,5 @@ public class MenuActivity extends Activity {
 
                 }
             }).setCancelable(false).create().show();
-    }
-
-    public void updateSyncCountMenuItem(){
-        int numObjects = MasterController.getInstance().user.getNumberOfSyncObjects();
-        AppLog.i(AppLog.LOG_TAG_UI, "Updating sync count: "+numObjects);
-        syncTextView.setText(
-                syncTextViewBaseText + "    "
-                        + "[" + ((numObjects <= 0) ? "-" : numObjects) + "]"
-        );
-        syncTextView.postInvalidate();
     }
 }

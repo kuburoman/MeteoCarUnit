@@ -4,10 +4,12 @@ import android.content.SharedPreferences;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
+import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.helper.UserHelper;
+import cz.meteocar.unit.engine.storage.helper.filter.FilterSetting;
 
 /**
  * Třída s duplicitními referencemi k objektům a metodám DB
@@ -23,6 +25,7 @@ public class DB {
     public static TripHelper tripHelper;
     public static UserHelper userHelper;
     public static ObdPidHelper obdPidHelper;
+    public static FilterSettingHelper filterSettingHelper;
 
     // persistence key-value
     public static SharedPreferences get(){

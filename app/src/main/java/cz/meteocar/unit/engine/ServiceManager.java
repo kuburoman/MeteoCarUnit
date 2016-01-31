@@ -123,7 +123,7 @@ public class ServiceManager {
         /**
          * Čas vytvoření eventu
          */
-        private final Long timeCreated;
+        protected Long timeCreated;
 
         /**
          * Super-konstruktor inicializující čas vytvoření
