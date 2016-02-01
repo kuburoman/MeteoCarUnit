@@ -9,12 +9,11 @@ import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.helper.UserHelper;
-import cz.meteocar.unit.engine.storage.helper.filter.FilterSetting;
 
 /**
  * Třída s duplicitními referencemi k objektům a metodám DB
  * - slouží pro pohodlnější přístup k často používaným DB objektům
- *
+ * <p/>
  * Created by Toms, 2014.
  */
 public class DB {
@@ -28,10 +27,11 @@ public class DB {
     public static FilterSettingHelper filterSettingHelper;
 
     // persistence key-value
-    public static SharedPreferences get(){
+    public static SharedPreferences get() {
         return ServiceManager.getInstance().db.getSettings();
     }
-    public static SharedPreferences.Editor set(){
+
+    public static SharedPreferences.Editor set() {
         return ServiceManager.getInstance().db.editSettings();
     }
 }

@@ -756,7 +756,7 @@ public class SettingsActivity extends PreferenceActivity
 
         if (key.equals(NETWORK_ADDRESS)) {
             String address = sharedPreferences.getString(key, "meteocar.herokuapp.com");
-            DB.set().putString("networkAddress", address);
+            DB.set().putString("networkAddress", address).commit();
             ServiceManager.getInstance().network.setAddress(address);
         }
     }

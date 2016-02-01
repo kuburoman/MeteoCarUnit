@@ -19,7 +19,7 @@ public class MySQLiteConfig {
     public static final String COMMA_SEP = ",";
 
     // databáze
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "AndroidCarTracker.db";
 
 
