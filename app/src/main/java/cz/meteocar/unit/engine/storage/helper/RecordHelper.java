@@ -33,6 +33,7 @@ public class RecordHelper {
     public static final String COLUMN_NAME_TRIP_ID = "trip_id";
     public static final String COLUMN_NAME_TYPE = "type";
     public static final String COLUMN_NAME_JSON = "json";
+    public static final String COLUMN_NAME_PROCESSED = "processed";
 
     /* SQL statement pro vytvoreni tabulky */
     public static final String SQL_CREATE_ENTRIES =
@@ -42,7 +43,8 @@ public class RecordHelper {
                     COLUMN_NAME_USER_ID + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_TRIP_ID + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_TYPE + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_JSON + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" +
+                    COLUMN_NAME_JSON + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
+                    COLUMN_NAME_PROCESSED + MySQLiteConfig.TYPE_BOOLEAN + " DEFAULT ''" +
                     " )";
 
     /* SQL statement pro smazani tabulky */
@@ -69,13 +71,7 @@ public class RecordHelper {
         if (cursor.moveToFirst()) {
             while (cursor.isAfterLast() == false) {
 
-                obj = new RecordEntity();
-                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_TIME)));
-                obj.setTripId(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-                obj.setUserName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
-                obj.setType(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TYPE)));
-                obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
+                obj = createEntity(cursor);
                 arr.add(obj);
 
                 // dalsi
@@ -104,6 +100,7 @@ public class RecordHelper {
         values.put(COLUMN_NAME_USER_ID, obj.getUserName());
         values.put(COLUMN_NAME_TRIP_ID, obj.getTripId());
         values.put(COLUMN_NAME_JSON, obj.getJson());
+        values.put(COLUMN_NAME_PROCESSED, obj.isProcessed());
 
         // db
         SQLiteDatabase db = DB.helper.getWritableDatabase();
@@ -136,13 +133,7 @@ public class RecordHelper {
         if (c.getCount() > 0) {
             c.moveToFirst();
 
-            RecordEntity obj = new RecordEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setTime(c.getLong(c.getColumnIndex(COLUMN_NAME_TIME)));
-            obj.setTripId(c.getString(c.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-            obj.setUserName(c.getString(c.getColumnIndex(COLUMN_NAME_USER_ID)));
-            obj.setType(c.getString(c.getColumnIndex(COLUMN_NAME_TYPE)));
-            obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
+            RecordEntity obj = createEntity(c);
             return obj;
 
         } else {
@@ -150,25 +141,19 @@ public class RecordHelper {
         }
     }
 
-    public List<RecordEntity> getByUserId(String userId, int maxNumberOfRecords) {
+    public List<RecordEntity> getByUserId(String userId, int maxNumberOfRecords, boolean processed) {
 
         RecordEntity obj;
         List<RecordEntity> arr = new ArrayList<>();
 
         SQLiteDatabase db = DB.helper.getReadableDatabase();
 
-        Cursor cs = db.query(TABLE_NAME, null, "user_id = ?", new String[]{"" + userId}, null, null, null, String.valueOf(maxNumberOfRecords));
+        Cursor cs = db.query(TABLE_NAME, null, COLUMN_NAME_USER_ID + " = ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{userId, processed == false ? "0" : "1"}, null, null, null, String.valueOf(maxNumberOfRecords));
 
         if (cs.moveToFirst()) {
             while (cs.isAfterLast() == false) {
 
-                obj = new RecordEntity();
-                obj.setId(cs.getInt(cs.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setTime(cs.getLong(cs.getColumnIndex(COLUMN_NAME_TIME)));
-                obj.setTripId(cs.getString(cs.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-                obj.setUserName(cs.getString(cs.getColumnIndex(COLUMN_NAME_USER_ID)));
-                obj.setType(cs.getString(cs.getColumnIndex(COLUMN_NAME_TYPE)));
-                obj.setJson(cs.getString(cs.getColumnIndex(COLUMN_NAME_JSON)));
+                obj = createEntity(cs);
                 arr.add(obj);
 
                 // dalsi
@@ -197,6 +182,15 @@ public class RecordHelper {
         return cnt;
     }
 
+    public int getNumberOfRecord(Boolean processed) {
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_PROCESSED + " = ?", new String[]{processed == false ? "0" : "1"}, null, null, null);
+        int count = c.getCount();
+        c.close();
+
+        return count;
+    }
+
     /**
      * Smaze vsechny zaznamy z tabulky
      */
@@ -216,7 +210,22 @@ public class RecordHelper {
         db.delete(TABLE_NAME, "id IN (" + makePlaceholders(id.size()) + ")", array);
     }
 
-    String makePlaceholders(int len) {
+    public void updateProcessed(List<Integer> id, Boolean processed) {
+        String[] array = new String[id.size()];
+
+
+        for (int i = 0; i < id.size(); i++) {
+            array[i] = String.valueOf(id.get(i));
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_PROCESSED, processed);
+
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        db.update(TABLE_NAME, values, "id IN (" + makePlaceholders(id.size()) + ")", array);
+    }
+
+    protected String makePlaceholders(int len) {
         if (len < 1) {
             // It will lead to an invalid query anyway ..
             throw new RuntimeException("No placeholders");
@@ -246,6 +255,18 @@ public class RecordHelper {
         return userIds;
     }
 
+    public RecordEntity createEntity(Cursor cursor) {
+        RecordEntity obj = new RecordEntity();
+        obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+        obj.setTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_TIME)));
+        obj.setTripId(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
+        obj.setUserName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
+        obj.setType(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TYPE)));
+        obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
+        obj.setProcessed(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PROCESSED)) != 0);
+        return obj;
+    }
+
     public void save(ServiceManager.AppEvent evt) {
 
         // nový objekt
@@ -256,6 +277,7 @@ public class RecordHelper {
         obj.setTime(evt.getTimeCreated());
         obj.setUserName(evt.getUserId());
         obj.setTripId(evt.getTripId());
+        obj.setProcessed(false);
 
 
         // připravíme JSON objekt na data
@@ -282,8 +304,8 @@ public class RecordHelper {
                 jsonObj.put("lng", m * loc.getLongitude());
                 jsonObj.put("alt", loc.getAltitude());
                 jsonObj.put("acc", loc.getAccuracy());
-            // TODO - Až bude přidaná rychlost odkomentovat
-            //  jsonObj.put("speed", 3.6 * loc.getSpeed());
+                // TODO - Až bude přidaná rychlost odkomentovat
+                //  jsonObj.put("speed", 3.6 * loc.getSpeed());
             } catch (Exception e) {
                 AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding GPS event data to JSON object");
             }

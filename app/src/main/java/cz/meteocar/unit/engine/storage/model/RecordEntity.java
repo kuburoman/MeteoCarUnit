@@ -11,6 +11,7 @@ public class RecordEntity {
     private String tripId;
     private String type;
     private String json;
+    private boolean processed;
 
     public int getId() {
         return id;
@@ -58,5 +59,13 @@ public class RecordEntity {
 
     public void setJson(String json) {
         this.json = json;
+    }
+
+    public boolean isProcessed() {
+        return processed;
+    }
+
+    public void setProcessed(boolean processed) {
+        this.processed = processed;
     }
 }

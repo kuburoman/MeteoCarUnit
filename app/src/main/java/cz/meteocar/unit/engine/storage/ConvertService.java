@@ -41,7 +41,7 @@ public class ConvertService extends Thread {
     @Override
     public void run() {
         while (threadRun) {
-            if (DB.recordHelper.getNumberOfRecord() > 0) {
+            if (DB.recordHelper.getNumberOfRecord(false) > 0) {
                 createJsonRecords();
             } else {
 
@@ -89,7 +89,7 @@ public class ConvertService extends Thread {
         List<String> userIds = DB.recordHelper.getUserIdStored();
         for (String userId : userIds) {
             while (true) {
-                List<RecordEntity> entityList = DB.recordHelper.getByUserId(userId, 100);
+                List<RecordEntity> entityList = DB.recordHelper.getByUserId(userId, 100, false);
                 if (entityList.size() < 1) {
                     break;
                 }
@@ -101,8 +101,6 @@ public class ConvertService extends Thread {
                     e.printStackTrace();
                 }
 
-                // I po chybě chceme dále pokračovat, potřebujeme dostranit data z
-                // DB jinak by se tento cyklus opakoval do nekonečna.
                 DB.tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
 
                 List<Integer> integers = new ArrayList<>();
@@ -110,7 +108,7 @@ public class ConvertService extends Thread {
                     integers.add(recordEntity.getId());
                 }
 
-                DB.recordHelper.deleteRecords(integers);
+                DB.recordHelper.updateProcessed(integers, true);
                 AppLog.i(AppLog.LOG_TAG_DB, "Successful creation of trip");
             }
 
