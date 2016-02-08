@@ -47,6 +47,7 @@
         <item>Synchronizovat</item>
         <item>Nastavení</item>
         <item>Debug</item>
+        <item>Trips</item>
         <item>Ukončit</item>
     </string-array>
 
@@ -56,6 +57,7 @@
         <item>@drawable/icon_list</item>
         <item>@drawable/icon_sync</item>
         <item>@drawable/icon_settings</item>
+        <item>@drawable/icon_bug</item>
         <item>@drawable/icon_bug</item>
         <item>@drawable/icon_off</item>
     </string-array>

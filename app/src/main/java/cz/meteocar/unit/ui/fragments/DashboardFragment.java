@@ -11,21 +11,21 @@ import android.widget.TextView;
 import net.engio.mbassy.listener.Handler;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
-import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
-import cz.meteocar.unit.ui.UIManager;
-import cz.meteocar.unit.ui.view.SpeedMeterView;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.accel.AccelService;
 import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.DatabaseService;
+import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.ui.UIManager;
+import cz.meteocar.unit.ui.view.SpeedMeterView;
 
 public class DashboardFragment extends Fragment {
 
@@ -76,7 +76,6 @@ public class DashboardFragment extends Fragment {
         gpsText = (TextView) view.findViewById(R.id.dashboardGpsText);
         timeText = (TextView) view.findViewById(R.id.dashboardTextTime);
         infoText = (TextView) view.findViewById(R.id.osmInfoText);
-        //timeText = (TextView) view.findViewById(R.id.dashboardTextTime);
 
         // inicializace trip kontroleru
         //Button tripButton = (Button) view.findViewById(R.id.dashboardTripButton);
@@ -140,7 +139,7 @@ public class DashboardFragment extends Fragment {
         //debugText.setText("S: "+value);
         speedGauge.setSecondValue(value);
 
-        if(getView() != null) {
+        if (getView() != null) {
             getView().postInvalidate();
         }
         //}
@@ -173,6 +172,7 @@ public class DashboardFragment extends Fragment {
     /**
      * Handler stavu OBD
      * - používá enum typy OBDService
+     *
      * @param msg
      */
     @Handler
@@ -194,9 +194,8 @@ public class DashboardFragment extends Fragment {
     }
 
 
-
     @Handler
-    public void handleOBDPID(final OBDService.OBDEventPID evt){
+    public void handleOBDPID(final OBDService.OBDEventPID evt) {
 
         // debug
         //AppLog.i(AppLog.LOG_TAG_UI, "PID received, tag: "+evt.getMessage().getTag()+" value: "+evt.getValue()+" id: "+evt.getMessage().getID());
@@ -207,20 +206,20 @@ public class DashboardFragment extends Fragment {
             public void run() {
 
                 // speed
-                if(evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED){
+                if (evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
                     //line6obd_speed = "S: "+evt.getValue()   + "   [ "+evt.getRawResponse()+" ]";
 
                     int value = (int) Math.round(evt.getValue());
                     //debugText.setText("S: "+value);
                     speedGauge.setValue(value);
 
-                    if(getView() != null) {
+                    if (getView() != null) {
                         getView().postInvalidate();
                     }
 
                     //AppLog.i("SPEED");
                 }
-                if(evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_RPM){
+                if (evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_RPM) {
                     //line6obd_rpm = "R: "+evt.getValue()       + "   [ "+evt.getRawResponse()+" ]";
                     int value = (int) Math.round(evt.getValue());
                     rpmGauge.setValue(value);
@@ -235,12 +234,13 @@ public class DashboardFragment extends Fragment {
 
     /**
      * Handler události DB - poskytuje zákl. statistiky jízdy
+     *
      * @param evt
      */
     @Handler
-    public void handleDatabaseEvent(DatabaseService.DBEvent evt){
+    public void handleDatabaseEvent(DatabaseService.DBEvent evt) {
         //line7db = "DB count: "+evt.getCount();
-       // postInvalidate();
+        // postInvalidate();
 
         // debug
         //AppLog.i(AppLog.LOG_TAG_UI, "received time event: "+counter);
@@ -263,14 +263,14 @@ public class DashboardFragment extends Fragment {
         timeText.invalidate();
 
         double val = Math.round((double) evt.getObdDistance() / 10);
-        String distObd = ""+(val/100);
+        String distObd = "" + (val / 100);
         val = Math.round((double) evt.getGpsDistance() / 10);
-        String distGps = ""+(val/100);
+        String distGps = "" + (val / 100);
 
         // vzdálenost
         infoText.setText(
-            ""+distObd+" km\n"+
-            "[ "+distGps+" km ]"
+                "" + distObd + " km\n" +
+                        "[ " + distGps + " km ]"
         );
         infoText.invalidate();
 

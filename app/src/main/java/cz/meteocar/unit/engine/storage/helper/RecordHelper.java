@@ -18,6 +18,7 @@ import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
+import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -162,7 +163,6 @@ public class RecordHelper {
         }
 
         return arr;
-
     }
 
     /**
@@ -238,6 +238,55 @@ public class RecordHelper {
             return sb.toString();
         }
     }
+
+    public ArrayList<TripDetailVO> getUserTripDetailList(String userId) {
+        ArrayList<TripDetailVO> detailVOs = new ArrayList<>();
+        List<String> userTrips = getUserTrips(userId);
+        for (String tripId : userTrips) {
+            Long startTime = getTimeOfTrip(tripId, true);
+            Long endTime = getTimeOfTrip(tripId, false);
+            detailVOs.add(new TripDetailVO(tripId, startTime, endTime));
+        }
+        return detailVOs;
+    }
+
+    protected List<String> getUserTrips(String userId) {
+
+
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        List<String> tripIds = new ArrayList<>();
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, null, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            while (cursor.isAfterLast() == false) {
+
+                tripIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
+
+                cursor.moveToNext();
+            }
+        }
+        return tripIds;
+    }
+
+    protected Long getTimeOfTrip(String tripId, boolean min) {
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        Cursor cursor;
+        if (min) {
+            cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ?", new String[]{tripId}, null, null, COLUMN_NAME_TIME + " ASC", "1");
+        } else {
+            cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ?", new String[]{tripId}, null, null, COLUMN_NAME_TIME + " DESC", "1");
+        }
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            Long time = cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_TIME));
+            cursor.close();
+            return time;
+
+        }
+        return null;
+    }
+
 
     public List<String> getUserIdStored() {
         SQLiteDatabase db = DB.helper.getReadableDatabase();
