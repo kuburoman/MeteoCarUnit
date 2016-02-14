@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -204,7 +205,7 @@ public class RecordHelper {
             obj.setY(jsonObject.getDouble("y"));
             obj.setZ(jsonObject.getDouble("z"));
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(AppLog.LOG_TAG_DB, "Cannot parse acceleration.", e);
         }
 
         return obj;
@@ -229,7 +230,7 @@ public class RecordHelper {
 
     public int getNumberOfRecord(Boolean processed) {
         SQLiteDatabase db = DB.helper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_PROCESSED + " = ?", new String[]{processed == false ? "0" : "1"}, null, null, null);
+        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_PROCESSED + " = ?", new String[]{!processed ? "0" : "1"}, null, null, null);
         int count = c.getCount();
         c.close();
 
@@ -302,13 +303,14 @@ public class RecordHelper {
         Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, null, null, null, null);
 
         if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
 
                 tripIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
 
                 cursor.moveToNext();
             }
         }
+        cursor.close();
         return tripIds;
     }
 
@@ -338,13 +340,14 @@ public class RecordHelper {
         Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_USER_ID}, null, null, COLUMN_NAME_ID, null, null, null);
 
         if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
+            while (!cursor.isAfterLast()) {
 
                 userIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
 
                 cursor.moveToNext();
             }
         }
+        cursor.close();
         return userIds;
     }
 
@@ -400,7 +403,7 @@ public class RecordHelper {
                 // TODO - Až bude přidaná rychlost odkomentovat
                 //  jsonObj.put("speed", 3.6 * loc.getSpeed());
             } catch (Exception e) {
-                AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding GPS event data to JSON object");
+                Log.e(AppLog.LOG_TAG_DB, "Exception while adding GPS event data to JSON object", e);
             }
 
             // přidáme JSON objekt do DB záznamu
@@ -427,7 +430,7 @@ public class RecordHelper {
                 canWrite = true;
                 jsonObj.put("value", obdEvent.getValue());
             } catch (Exception e) {
-                AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
+                Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
             }
 
             // přidáme json k záznamu
@@ -456,7 +459,7 @@ public class RecordHelper {
                 jsonObj.put("z", accelEvent.getZ());
 //                jsonObj.put("total", accelEvent.getValue());
             } catch (Exception e) {
-                AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
+                Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
             }
 
             // přidáme json k záznamu

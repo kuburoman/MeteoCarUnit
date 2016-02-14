@@ -18,6 +18,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -335,7 +336,9 @@ public class MenuActivity extends Activity {
     public void showActionBar(){
         try {
             actionBarView.getBackground().setAlpha(128);
-        }catch(Exception e){}
+        }catch(Exception e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Unable to show action bar", e);
+        }
     }
 
     /**
@@ -343,9 +346,10 @@ public class MenuActivity extends Activity {
      */
     private void hideActionBar(){
         try {
-            //actionBarBg.setAlpha(0);
             actionBarView.getBackground().setAlpha(128);
-        }catch(Exception e){}
+        }catch(Exception e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Unable to hide action bar", e);
+        }
     }
 
     /**
@@ -595,9 +599,9 @@ public class MenuActivity extends Activity {
                 MasterController.getInstance().trip.stopTrip();
                 ServiceManager.getInstance().exitApp();
                 try {
-                    finalize();
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
+                    super.finalize();
+                } catch (Throwable e) {
+                    Log.e(AppLog.LOG_TAG_DEFAULT,"Error when exiting application", e);
                 }
             }
         }).setNegativeButton(R.string.dialog_trip_exit_exit, new DialogInterface.OnClickListener() {

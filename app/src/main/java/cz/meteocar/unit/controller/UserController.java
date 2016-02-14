@@ -1,6 +1,7 @@
 package cz.meteocar.unit.controller;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.engio.mbassy.listener.Handler;
 
@@ -170,35 +171,6 @@ public class UserController {
         return false;
     }
 
-    // ---------- Defaultní PIDy -----------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    public void checkDefaultPIDs() {
-
-        // obd - nastavení
-        // máme nastavené PIDy? pokud ne, nejprve je musíme načíst a až poté startovat OBD
-        if (!DB.get().getBoolean(SETTINGS_KEY_OBD_PIDS_SET, false)) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "OBD PIDs not set, requesting");
-
-            // odešleme požadavek
-            ServiceManager.getInstance().network.sendRequest(
-                    NETWORK_PIDS_RESPONSE, "androidDownloadDefaultPids.php",
-                    new HashMap<String, String>() {
-                        HashMap<String, String> init() {
-                            // zde nepotřebujeme JSON
-                            return this;
-                        }
-                    }.init()
-            );
-        } else {
-            AppLog.i(AppLog.LOG_TAG_OBD, "OBD PIDs OK");
-
-            //
-            UIManager.getInstance().showMenuActivity();
-        }
-
-    }
-
     /**
      * Zpracování příchozí odpovědi na JSON dotaz
      *
@@ -221,13 +193,6 @@ public class UserController {
             AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: A");
             containingArray = evt.getResponse().getJSONArray("pids");
 
-            // načteme pidy do DB
-//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(0));
-//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(1));
-//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(2));
-//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(3));
-//            ObdPidObject.insertFromJSONArray(containingArray.getJSONArray(4));
-
             // ok
             DB.set().putBoolean(SETTINGS_KEY_OBD_PIDS_SET, true).commit();
 
@@ -237,19 +202,10 @@ public class UserController {
             // ok, nyní ověříme stav služby a zapneme, pokud je potřeba
             //updateOBDstate();
 
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: B");
+            Log.d(AppLog.LOG_TAG_NETWORK, "Pids received");
         } catch (Exception e) {
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: C");
-            e.printStackTrace();
-
-            // chyba, vše smažeme
-//            ObdPidObject.deleteAll();
-            jsonError = true;
-            AppLog.i(AppLog.LOG_TAG_DB, "Error while saving pids!");
-
+            Log.e(AppLog.LOG_TAG_NETWORK, "Error receiving PIDS.");
         }
-
-        AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler exiting");
     }
 
 
@@ -353,16 +309,4 @@ public class UserController {
         DB.set().putBoolean(SETTINGS_KEY_USER_LOGGED, false).commit();
     }
 
-    // ---------- Položky k synchronizaci --------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    /**
-     * Počet objektů k synchronizaci
-     *
-     * @return
-     */
-    public int getNumberOfSyncObjects() {
-//        return FileObject.getNumberOfRecord();
-        return 0;
-    }
 }

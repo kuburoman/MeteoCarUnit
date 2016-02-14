@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -28,7 +29,6 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.model.UserEntity;
 import cz.meteocar.unit.ui.UIManager;
 
 
@@ -116,6 +116,7 @@ public class LoginActivity extends Activity {
 
                 textOnNFC = text;
             } catch (Exception e) {
+                Log.d(AppLog.LOG_TAG_DEFAULT, "Cannot read NFC card", e);
                 Toast.makeText(getApplicationContext(), "NFC karta nebyla přečtena správně", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -133,6 +134,7 @@ public class LoginActivity extends Activity {
                 name = obj.getString("name");
 
             } catch (Exception e) {
+                Log.d(AppLog.LOG_TAG_DEFAULT, "Cannot read NFC card", e);
                 Toast.makeText(getApplicationContext(), "NFC karta nebyla přečtena správně", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -161,7 +163,6 @@ public class LoginActivity extends Activity {
         // přečteme jméno a heslo
         final String name = ((TextView) findViewById(R.id.nameEditText)).getText().toString();
         final String pwd = ((TextView) findViewById(R.id.pwdEditText)).getText().toString();
-
 
 
         if (MasterController.getInstance().user.logUser(name, pwd)) {
@@ -198,80 +199,8 @@ public class LoginActivity extends Activity {
             return;
         }
 
-        // přečteme stav z JSONu
-        String error = "";
-        String status = "none";
-        try {
-            //status = "ok";
-            status = evt.getResponse().getString("status");
-            error = evt.getResponse().getString("error");
-        } catch (Exception e) {
-            e.printStackTrace();
-            // chyba, použijeme výchozí hodnoty
-            error = "";
-            status = "none";
-        }
-
-        // pokud je status ok, pokračujeme dále
-        if (status.equals("ok")) {
-
-            // přečteme údaje uživatele
-            boolean jsonError = false; // došlo k chybě při parsování?
-            int id = -1;
-            String name = null;
-            String email = null;
-            String key = null;
-            try {
-/*                id = 10;
-                name = "Roman Kubů";
-                email = "kuburoman@seznam.cz";
-                key = "ea74f882";*/
-
-                id = evt.getResponse().getInt("id");
-                name = evt.getResponse().getString("name");
-                email = evt.getResponse().getString("email");
-                key = evt.getResponse().getString("key");
-            } catch (Exception e) {
-
-                // chyba
-                jsonError = true;
-            }
-
-            // byla chyba parsování?
-            if (!jsonError) {
-
-                MasterController.getInstance().user.checkDefaultPIDs();
-                //UIManager.getInstance().showMenuActivity();
-                return;
-
-            } else {
-
-                // chyba parsování JSONu - zobrazíme neznámou chybu
-                status = "none";
-                error = "";
-            }
-        }
-
-        // pokud jsem tady, přihlášení se nepovedlo, připravíme hlášku ke zobrazení
-        String warningText = getResources().getString(R.string.login_check_error_none);
-        if (error.equals("nameempty")) {
-            warningText = getResources().getString(R.string.login_check_name_empty);
-        }
-        if (error.equals("pwdempty")) {
-            warningText = getResources().getString(R.string.login_check_pwd_empty);
-        }
-        if (error.equals("dbconnect") || error.equals("dberror")) {
-            warningText = getResources().getString(R.string.login_check_db_error);
-        }
-        if (error.equals("nouser")) {
-            warningText = getResources().getString(R.string.login_check_no_user);
-        }
-        if (error.equals("badpwd")) {
-            warningText = getResources().getString(R.string.login_check_bad_pwd);
-        }
-
         // zobrazíme odklikávací varování
-        final String finalWarningText = warningText;
+        final String finalWarningText = getResources().getString(R.string.login_check_bad_pwd);
         runOnUiThread(new Runnable() {
             public void run() {
                 showWarningDialog(finalWarningText);

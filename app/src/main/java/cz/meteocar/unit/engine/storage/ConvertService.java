@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.storage;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +50,7 @@ public class ConvertService extends Thread {
                 try {
                     this.sleep(30000);
                 } catch (Exception e) {
+                    Log.e(AppLog.LOG_TAG_DEFAULT, "Error in convert run", e);
                     threadRun = false;
                 }
             }
@@ -98,6 +101,7 @@ public class ConvertService extends Thread {
                 try {
                     jsonTrip = createJsonTrip(entityList);
                 } catch (JSONException e) {
+                    Log.e(AppLog.LOG_TAG_DEFAULT, "Cannot convert trip", e);
                     e.printStackTrace();
                 }
 
@@ -109,7 +113,7 @@ public class ConvertService extends Thread {
                 }
 
                 DB.recordHelper.updateProcessed(integers, true);
-                AppLog.i(AppLog.LOG_TAG_DB, "Successful creation of trip");
+                Log.d(AppLog.LOG_TAG_DB, "Successful creation of trip");
             }
 
         }

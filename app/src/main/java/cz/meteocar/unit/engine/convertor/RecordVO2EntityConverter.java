@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.convertor;
 
+import android.util.Log;
+
 import org.json.JSONObject;
 
 import cz.meteocar.unit.engine.log.AppLog;
@@ -25,7 +27,7 @@ public class RecordVO2EntityConverter extends AbstractConverter<RecordVO, Record
         try {
             jsonObj.put("value", input.getValue());
         } catch (Exception e) {
-            AppLog.p(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
+            Log.e(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
         }
 
         res.setJson(jsonObj.toString());

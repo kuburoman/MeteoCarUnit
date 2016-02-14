@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -60,8 +61,6 @@ public class NetworkService extends Thread {
     private int checkConnectingStatusRetries;
     private final int MAX_CONN_CHECK_RETRIES = 10; // 10s
 
-    private ArrayList<PostTripRecord> postTripRecordsQueue;
-
     public boolean isConnected(){
         return checkConnectingStatusFlag;
     }
@@ -113,60 +112,6 @@ public class NetworkService extends Thread {
         HashMap<String, String> data;
     }
 
-    public synchronized void sendRequest(String id, String relativeURL, HashMap<String, String> data) {
-        requestQueue.add(new JSONRequest(id, relativeURL, data));
-        this.notifyAll();
-    }
-
-    public synchronized void executeRequest(JSONRequest req) {
-
-        // připravíme http klienta a požadavek na absolutní URL
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpPost httppost = new HttpPost(baseURL + req.relativeURL);
-
-        try {
-
-            // vytvoříme nový seznam hodnot, délka je stejná jako u parametru data
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(req.data.size());
-
-            // postupně přidáme naše data
-            Iterator it = req.data.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry<String, String> pairs = (Map.Entry) it.next();
-                System.out.println(pairs.getKey() + " = " + pairs.getValue());
-                nameValuePairs.add(new BasicNameValuePair(pairs.getKey(), pairs.getValue()));
-                it.remove(); // pro jistotu tento pár rovnou odstraníme
-            }
-
-            // přidáme seznam hodnot do požadavku
-            httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-            // odešleme požadavek a načteme odpověď
-            HttpResponse httpresponse = httpclient.execute(httppost);
-
-            // načíst odpověď po řádcích (ikdyž bude většinou jednořádková.. ale pro jistotu)
-            BufferedReader reader = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent(), "UTF-8"));
-            StringBuilder builder = new StringBuilder();
-            for (String line = null; (line = reader.readLine()) != null; ) {
-                builder.append(line).append("\n");
-            }
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Server response: " + builder.toString());
-
-            // naparsovat JSON
-            JSONTokener tokener = new JSONTokener(builder.toString());
-            JSONObject response = new JSONObject(tokener);
-
-            // oedslat event na bus
-            NetworkRequestEvent evt = new NetworkRequestEvent(req.id, response);
-            ServiceManager.getInstance().eventBus.post(evt).asynchronously();
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "ServerRequestEvent sent");
-
-        } catch (Exception e) {
-            // TODO exception handling
-            e.printStackTrace();
-        }
-    }
-
     /**
      * Ukončí thread bezpečně
      */
@@ -190,18 +135,10 @@ public class NetworkService extends Thread {
                     try {
                         this.sleep(500);
                     } catch (Exception e) {
-                        // no problem, pravděpodobně přišel nový požadavek na service
-                        // a ten náš thread probudil
+                        Log.e(AppLog.LOG_TAG_NETWORK, "Error in sleep", e);
                         threadRun = false;
                     }
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
-                }
-
-                // požadavky na POST/JSON komunikaci
-                if (!requestQueue.isEmpty()) {
-                    AppLog.i("Will exec request");
-                    executeRequest(requestQueue.remove(0));
-                    continue;
                 }
 
                 sendTripsToServer();
@@ -210,7 +147,7 @@ public class NetworkService extends Thread {
                 this.wait(60000);
             }
         } catch (Exception ex) {
-            //
+            Log.e(AppLog.LOG_TAG_NETWORK, "Error in main thread.", ex);
         }
     }
 
@@ -247,7 +184,7 @@ public class NetworkService extends Thread {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(AppLog.LOG_TAG_NETWORK, "Cannot send trip to server.", e);
             return false;
         }
     }
@@ -434,7 +371,7 @@ public class NetworkService extends Thread {
             // začneme updatovat stav
             startUpdatingConnectionStatus();
         } catch (Exception e) {
-
+            Log.e(AppLog.LOG_TAG_NETWORK, "Mobile network cannot be started.", e);
             // nepodařilo se - odešleme event, že není připojení
             updateNetworkStatus();
         }

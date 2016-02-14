@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,7 +68,6 @@ public class OBDService extends Thread {
 
     // bluetooth
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    //private static final UUID MY_UUID = UUID.fromString("E4CBF470-7296-11E4-82F8-0800200C9A66");
     private BluetoothSocket btSocket;   // komunikační socket mezi BT zařízeními
     private BluetoothDevice btDevice;   // vzdálené BT zařízení (OBD adaptér)
     private String btDeviceName;        // název vzdáleného BT zařízení
@@ -330,9 +330,8 @@ public class OBDService extends Thread {
             msgResolver.setInputStream(inStream);
             msgResolver.setOutputStream(outStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(AppLog.LOG_TAG_OBD, "Failed connect to OBD", e);
             disconnectAndCleanup();
-            // TODO - nastavit handlery chybové události
             return false;
         }
         return true;
@@ -356,8 +355,7 @@ public class OBDService extends Thread {
                 btSocket = null;
             }
         } catch (IOException e) {
-            AppLog.p(AppLog.LOG_TAG_OBD,
-                    "IOException while OBD service disconnect");
+            Log.d(AppLog.LOG_TAG_OBD, "IOException while OBD service disconnect", e);
         }
     }
 
@@ -501,21 +499,14 @@ public class OBDService extends Thread {
 
                     // odešleme obd zprávu
                     if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
-//                        AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value: " + msgResolver.getLastInterpretedValue());
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
                         AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");
                         firePIDEvent(msg, -5.0, msgResolver.getLastResponse());
                     }
                 }
-
-                // pokud
-                //setStatusAndFireEvent(OBD_STATE_RECONNECTING);
-
-                //runOnUiThread(done);
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                Log.e(AppLog.LOG_TAG_OBD, "Error in run of OBDService", e);
             }
         }
 

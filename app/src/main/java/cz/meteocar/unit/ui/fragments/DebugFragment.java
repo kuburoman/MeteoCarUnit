@@ -45,14 +45,6 @@ public class DebugFragment extends Fragment {
     private void BUTTON_TEST() {
         AppLog.i(null, "Klik babe");
         textView1.setText("Kliknuto!");
-        // pošle zkušební zprávu
-        ServiceManager.getInstance().network.sendRequest("myid", "test.php", new HashMap<String, String>() {
-                    HashMap<String, String> init() {
-                        put("test", "test");
-                        return this;
-                    }
-                }.init()
-        );
     }
 
     /**

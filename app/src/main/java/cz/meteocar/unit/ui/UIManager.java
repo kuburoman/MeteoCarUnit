@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -321,7 +322,9 @@ public class UIManager {
             AppLog.log(AppLog.LOG_MSG_PROBLEM, "selected fragment not found in hashmap");
             try {
                 displayToast(appContext.getResources().getString(R.string.menu_no_such_fragment));
-            } catch (Exception e) { /* ok */}
+            } catch (Exception e) {
+                Log.e(AppLog.LOG_TAG_DEFAULT, "Error when displaying toast", e);
+            }
             return false;   // nebudeme zavírat menu
         } else {
             AppLog.log(AppLog.LOG_MSG_PROBLEM, "fragment OK");

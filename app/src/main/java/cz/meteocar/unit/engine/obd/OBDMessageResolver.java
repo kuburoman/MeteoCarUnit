@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.obd;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,7 +13,7 @@ import cz.meteocar.unit.engine.log.AppLog;
  * Existuje v jedné instanci vytvořené OBD Service. Zabezpečuje exekuci OBD zpráv, na streamech
  * jež byly otevřeny v OBD Service. Zprávy jsou exekuovány synchronně, proto je možné uchovávat
  * informace o poslední zprac. zprávě, aniž by hrozila chyba synchronizace.
- *
+ * <p/>
  * Created by Toms, 2014.
  */
 public class OBDMessageResolver {
@@ -34,21 +36,27 @@ public class OBDMessageResolver {
     /**
      * Init
      */
-    public OBDMessageResolver(){
+    public OBDMessageResolver() {
         readStringBuilder = new StringBuilder();
     }
 
     /**
      * Nastaví vstupní proud
+     *
      * @param is Vstupní stream
      */
-    public void setInputStream(InputStream is){ inStream = is; }
+    public void setInputStream(InputStream is) {
+        inStream = is;
+    }
 
     /**
      * Nastaví výstupní proud
+     *
      * @param os Výstupní stream
      */
-    public void setOutputStream(OutputStream os){ outStream = os; }
+    public void setOutputStream(OutputStream os) {
+        outStream = os;
+    }
 
     /**
      * Poslední odpověď zařízení (na poslední dotaz)
@@ -67,60 +75,62 @@ public class OBDMessageResolver {
 
     /**
      * Vrátí textovou hodnotu poslední odpocědi OBD BT zařízení
+     *
      * @return Neinterpretovaná textová odpověď
      */
-    public String getLastResponse(){
+    public String getLastResponse() {
         return lastResponse;
     }
 
     /**
      * Vrátí poslední interpretovanou hodnotu
+     *
      * @return Číselná hodnota
      */
-    public double getLastInterpretedValue(){
+    public double getLastInterpretedValue() {
         return lastInterpretedValue;
     }
 
     /**
      * Odešle zprávu do OBD zařízení a načte odpověď
+     *
      * @param msg OBD zpráva
      */
-    public boolean sendMessageToDeviceAndReadReply(OBDMessage msg){
+    public boolean sendMessageToDeviceAndReadReply(OBDMessage msg) {
 
         // nastavíme aktuální zprávu jako poslední
         lastMessage = msg;
-        //AppLog.i("OBD sending: "+msg.getCommand());
 
-        if(sendByteMessage(msg.getCommandByteData())){
-            if(readStringResponse()){
-                //AppLog.i("OBD received: "+lastResponse);
+        if (sendByteMessage(msg.getCommandByteData())) {
+            if (readStringResponse()) {
 
                 // ověříme zprávu, pokud není OK vrátíme chybu
-                if(!isValid()){ return false; }
+                if (!isValid()) {
+                    return false;
+                }
 
                 // interpretuje zprávu, pokud je to potřeba
-                if(msg.needsInterpreting()){
+                if (msg.needsInterpreting()) {
                     lastInterpretedValue = msg.getValueFrom(lastResponse);
                 }
                 return true;
-            }else{
-                // TODO - failed to read message
-                AppLog.p("Failed read msg response to: "+msg.getCommand());
+            } else {
+                AppLog.p("Failed read msg response to: " + msg.getCommand());
                 return false;
             }
-        }else{
-            // TODO - failed to send message
-            AppLog.p("Failed to send msg: "+msg.getCommand());
+        } else {
+            AppLog.p("Failed to send msg: " + msg.getCommand());
             return false;
         }
     }
 
     /**
      * Odešle zprávu do výstupního proudu k zařázení
+     *
      * @param byteMsg Zpráva k odeslání
      * @return True - pokud nedošlo k vyjímce, False - pokud došlo
      */
-    private boolean sendByteMessage(byte[] byteMsg){
+    private boolean sendByteMessage(byte[] byteMsg) {
         try {
             outStream.write(byteMsg);
         } catch (IOException e) {
@@ -128,13 +138,13 @@ public class OBDMessageResolver {
         }
         return true;
     }
-    // TODO - udělat aby to po odpojení kabelu nebrečelo :-)
 
     /**
      * Načíst odpověd zařízení ze vstupního streamu
+     *
      * @return True - pokud nedošlo k vyjímce, False - pokud ano
      */
-    private boolean readStringResponse(){
+    private boolean readStringResponse() {
 
         // smazání minulé obdržené zprávy
         // objekt je znovupoužit nastavením délky na 0, data budou přepsána
@@ -143,15 +153,11 @@ public class OBDMessageResolver {
         // cyklus čtení
         try {
             int data = inStream.read();
-            //AppLog.i("Incoming data: "+data);
             while (data != 62) {    // '<' - smybol uznačující konec zprávy
-                if ( (data != 10) && (data != 13) ) {   // vynechání znaků pro ukočení řádku
-                        readStringBuilder.append((char)data);
-                        //AppLog.i("Recorded data: "+data);
-                        //AppLog.i("Recorded data str: "+readStringBuilder.toString());
+                if ((data != 10) && (data != 13)) {   // vynechání znaků pro ukočení řádku
+                    readStringBuilder.append((char) data);
                 }
                 data = inStream.read();
-                //AppLog.i("Incoming data: "+data);
             }
 
             // přečte odpověď z builderu
@@ -159,7 +165,7 @@ public class OBDMessageResolver {
             return true;
         } catch (IOException e) {
             lastResponse = readStringBuilder.toString();
-            AppLog.i("OBD msg - EXCEPTION while reading response");
+            Log.d(AppLog.LOG_TAG_OBD, "EXCEPTION while reading response: " + lastResponse, e);
             return false;
         }
     }
@@ -178,19 +184,21 @@ public class OBDMessageResolver {
 
     /**
      * Vrátí poslední chybový kód, zjištěný při volání isValid()
+     *
      * @return Chybový kód, pořadí detekované chyby v seznamu errorCode
      */
-    public int getLastErrorCode(){
+    public int getLastErrorCode() {
         return lastErrorCode;
     }
 
     /**
      * Zkontroluje, zda poslední odpověď neobsahovala jeden z chybových kódů
+     *
      * @return True - pokud je odpověď v pořádku, False - odpověď obsahuje chybový kód
      */
-    private boolean isErrorFree(String msg){
+    private boolean isErrorFree(String msg) {
         for (int i = 0; i < errorCode.length; i++) {
-            if(msg.contains(errorCode[i])){
+            if (msg.contains(errorCode[i])) {
                 lastErrorCode = i;
                 return false;
             }
@@ -200,18 +208,23 @@ public class OBDMessageResolver {
 
     /**
      * Je odpověď na poslední zprávu platná
+     *
      * @return True - pokud ano, False - pokud ne
      */
-    public boolean isValid(){
+    public boolean isValid() {
 
         // odpověď byla nulová
-        if(lastResponse == null){ return false; }
+        if (lastResponse == null) {
+            return false;
+        }
 
         // obsahovala chybový kód?
-        if(!isErrorFree(lastResponse)){ return false; }
+        if (!isErrorFree(lastResponse)) {
+            return false;
+        }
 
         //
-        if(lastMessage.needsInterpreting()){
+        if (lastMessage.needsInterpreting()) {
 
             // je syntaxe odpovědi ok?
             return lastMessage.isValid();
@@ -219,7 +232,7 @@ public class OBDMessageResolver {
         } else {
 
             // obsahuje požadovaný řetězec, který potvrdí správnost?
-            if(lastMessage.getValidationString() != null) {
+            if (lastMessage.getValidationString() != null) {
                 return lastResponse.contains(lastMessage.getValidationString());
             }
 

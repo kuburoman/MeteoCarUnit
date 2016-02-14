@@ -61,21 +61,19 @@ public class MeanFilterSmoothing
 	 */
 	public MeanFilterSmoothing()
 	{
-		dataLists = new ArrayList<LinkedList<Number>>();
+		dataLists = new ArrayList<>();
 		dataInit = false;
 	}
 
 	/**
 	 * Filter the data.
-	 * 
-	 * @param iterator
-	 *            contains input the data.
+	 *
 	 * @return the filtered output data.
 	 */
 	public float[] addSamples(float[] data)
 	{
 		// Initialize the start time.
-		if (startTime == 0)
+		if (Float.floatToRawIntBits(startTime) == 0)
 		{
 			startTime = System.nanoTime();
 		}
@@ -137,7 +135,7 @@ public class MeanFilterSmoothing
 			count++;
 		}
 
-		if (count != 0)
+		if (Float.floatToRawIntBits(count) != 0)
 		{
 			m = m / count;
 		}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="projectSettings">
+    <option name="alternativeWorkingDirPath" value="" />
+    <option name="localAnalysisScripName" value="&lt;NO LOCAL ANALYSIS&gt;" />
+    <option name="resources">
+      <list>
+        <Resource>
+          <option name="creationDate" value="1455392855000" />
+          <option name="date" value="1455443818000" />
+          <option name="description" value="Sonar" />
+          <option name="id" value="1" />
+          <option name="key" value="MeteoCarUnit:app" />
+          <option name="longName" value="Meteocar" />
+          <option name="name" value="Meteocar" />
+          <option name="qualifier" value="TRK" />
+          <option name="scope" value="PRJ" />
+          <option name="version" value="1.0.2" />
+        </Resource>
+      </list>
+    </option>
+    <option name="serverName" value="localhost" />
+    <option name="useAlternativeWorkingDir" value="false" />
+    <option name="workingDirSelection" value="&lt;PROJECT&gt;" />
+  </component>
+</project>

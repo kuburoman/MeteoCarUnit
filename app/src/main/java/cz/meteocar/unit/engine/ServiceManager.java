@@ -1,6 +1,7 @@
 package cz.meteocar.unit.engine;
 
 import android.content.Context;
+import android.util.Log;
 
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
@@ -8,6 +9,7 @@ import net.engio.mbassy.bus.config.BusConfiguration;
 import cz.meteocar.unit.engine.accel.AccelService;
 import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
+import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.ConvertService;
@@ -78,11 +80,31 @@ public class ServiceManager {
         convert.exit();
 
         // teď jen voláme na jejich vláknech joiny
-        try{clock.join(500);      }catch(InterruptedException e){ /*nevadí*/}
-        try{gps.join(500);      }catch(InterruptedException e){ /*nevadí*/}
-        try{obd.join(500);      }catch(InterruptedException e){ /*nevadí*/}
-        try{db.join(500);       }catch(InterruptedException e){ /*nevadí*/}
-        try{network.join(500);  }catch(InterruptedException e){ /*nevadí*/}
+        try{
+            clock.join(500);
+        }catch(InterruptedException e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Clock thread interrupted for calling join.",e);
+        }
+        try{
+            gps.join(500);
+        }catch(InterruptedException e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "GPS thread interrupted for calling join.",e);
+        }
+        try{
+            obd.join(500);
+        }catch(InterruptedException e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "OBD thread interrupted for calling join.",e);
+        }
+        try{
+            db.join(500);
+        }catch(InterruptedException e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "DB thread interrupted for calling join.",e);
+        }
+        try{
+            network.join(500);
+        }catch(InterruptedException e){
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Network thread interrupted for calling join.",e);
+        }
 
         // nastavíme na null, pro jistotu
         gps = null;
