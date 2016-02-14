@@ -5,24 +5,24 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 
 /**
- * Servisa starající se o ukládání a načítání usera z databáze.
+ * Helper for saving and loading {@link UserEntity}.
  */
 public class UserHelper {
 
-    /* Definice obsahu DB tabulky */
-    public static final String TABLE_NAME = "meteocar_users";
-    public static final String COLUMN_NAME_ID = "id";
-    public static final String COLUMN_NAME_USERNAME = "username";
-    public static final String COLUMN_NAME_PASSWORD = "password";
-    public static final String COLUMN_NAME_LOGGED = "logged";
+    private DatabaseHelper helper;
 
-    /* SQL statement pro vytvoření tabulky */
+    private static final String TABLE_NAME = "meteocar_users";
+    private static final String COLUMN_NAME_ID = "id";
+    private static final String COLUMN_NAME_USERNAME = "username";
+    private static final String COLUMN_NAME_PASSWORD = "password";
+    private static final String COLUMN_NAME_LOGGED = "logged";
+
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + MySQLiteConfig.TYPE_ID + MySQLiteConfig.COMMA_SEP +
@@ -38,67 +38,64 @@ public class UserHelper {
             COLUMN_NAME_LOGGED + ") VALUES(" +
             "1, 'Johny', 'root', 0)";
 
-    /* SQL statement pro smazání tabulky */
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
+    public static final String SQL_GET_ALL = "SELECT * FROM " + TABLE_NAME;
+
     /**
-     * Načte všechny záznamy
+     * Constructor.
      *
-     * @return ArrayList všech objektů
+     * @param helper {@Link DatabaseHelper}
      */
-    public static ArrayList<UserEntity> getAll() {
-
-        ArrayList<UserEntity> arr = new ArrayList<>();
-
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-
-        // projdeme po řádcích
-        UserEntity obj;
-        if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
-
-                obj = new UserEntity();
-                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
-                obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
-                obj.setLogged(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
-                arr.add(obj);
-
-                // další
-                cursor.moveToNext();
-            }
-        }
-
-        // ok
-        return arr;
+    public UserHelper(DatabaseHelper helper) {
+        this.helper = helper;
     }
 
     /**
-     * Vložení nového objektu
+     * Returns all {@link UserEntity} stored in DB.
      *
-     * @param obj Vkládaný objekt
-     * @return Počet ovlivněných řádek
+     * @return List of {@link UserEntity}
+     */
+    public List<UserEntity> getAll() {
+        ArrayList<UserEntity> arr = new ArrayList<>();
+
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    arr.add(convert(cursor));
+                    cursor.moveToNext();
+                }
+            }
+
+            return arr;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Inserts new {@link UserEntity} into DB.
+     *
+     * @param obj {@link UserEntity}
+     * @return Number of affected rows
      */
     public UserEntity save(UserEntity obj) {
-
-        // nové values
         ContentValues values = new ContentValues();
 
-        // nastavíme hodnoty
         values.put(COLUMN_NAME_USERNAME, obj.getUsername());
         values.put(COLUMN_NAME_PASSWORD, obj.getPassword());
         values.put(COLUMN_NAME_LOGGED, obj.getLogged());
 
-        // db
-        SQLiteDatabase db = DB.helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
 
-        // vložíme nebo updatujeme v závislosti na ID
         if (obj.getId() > 0) {
-
-            // máme id, provedeme update
             values.put(COLUMN_NAME_ID, obj.getId());
-            int id = db.update(TABLE_NAME, values, "id = ?", new String[]{"" + obj.getId()});
+            int id = db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
             obj.setId(id);
             return obj;
         } else {
@@ -108,145 +105,151 @@ public class UserHelper {
         }
     }
 
+    /**
+     * Set user logged.
+     *
+     * @param userEntity user to log
+     */
     public void logUser(UserEntity userEntity) {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        // nastavíme kurzor k požadovanému řádku
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null);
 
-        UserEntity obj;
-        if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
+        try {
 
-                obj = new UserEntity();
-                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
-                obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
-                obj.setLogged(false);
-                save(obj);
+            UserEntity obj;
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
 
-                // další
-                cursor.moveToNext();
+                    obj = new UserEntity();
+                    obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+                    obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
+                    obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
+                    obj.setLogged(false);
+                    save(obj);
+
+                    cursor.moveToNext();
+                }
+            }
+
+            userEntity.setLogged(true);
+            save(userEntity);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
-
-        userEntity.setLogged(true);
-        save(userEntity);
     }
 
 
     /**
-     * Získání objektu z DB dle ID
+     * Returns {@link UserEntity} based on id
      *
-     * @param id ID objektu
-     * @return True - pokud se podařilo objekt nalézt, False - pokud ne
+     * @param id of user entity
+     * @return {@link UserEntity}
      */
     public UserEntity get(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
 
-        // nastavíme kurzor k požadovanému řádku
-        Cursor c = db.query(TABLE_NAME, null, "id = ?", new String[]{"" + id}, null, null, null);
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                return convert(cursor);
+            } else {
+                return null;
+            }
 
-        // pokud máme výsledek zkopírujeme hodnoty
-        ContentValues values = new ContentValues();
-        if (c.getCount() > 0) {
-            c.moveToFirst();
-
-            // přečeteme hodnoty a vrátíme
-            UserEntity obj = new UserEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setUsername(c.getString(c.getColumnIndex(COLUMN_NAME_USERNAME)));
-            obj.setPassword(c.getString(c.getColumnIndex(COLUMN_NAME_PASSWORD)));
-            obj.setLogged(c.getInt(c.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
-            return obj;
-
-        } else {
-            return null;
-        }
-    }
-
-    public UserEntity getUser(String username, String password) {
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        // nastavíme kurzor k požadovanému řádku
-        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ? and " + COLUMN_NAME_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
-
-        // pokud máme výsledek zkopírujeme hodnoty
-        ContentValues values = new ContentValues();
-        if (c.getCount() > 0) {
-            c.moveToFirst();
-
-            // přečeteme hodnoty a vrátíme
-            UserEntity obj = new UserEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setUsername(c.getString(c.getColumnIndex(COLUMN_NAME_USERNAME)));
-            obj.setPassword(c.getString(c.getColumnIndex(COLUMN_NAME_PASSWORD)));
-            obj.setLogged(c.getInt(c.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
-            return obj;
-
-        } else {
-            return null;
-        }
-    }
-
-    public UserEntity getLoggedUser() {
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        // nastavíme kurzor k požadovanému řádku
-        Cursor c = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null, "1");
-
-        // pokud máme výsledek zkopírujeme hodnoty
-        ContentValues values = new ContentValues();
-        if (c.getCount() > 0) {
-            c.moveToFirst();
-
-            // přečeteme hodnoty a vrátíme
-            UserEntity obj = new UserEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setUsername(c.getString(c.getColumnIndex(COLUMN_NAME_USERNAME)));
-            obj.setPassword(c.getString(c.getColumnIndex(COLUMN_NAME_PASSWORD)));
-            obj.setLogged(c.getInt(c.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
-            return obj;
-
-        } else {
-            return null;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
     /**
-     * Vrátí počet řádků tabulky
+     * Return user for given username and password
      *
-     * @return Počet řádků
+     * @param username of user
+     * @param password of user
+     * @return {@link UserEntity}
+     */
+    public UserEntity getUser(String username, String password) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ? and " + COLUMN_NAME_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
+
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                return convert(cursor);
+
+            } else {
+                return null;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Return logged users
+     *
+     * @return {@link UserEntity}
+     */
+    public UserEntity getLoggedUser() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null, "1");
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                return convert(cursor);
+            } else {
+                return null;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    /**
+     * Return number of records.
+     *
+     * @return number of records
      */
     public int getNumberOfRecord() {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // připravíme sql query na všechny řádky
-        String countQuery = "SELECT  * FROM " + TABLE_NAME;
-
-        // db
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        // uděláme z query cursor, načteme počet řádek a uzavřeme ho
-        Cursor cursor = db.rawQuery(countQuery, null);
+        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
         int cnt = cursor.getCount();
         cursor.close();
 
-        //
         return cnt;
     }
 
     /**
-     * Smaže všechny záznamy z tabulky
+     * Deletes all records in table
      */
     public void deleteAllRecords() {
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
+    }
+
+    protected UserEntity convert(Cursor cursor) {
+        UserEntity obj = new UserEntity();
+        obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+        obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
+        obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
+        obj.setLogged(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
+        return obj;
+
     }
 
 

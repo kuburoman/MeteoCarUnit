@@ -3,7 +3,6 @@ package cz.meteocar.unit.engine.storage;
 import android.content.SharedPreferences;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
@@ -13,13 +12,10 @@ import cz.meteocar.unit.engine.storage.helper.UserHelper;
 /**
  * Třída s duplicitními referencemi k objektům a metodám DB
  * - slouží pro pohodlnější přístup k často používaným DB objektům
- * <p/>
- * Created by Toms, 2014.
  */
 public class DB {
 
     // DB helpery
-    public static DatabaseHelper helper;
     public static RecordHelper recordHelper;
     public static TripHelper tripHelper;
     public static UserHelper userHelper;

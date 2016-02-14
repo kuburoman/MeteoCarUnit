@@ -33,7 +33,7 @@ import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
  * Created by Toms, 2014.
@@ -305,9 +305,9 @@ public class SettingsActivity extends PreferenceActivity
         //checkBoxPreference.setChecked(true);
         //targetCategory.addPreference(checkBoxPreference);
 
-        ArrayList<ObdPidObject> arr = DB.obdPidHelper.getAll();
+        ArrayList<ObdPidEntity> arr = DB.obdPidHelper.getAll();
         int index = 0;
-        for (ObdPidObject pid : arr) {
+        for (ObdPidEntity pid : arr) {
 
             //
             AppLog.i(AppLog.LOG_TAG_UI, "Adding obd pid button: " + pid.getName());
@@ -349,7 +349,7 @@ public class SettingsActivity extends PreferenceActivity
         //txt.setText("Showing menu item: " + i);
 
         // načteme z DB PID
-        ObdPidObject pid = DB.obdPidHelper.get(id);
+        ObdPidEntity pid = DB.obdPidHelper.get(id);
 
         // pokud nebyl PID nalezen
         if (pid == null) {
@@ -546,7 +546,7 @@ public class SettingsActivity extends PreferenceActivity
                         dialog.dismiss();
 
                         // připravíme si objekt
-                        ObdPidObject obj = new ObdPidObject();
+                        ObdPidEntity obj = new ObdPidEntity();
 
                         // id
                         obj.setId(dialogDataID);

@@ -8,6 +8,11 @@
             <set />
           </value>
         </entry>
+        <entry key="/a.dummy">
+          <value>
+            <set />
+          </value>
+        </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/controller/MasterController.java">
           <value>
             <set>
@@ -2467,318 +2472,12 @@
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/DB.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6J" />
-                <option name="line" value="22" />
-                <option name="message" value="Make helper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTSEpl06MsfbO6D" />
-                <option name="line" value="22" />
-                <option name="message" value="Make this &quot;public static helper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6M" />
-                <option name="line" value="25" />
-                <option name="message" value="Make userHelper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTTEpl06MsfbO6G" />
-                <option name="line" value="25" />
-                <option name="message" value="Make this &quot;public static userHelper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6N" />
-                <option name="line" value="26" />
-                <option name="message" value="Make obdPidHelper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTTEpl06MsfbO6H" />
-                <option name="line" value="26" />
-                <option name="message" value="Make this &quot;public static obdPidHelper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6K" />
-                <option name="line" value="23" />
-                <option name="message" value="Make recordHelper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTTEpl06MsfbO6E" />
-                <option name="line" value="23" />
-                <option name="message" value="Make this &quot;public static recordHelper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6L" />
-                <option name="line" value="24" />
-                <option name="message" value="Make tripHelper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTTEpl06MsfbO6F" />
-                <option name="line" value="24" />
-                <option name="message" value="Make this &quot;public static tripHelper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTVEpl06MsfbO6O" />
-                <option name="line" value="27" />
-                <option name="message" value="Make filterSettingHelper a static final constant or non-public and provide accessors if needed." />
-                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTUEpl06MsfbO6I" />
-                <option name="line" value="27" />
-                <option name="message" value="Make this &quot;public static filterSettingHelper&quot; field final" />
-                <option name="ruleKey" value="squid:S1444" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTVEpl06MsfbO6P" />
-                <option name="line" value="19" />
-                <option name="message" value="Add a private constructor to hide the implicit public one." />
-                <option name="ruleKey" value="squid:S1118" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/DatabaseService.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTiEpl06MsfbO6p" />
-                <option name="line" value="228" />
-                <option name="message" value="At most one statement is allowed per line, but 2 statements were found on this line." />
-                <option name="ruleKey" value="squid:S00122" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTiEpl06MsfbO6n" />
-                <option name="line" value="193" />
-                <option name="message" value="At most one statement is allowed per line, but 2 statements were found on this line." />
-                <option name="ruleKey" value="squid:S00122" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6c" />
-                <option name="line" value="106" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTdEpl06MsfbO6V" />
-                <option name="line" value="80" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6a" />
-                <option name="line" value="100" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6b" />
-                <option name="line" value="101" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6f" />
-                <option name="line" value="225" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTbEpl06MsfbO6Q" />
-                <option name="line" value="42" />
-                <option name="message" value="Remove this unused &quot;helper&quot; private field." />
-                <option name="ruleKey" value="squid:S1068" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTiEpl06MsfbO6o" />
-                <option name="line" value="209" />
-                <option name="message" value="At most one statement is allowed per line, but 2 statements were found on this line." />
-                <option name="ruleKey" value="squid:S00122" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTfEpl06MsfbO6X" />
-                <option name="line" value="92" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTcEpl06MsfbO6S" />
-                <option name="line" value="72" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTcEpl06MsfbO6R" />
-                <option name="line" value="48" />
-                <option name="message" value="Replace the type specification in this constructor call with the diamond operator (&quot;&lt;&gt;&quot;)." />
-                <option name="ruleKey" value="squid:S2293" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTdEpl06MsfbO6W" />
-                <option name="line" value="86" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTiEpl06MsfbO6l" />
-                <option name="line" value="348" />
-                <option name="message" value="Rename this field &quot;SHARED_PREFS_NAME&quot; to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00116" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6j" />
-                <option name="line" value="348" />
-                <option name="message" value="Make this final field static too." />
-                <option name="ruleKey" value="squid:S1170" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6e" />
-                <option name="line" value="348" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6g" />
-                <option name="line" value="237" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTcEpl06MsfbO6U" />
-                <option name="line" value="79" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6k" />
-                <option name="line" value="299" />
-                <option name="message" value="Either log or rethrow this exception." />
-                <option name="ruleKey" value="squid:S1166" />
-                <option name="severity" value="CRITICAL" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6Y" />
-                <option name="line" value="98" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTiEpl06MsfbO6m" />
-                <option name="line" value="177" />
-                <option name="message" value="At most one statement is allowed per line, but 2 statements were found on this line." />
-                <option name="ruleKey" value="squid:S00122" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKThEpl06MsfbO6h" />
-                <option name="line" value="298" />
-                <option name="message" value="Change this instance-reference to a static reference." />
-                <option name="ruleKey" value="squid:S2209" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6Z" />
-                <option name="line" value="99" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTcEpl06MsfbO6T" />
-                <option name="line" value="78" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKTgEpl06MsfbO6d" />
-                <option name="line" value="157" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/FileSystem.java">
@@ -2811,312 +2510,27 @@
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/DatabaseHelper.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKT9Epl06MsfbO6t" />
-                <option name="line" value="9" />
-                <option name="message" value="Remove this unused import 'cz.meteocar.unit.engine.storage.model.FilterSettingEntity'." />
-                <option name="ruleKey" value="squid:UselessImportCheck" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/FilterSettingHelper.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUFEpl06MsfbO6z" />
-                <option name="line" value="184" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUEEpl06MsfbO6y" />
-                <option name="line" value="150" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUEEpl06MsfbO6x" />
-                <option name="line" value="88" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUEEpl06MsfbO6w" />
-                <option name="line" value="76" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUEEpl06MsfbO6v" />
-                <option name="line" value="35" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot; DEFAULT ''&quot; 8 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUDEpl06MsfbO6u" />
-                <option name="line" value="138" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot;id = ?&quot; 3 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/ObdPidHelper.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUNEpl06MsfbO69" />
-                <option name="line" value="196" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO68" />
-                <option name="line" value="114" />
-                <option name="message" value="Remove this useless assignment to local variable &quot;cursor&quot;." />
-                <option name="ruleKey" value="squid:S1854" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO67" />
-                <option name="line" value="282" />
-                <option name="message" value="Remove the unused method parameter(s) &quot;newName&quot;." />
-                <option name="ruleKey" value="squid:S1172" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO66" />
-                <option name="line" value="124" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO65" />
-                <option name="line" value="107" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO64" />
-                <option name="line" value="97" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO63" />
-                <option name="line" value="88" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUMEpl06MsfbO62" />
-                <option name="line" value="45" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot; DEFAULT ''&quot; 4 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKULEpl06MsfbO61" />
-                <option name="line" value="114" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot;SELECT * FROM &quot; 3 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKULEpl06MsfbO60" />
-                <option name="line" value="49" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot; DEFAULT 0&quot; 4 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/RecordHelper.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUZEpl06MsfbO7G" />
-                <option name="line" value="155" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUYEpl06MsfbO6_" />
-                <option name="line" value="404" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUaEpl06MsfbO7J" />
-                <option name="line" value="233" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUZEpl06MsfbO7E" />
-                <option name="line" value="140" />
-                <option name="message" value="Immediately return this expression instead of assigning it to the temporary variable &quot;obj&quot;." />
-                <option name="ruleKey" value="squid:S1488" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUbEpl06MsfbO7V" />
-                <option name="line" value="135" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUaEpl06MsfbO7M" />
-                <option name="line" value="403" />
-                <option name="message" value="Complete the task associated to this TODO comment." />
-                <option name="ruleKey" value="squid:S1135" />
-                <option name="severity" value="INFO" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUYEpl06MsfbO7B" />
-                <option name="line" value="460" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUbEpl06MsfbO7T" />
-                <option name="line" value="277" />
-                <option name="message" value="Define and throw a dedicated exception instead of using a generic one." />
-                <option name="ruleKey" value="squid:S00112" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUbEpl06MsfbO7U" />
-                <option name="line" value="397" />
-                <option name="message" value="Remove this useless assignment to local variable &quot;k&quot;." />
-                <option name="ruleKey" value="squid:S1854" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUaEpl06MsfbO7O" />
-                <option name="line" value="397" />
-                <option name="message" value="Remove this unused &quot;k&quot; local variable." />
-                <option name="ruleKey" value="squid:S1481" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUXEpl06MsfbO6-" />
-                <option name="line" value="47" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot; DEFAULT ''&quot; 5 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUYEpl06MsfbO7A" />
-                <option name="line" value="423" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/TripHelper.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUlEpl06MsfbO7b" />
-                <option name="line" value="166" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUlEpl06MsfbO7a" />
-                <option name="line" value="107" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUkEpl06MsfbO7Z" />
-                <option name="line" value="12" />
-                <option name="message" value="Remove this unused import 'cz.meteocar.unit.engine.storage.model.RecordEntity'." />
-                <option name="ruleKey" value="squid:UselessImportCheck" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUkEpl06MsfbO7Y" />
-                <option name="line" value="53" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUkEpl06MsfbO7X" />
-                <option name="line" value="41" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUkEpl06MsfbO7W" />
-                <option name="line" value="90" />
-                <option name="message" value="Define a constant instead of duplicating this literal &quot;id = ?&quot; 3 times." />
-                <option name="ruleKey" value="squid:S1192" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/UserHelper.java">
@@ -3124,82 +2538,34 @@
             <set>
               <SonarIssue>
                 <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUtEpl06MsfbO7o" />
-                <option name="line" value="152" />
-                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
-                <option name="ruleKey" value="squid:S2131" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUtEpl06MsfbO7n" />
-                <option name="line" value="205" />
-                <option name="message" value="Remove this useless assignment to local variable &quot;values&quot;." />
-                <option name="ruleKey" value="squid:S1854" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
                 <option name="key" value="AVLcLKUtEpl06MsfbO7m" />
-                <option name="line" value="180" />
+                <option name="line" value="182" />
                 <option name="message" value="Remove this useless assignment to local variable &quot;values&quot;." />
                 <option name="ruleKey" value="squid:S1854" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUtEpl06MsfbO7l" />
-                <option name="line" value="155" />
-                <option name="message" value="Remove this useless assignment to local variable &quot;values&quot;." />
-                <option name="ruleKey" value="squid:S1854" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUtEpl06MsfbO7k" />
-                <option name="line" value="205" />
-                <option name="message" value="Remove this unused &quot;values&quot; local variable." />
-                <option name="ruleKey" value="squid:S1481" />
                 <option name="severity" value="MAJOR" />
               </SonarIssue>
               <SonarIssue>
                 <option name="isNew" value="false" />
                 <option name="key" value="AVLcLKUsEpl06MsfbO7j" />
-                <option name="line" value="180" />
+                <option name="line" value="182" />
                 <option name="message" value="Remove this unused &quot;values&quot; local variable." />
                 <option name="ruleKey" value="squid:S1481" />
                 <option name="severity" value="MAJOR" />
               </SonarIssue>
               <SonarIssue>
                 <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUsEpl06MsfbO7i" />
-                <option name="line" value="155" />
-                <option name="message" value="Remove this unused &quot;values&quot; local variable." />
-                <option name="ruleKey" value="squid:S1481" />
-                <option name="severity" value="MAJOR" />
+                <option name="key" value="AVLcLKUsEpl06MsfbO7d" />
+                <option name="line" value="23" />
+                <option name="message" value="Remove this hard-coded password." />
+                <option name="ruleKey" value="squid:S2068" />
+                <option name="severity" value="CRITICAL" />
               </SonarIssue>
               <SonarIssue>
                 <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUsEpl06MsfbO7h" />
-                <option name="line" value="121" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUsEpl06MsfbO7g" />
-                <option name="line" value="59" />
-                <option name="message" value="Remove the literal &quot;false&quot; boolean value." />
-                <option name="ruleKey" value="squid:S1125" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUsEpl06MsfbO7f" />
-                <option name="line" value="49" />
-                <option name="message" value="The return type of this method should be an interface such as &quot;List&quot; rather than the implementation &quot;ArrayList&quot;." />
-                <option name="ruleKey" value="squid:S1319" />
+                <option name="key" value="AVLcLKUtEpl06MsfbO7o" />
+                <option name="line" value="154" />
+                <option name="message" value="Use &quot;Integer.toString&quot; instead." />
+                <option name="ruleKey" value="squid:S2131" />
                 <option name="severity" value="MAJOR" />
               </SonarIssue>
               <SonarIssue>
@@ -3212,11 +2578,19 @@
               </SonarIssue>
               <SonarIssue>
                 <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKUsEpl06MsfbO7d" />
-                <option name="line" value="22" />
-                <option name="message" value="Remove this hard-coded password." />
-                <option name="ruleKey" value="squid:S2068" />
-                <option name="severity" value="CRITICAL" />
+                <option name="key" value="AVLcLKUtEpl06MsfbO7n" />
+                <option name="line" value="208" />
+                <option name="message" value="Remove this useless assignment to local variable &quot;values&quot;." />
+                <option name="ruleKey" value="squid:S1854" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKUtEpl06MsfbO7k" />
+                <option name="line" value="208" />
+                <option name="message" value="Remove this unused &quot;values&quot; local variable." />
+                <option name="ruleKey" value="squid:S1481" />
+                <option name="severity" value="MAJOR" />
               </SonarIssue>
               <SonarIssue>
                 <option name="isNew" value="false" />
@@ -3226,6 +2600,11 @@
                 <option name="severity" value="MAJOR" />
               </SonarIssue>
             </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/convertor/Cursor2FilterSettingEntity.java">
+          <value>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/helper/filter/AccelerationVO.java">
@@ -3304,6 +2683,164 @@
                 <option name="message" value="1 duplicated blocks of code must be removed." />
                 <option name="ruleKey" value="common-java:DuplicatedBlocks" />
                 <option name="severity" value="MAJOR" />
+              </SonarIssue>
+            </set>
+          </value>
+        </entry>
+        <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/engine/storage/model/ObdPidEntity.java">
+          <value>
+            <set>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO7_" />
+                <option name="line" value="27" />
+                <option name="message" value="Make formula a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO72" />
+                <option name="line" value="27" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO8C" />
+                <option name="line" value="30" />
+                <option name="message" value="Make active a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO75" />
+                <option name="line" value="30" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO8B" />
+                <option name="line" value="29" />
+                <option name="message" value="Make max a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO74" />
+                <option name="line" value="29" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO7-" />
+                <option name="line" value="26" />
+                <option name="message" value="Make pidCode a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO71" />
+                <option name="line" value="26" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVcEpl06MsfbO77" />
+                <option name="line" value="23" />
+                <option name="message" value="Make id a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVaEpl06MsfbO7y" />
+                <option name="line" value="23" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVcEpl06MsfbO78" />
+                <option name="line" value="24" />
+                <option name="message" value="Make name a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVaEpl06MsfbO7z" />
+                <option name="line" value="24" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO8A" />
+                <option name="line" value="28" />
+                <option name="message" value="Make min a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO73" />
+                <option name="line" value="28" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVeEpl06MsfbO8F" />
+                <option name="line" value="8" />
+                <option name="message" value="Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation." />
+                <option name="ruleKey" value="squid:S1186" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVdEpl06MsfbO8D" />
+                <option name="line" value="31" />
+                <option name="message" value="Make locked a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVcEpl06MsfbO76" />
+                <option name="line" value="31" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVcEpl06MsfbO79" />
+                <option name="line" value="25" />
+                <option name="message" value="Make tag a static final constant or non-public and provide accessors if needed." />
+                <option name="ruleKey" value="squid:ClassVariableVisibilityCheck" />
+                <option name="severity" value="MAJOR" />
+              </SonarIssue>
+              <SonarIssue>
+                <option name="isNew" value="false" />
+                <option name="key" value="AVLcLKVbEpl06MsfbO70" />
+                <option name="line" value="25" />
+                <option name="message" value="Move this variable to comply with Java Code Conventions." />
+                <option name="ruleKey" value="squid:S1213" />
+                <option name="severity" value="MINOR" />
               </SonarIssue>
             </set>
           </value>
@@ -4651,120 +4188,7 @@
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/ui/fragments/DebugFragment.java">
           <value>
-            <set>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_p" />
-                <option name="line" value="208" />
-                <option name="message" value="Move this variable to comply with Java Code Conventions." />
-                <option name="ruleKey" value="squid:S1213" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXvEpl06MsfbO_v" />
-                <option name="line" value="82" />
-                <option name="message" value="Make &quot;BUTTON_NUKE_TRIPS&quot; a &quot;static&quot; method." />
-                <option name="ruleKey" value="squid:S2325" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXvEpl06MsfbO_1" />
-                <option name="line" value="82" />
-                <option name="message" value="Rename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00100" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_q" />
-                <option name="line" value="85" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXvEpl06MsfbO_w" />
-                <option name="line" value="99" />
-                <option name="message" value="Make &quot;BUTTON_SEND_FILE&quot; a &quot;static&quot; method." />
-                <option name="ruleKey" value="squid:S2325" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXvEpl06MsfbO_2" />
-                <option name="line" value="99" />
-                <option name="message" value="Rename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00100" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_s" />
-                <option name="line" value="91" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXxEpl06MsfbPAA" />
-                <option name="line" value="127" />
-                <option name="message" value="Rename this local variable name to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00117" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_u" />
-                <option name="line" value="275" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXxEpl06MsfbPAD" />
-                <option name="line" value="274" />
-                <option name="message" value="Add the &quot;@Override&quot; annotation above this method signature" />
-                <option name="ruleKey" value="squid:S1161" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXxEpl06MsfbPAC" />
-                <option name="line" value="219" />
-                <option name="message" value="Rename this local variable name to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00117" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_t" />
-                <option name="line" value="100" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXxEpl06MsfbPAB" />
-                <option name="line" value="128" />
-                <option name="message" value="Rename this local variable name to match the regular expression '^[a-z][a-zA-Z0-9]*$'." />
-                <option name="ruleKey" value="squid:S00117" />
-                <option name="severity" value="MINOR" />
-              </SonarIssue>
-              <SonarIssue>
-                <option name="isNew" value="false" />
-                <option name="key" value="AVLcLKXuEpl06MsfbO_r" />
-                <option name="line" value="88" />
-                <option name="message" value="This block of commented-out lines of code should be removed." />
-                <option name="ruleKey" value="squid:CommentedOutCodeLine" />
-                <option name="severity" value="MAJOR" />
-              </SonarIssue>
-            </set>
+            <set />
           </value>
         </entry>
         <entry key="$PROJECT_DIR$/app/src/main/java/cz/meteocar/unit/ui/fragments/DetailsFragment.java">

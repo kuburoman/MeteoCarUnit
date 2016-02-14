@@ -4,41 +4,34 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
+import java.util.List;
 
-import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
- * Created by Nell on 13.12.2015.
+ * Helper for saving and loading {@link ObdPidEntity}.
  */
 public class ObdPidHelper {
 
-    // enum k základním PIDům
     public static final int OBD_PID_ID_SPEED = 1;
     public static final int OBD_PID_ID_RPM = 2;
     public static final int OBD_PID_ID_THROTTLE = 3;
     public static final int OBD_PID_ID_ENGINE_TEMP = 4;
     public static final int OBD_PID_ID_MASS_AIRFLOW = 5;
 
-    /* Definice obsahu DB tabulky */
-    public static final String TABLE_NAME = "obd_pids";
-    public static final String COLUMN_NAME_ID = "id";
-    public static final String COLUMN_NAME_NAME = "name";
-    public static final String COLUMN_NAME_TAG = "tag";
-    public static final String COLUMN_NAME_PID_CODE = "pid_code";
-    public static final String COLUMN_NAME_FORMULA = "formula";
-    public static final String COLUMN_NAME_MIN = "min";
-    public static final String COLUMN_NAME_MAX = "max";
-    public static final String COLUMN_NAME_ACTIVE = "active";
-    public static final String COLUMN_NAME_LOCKED = "locked";
+    private static final String TABLE_NAME = "obd_pids";
+    private static final String COLUMN_NAME_ID = "id";
+    private static final String COLUMN_NAME_NAME = "name";
+    private static final String COLUMN_NAME_TAG = "tag";
+    private static final String COLUMN_NAME_PID_CODE = "pid_code";
+    private static final String COLUMN_NAME_FORMULA = "formula";
+    private static final String COLUMN_NAME_MIN = "min";
+    private static final String COLUMN_NAME_MAX = "max";
+    private static final String COLUMN_NAME_ACTIVE = "active";
+    private static final String COLUMN_NAME_LOCKED = "locked";
 
-    /* SQL statement pro vytvoření tabulky */
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + MySQLiteConfig.TYPE_ID + MySQLiteConfig.COMMA_SEP +
@@ -73,89 +66,67 @@ public class ObdPidHelper {
                     "(4, 'Teplota motoru', 'obd_engine_temp', '01051', 'A-40'           , -40, 215  , 1, 1)," +
                     "(5, 'Aiflow'        , 'obf_airflow'    , '01102', '((A*256)+B)/100', 0  , 656  , 1, 1);";
 
-    /* SQL statement pro smazání tabulky */
-    public static final String SQL_DELETE_ENTRIES =
-            "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    // ---------- Helper metody ------------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
+    private static final String SQL_GET_ALL = "SELECT * FROM " + TABLE_NAME;
+
+    public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
+
+
+    private DatabaseHelper helper;
+
+    public ObdPidHelper(DatabaseHelper helper) {
+        this.helper = helper;
+    }
 
     /**
-     * Načte všechny záznamy
+     * Return all entities in database.
      *
-     * @return ArrayList všech objektů
+     * @return List of {@link ObdPidEntity}.
      */
-    public ArrayList<ObdPidObject> getAll() {
+    public List<ObdPidEntity> getAll() {
         return getAll(false);
     }
 
     /**
-     * Načte všechny záznamy
+     * Return only entities that are active.
      *
-     * @return ArrayList všech objektů
+     * @return List of {@link ObdPidEntity}
      */
-    public ArrayList<ObdPidObject> getAllActive() {
+    public ArrayList<ObdPidEntity> getAllActive() {
         return getAll(true);
     }
 
-    /**
-     * Načte všechny záznamy
-     *
-     * @param onlyActive Omezí na aktivní
-     * @return
-     */
-    public ArrayList<ObdPidObject> getAll(boolean onlyActive) {
+    protected ArrayList<ObdPidEntity> getAll(boolean onlyActive) {
+        ArrayList<ObdPidEntity> arr = new ArrayList<>();
 
-        //
-        ArrayList<ObdPidObject> arr = new ArrayList<>();
-
-        // připravíme kurzor k DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor;
         if (!onlyActive) {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+            cursor = db.rawQuery(SQL_GET_ALL, null);
         } else {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME_ACTIVE + " = 1", null);
+            cursor = db.rawQuery(SQL_GET_ALL + " WHERE " + COLUMN_NAME_ACTIVE + " = 1", null);
         }
 
-        // projdeme po řádcích
-        ObdPidObject obj;
         if (cursor.moveToFirst()) {
-            while (cursor.isAfterLast() == false) {
-
-                obj = new ObdPidObject();
-                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
-                obj.setTag(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TAG)));
-                obj.setPidCode(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PID_CODE)));
-                obj.setFormula(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_FORMULA)));
-                obj.setMin(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MIN)));
-                obj.setMax(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MAX)));
-                obj.setLocked(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOCKED)));
-                obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)));
-                arr.add(obj);
-
-                // další
+            while (!cursor.isAfterLast()) {
+                arr.add(convert(cursor));
                 cursor.moveToNext();
             }
         }
 
-        // ok
+        cursor.close();
         return arr;
     }
 
     /**
-     * Vložení nového objektu
+     * Insert new entity into database
      *
-     * @param obj Vkládaný objekt
-     * @return Počet ovlivněných řádek
+     * @param obj {@link ObdPidEntity}
+     * @return Number of affected rows.
      */
-    public int save(ObdPidObject obj) {
-
-        //  nové values
+    public int save(ObdPidEntity obj) {
         ContentValues values = new ContentValues();
 
-        // nastavíme hodnoty
         values.put(COLUMN_NAME_NAME, obj.getName());
         values.put(COLUMN_NAME_TAG, obj.getTag());
         values.put(COLUMN_NAME_PID_CODE, obj.getPidCode());
@@ -165,137 +136,95 @@ public class ObdPidHelper {
         values.put(COLUMN_NAME_LOCKED, obj.getLocked());
         values.put(COLUMN_NAME_ACTIVE, obj.getActive());
 
-        // db
-        SQLiteDatabase db = DB.helper.getWritableDatabase();
+        SQLiteDatabase db = helper.getWritableDatabase();
 
-        // vložíme nebo updatujeme v závislosti na ID
         if (obj.getId() > 0) {
-
-            // máme id, provedeme update
             values.put(COLUMN_NAME_ID, obj.getId());
-            return (int) db.update(TABLE_NAME, values, "id = ?", new String[]{"" + obj.getId()});
+            return (int) db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
         } else {
-
-            // nemáme íd, vložíme nový záznam
-            return (int) db.insert(TABLE_NAME, null, values);    // nepředpokládáme přetečení int
+            return (int) db.insert(TABLE_NAME, null, values);
         }
     }
 
     /**
-     * Získání objektu z DB dle ID
+     * Returns entity from database based on id.
      *
-     * @param id ID objektu
-     * @return True - pokud se podařilo objekt nalézt, False - pokud ne
+     * @param id of entity
+     * @return {@link ObdPidEntity}
      */
-    public ObdPidObject get(int id) {
+    public ObdPidEntity get(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
 
-        // nastavíme kurzor k požadovanému řádku
-        Cursor c = db.query(TABLE_NAME, null, "id = ?", new String[]{"" + id}, null, null, null);
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-        // pokud máme výsledek zkopírujeme hodnoty
-        if (c.getCount() > 0) {
-            c.moveToFirst();
-
-            // přečeteme hodnoty a vrátíme
-            ObdPidObject obj = new ObdPidObject();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setName(c.getString(c.getColumnIndex(COLUMN_NAME_NAME)));
-            obj.setTag(c.getString(c.getColumnIndex(COLUMN_NAME_TAG)));
-            obj.setPidCode(c.getString(c.getColumnIndex(COLUMN_NAME_PID_CODE)));
-            obj.setFormula(c.getString(c.getColumnIndex(COLUMN_NAME_FORMULA)));
-            obj.setMin(c.getInt(c.getColumnIndex(COLUMN_NAME_MIN)));
-            obj.setMax(c.getInt(c.getColumnIndex(COLUMN_NAME_MAX)));
-            obj.setLocked(c.getInt(c.getColumnIndex(COLUMN_NAME_LOCKED)));
-            obj.setActive(c.getInt(c.getColumnIndex(COLUMN_NAME_ACTIVE)));
-            return obj;
-
-        } else {
-            return null;
+                return convert(cursor);
+            } else {
+                return null;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
     /**
-     * Smaže záznam s daným ID
+     * Deletes entity base on id.
      *
-     * @param id
-     * @return True - úspěch, False - neúspěch
+     * @param id of entity
+     * @return True - success, False - failed to delete
      */
     public boolean delete(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        // smažeme
         return db.delete(TABLE_NAME, COLUMN_NAME_ID + " = " + id, null) > 0;
     }
 
     /**
-     * Vloží záznam z JSONArray objektu
-     * - použije se pro načtení defaultních PIDů z json souboru
-     *
-     * @param arr JSONArray pole osahující záznam ekvivalentní řádku tabulky
-     * @throws JSONException
-     */
-    public void insertFromJSONArray(JSONArray arr) throws JSONException {
-
-        // připravíme objekt s hodnotami
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME_ID, (int) arr.get(0));
-        values.put(COLUMN_NAME_NAME, (String) arr.get(1));
-        values.put(COLUMN_NAME_TAG, (String) arr.get(2));
-        values.put(COLUMN_NAME_PID_CODE, (String) arr.get(3));
-        AppLog.i(AppLog.LOG_TAG_DB, "DB inserting PID code: " + (String) arr.get(3));
-        values.put(COLUMN_NAME_FORMULA, (String) arr.get(4));
-        AppLog.i(AppLog.LOG_TAG_DB, "DB inserting Formula code: " + (String) arr.get(4));
-        values.put(COLUMN_NAME_MIN, (int) arr.get(5));
-        values.put(COLUMN_NAME_MAX, (int) arr.get(6));
-        values.put(COLUMN_NAME_LOCKED, (int) arr.get(7));
-        values.put(COLUMN_NAME_ACTIVE, (int) arr.get(8));
-
-
-        // otevřeme DB
-        SQLiteDatabase db = DB.helper.getWritableDatabase();
-
-        // vložíme do db
-        long newRowID = db.insert(TABLE_NAME, null, values);
-        AppLog.i(AppLog.LOG_TAG_DB, "New pid inserted with ID: " + newRowID);
-    }
-
-    /**
-     * Smaže všechny záznamy z tabulky
+     * Deletes all entities from databse.
      */
     public void deleteAll() {
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
     }
 
     /**
-     * Přidá do tabulky záznam jako kopii jiného záznamu
+     * Adds copy of entity based on id with new name.
      *
-     * @param id      ID kopírovaného záznamu
-     * @param newName Nová název
-     * @return ID nového záznamu
+     * @param id      ID of copied entity
+     * @param newName name of new entity
+     * @return ID of new entity
      */
     public int addOneByCopying(int id, String newName) {
+        ObdPidEntity obj = get(id);
 
-        // nový objekt
-        ObdPidObject obj = get(id);
-
-        // nalezen?
         if (obj == null) {
             return -1;
         }
 
-        // pokud máme výsledek, smažeme id, uzamčení a flag aktivity
         obj.setId(-1);
         obj.setActive(0);
         obj.setLocked(0);
 
-        // uložíme
         return save(obj);
+    }
+
+    protected ObdPidEntity convert(Cursor cursor) {
+        ObdPidEntity obj = new ObdPidEntity();
+        obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+        obj.setName(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_NAME)));
+        obj.setTag(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TAG)));
+        obj.setPidCode(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PID_CODE)));
+        obj.setFormula(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_FORMULA)));
+        obj.setMin(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MIN)));
+        obj.setMax(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MAX)));
+        obj.setLocked(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOCKED)));
+        obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)));
+        return obj;
     }
 
 }

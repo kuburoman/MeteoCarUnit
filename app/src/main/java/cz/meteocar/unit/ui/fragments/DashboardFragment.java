@@ -11,7 +11,6 @@ import android.widget.TextView;
 import net.engio.mbassy.listener.Handler;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
@@ -23,7 +22,7 @@ import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.DatabaseService;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.view.SpeedMeterView;
 
@@ -99,10 +98,10 @@ public class DashboardFragment extends Fragment {
 
         // získáme min a max hodnoty pro tachometry
 
-        ArrayList<ObdPidObject> all = DB.obdPidHelper.getAll();
+        ArrayList<ObdPidEntity> all = DB.obdPidHelper.getAll();
 
-        ObdPidObject speed = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_SPEED);
-        ObdPidObject rpm = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_RPM);
+        ObdPidEntity speed = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_SPEED);
+        ObdPidEntity rpm = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_RPM);
 
         // nastavíme je do tachometrů
         speedGauge.setMinMax(speed.getMin(), speed.getMax());

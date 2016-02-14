@@ -3,12 +3,12 @@ package cz.meteocar.unit.engine.storage.model;
 /**
  * Created by Toms, 2014.
  */
-public class ObdPidObject {
+public class ObdPidEntity {
 
-    public ObdPidObject() {
+    public ObdPidEntity() {
     }
 
-    public ObdPidObject(int id, String name, String tag, String pidCode, String formula, int min, int max, int active, int locked) {
+    public ObdPidEntity(int id, String name, String tag, String pidCode, String formula, int min, int max, int active, int locked) {
         this.id = id;
         this.name = name;
         this.tag = tag;

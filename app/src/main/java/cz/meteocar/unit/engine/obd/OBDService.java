@@ -16,7 +16,7 @@ import java.util.UUID;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
  * Created by Toms, 2014.
@@ -523,7 +523,7 @@ public class OBDService extends Thread {
     private void initPIDQueue() {
 
         // přidáme všechny aktivní z DB
-        for (ObdPidObject pid : DB.obdPidHelper.getAllActive()) {
+        for (ObdPidEntity pid : DB.obdPidHelper.getAllActive()) {
             queue.add(new OBDMessage(
                     pid.getPidCode(),
                     pid.getFormula(),
@@ -535,7 +535,7 @@ public class OBDService extends Thread {
 
         /*
         // rychlost
-        ObdPidObject speedPID = ObdPidObject.get(1);
+        ObdPidEntity speedPID = ObdPidEntity.get(1);
         if(speedPID == null){AppLog.i(AppLog.LOG_TAG_OBD, "speedPID NULL");}
         queue.add(new OBDMessage(
                 speedPID.getPidCode(),
@@ -546,7 +546,7 @@ public class OBDService extends Thread {
         ));
 
         // rpm
-        ObdPidObject rpmPID = ObdPidObject.get(2);
+        ObdPidEntity rpmPID = ObdPidEntity.get(2);
         if(rpmPID == null){AppLog.i(AppLog.LOG_TAG_OBD, "rpmPID NULL");}
         queue.add(new OBDMessage(
                 rpmPID.getPidCode(),

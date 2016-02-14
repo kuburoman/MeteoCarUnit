@@ -38,8 +38,15 @@ public class DatabaseService extends Thread {
     private boolean threadRun;
     private Context context;
 
+
     // helper
     private DatabaseHelper helper;
+    private TripHelper tripHelper;
+    private RecordHelper recordHelper;
+    private UserHelper userHelper;
+    private ObdPidHelper obdPidHelper;
+    private FilterSettingHelper filterSettingHelper;
+
 
     public DatabaseService(Context ctx) {
         context = ctx;
@@ -48,12 +55,12 @@ public class DatabaseService extends Thread {
         queue = new ArrayBlockingQueue<ServiceManager.AppEvent>(20);
 
         // helper
-        helper = DB.helper = new DatabaseHelper(ctx);
-        DB.tripHelper = new TripHelper();
-        DB.recordHelper = new RecordHelper();
-        DB.userHelper = new UserHelper();
-        DB.obdPidHelper = new ObdPidHelper();
-        DB.filterSettingHelper = new FilterSettingHelper();
+        helper = new DatabaseHelper(ctx);
+        tripHelper = new TripHelper(helper);
+        recordHelper = new RecordHelper(helper);
+        userHelper = new UserHelper(helper);
+        obdPidHelper = new ObdPidHelper(helper);
+        filterSettingHelper = new FilterSettingHelper(helper);
 
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
@@ -154,9 +161,8 @@ public class DatabaseService extends Thread {
         gpsLastLocation = loc;
     }
 
-    private double metersPerMilisecConvert = 1.0 / 3600.0;
-
     public void incrementObdDistance(OBDService.OBDEventPID evt) {
+        double metersPerMilisecConvert = 1.0 / 3600.0;
 
         if (obdLastEvent != null) {
             long milisElapsed = evt.getTimeCreated() - obdLastEvent.getTimeCreated();
@@ -173,7 +179,6 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleLocationUpdate(ServiceGPS.GPSPositionEvent evt) {
-
         if (!tripRecordEnabled) {
             return;
         }
@@ -188,13 +193,10 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleLocationUpdate(OBDService.OBDEventPID evt) {
-
-        // je povolen záznam?
         if (!tripRecordEnabled) {
             return;
         }
 
-        // záznam
         queue.add(evt);
     }
 
@@ -205,7 +207,6 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleAccelEvent(AccelService.AccelEvent evt) {
-
         if (!tripRecordEnabled) {
             return;
         }
@@ -220,23 +221,12 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleClockEvent(ClockService.TimeEvent evt) {
-
-        // debug
-        //AppLog.i(AppLog.LOG_TAG_DB, "time incomin");
-
-        // je povolen záznam?
         if (!tripRecordEnabled) {
             return;
         }
 
-        // inkrementujeme čas
-        // - nepředpokládáme race condition, neboť event příchází jen jednou za 1s
         seconds++;
 
-        // debug
-        //AppLog.i(AppLog.LOG_TAG_DB, "sending time event");
-
-        // odešleme event
         ServiceManager.getInstance().eventBus.post(
                 new DBEvent(count, seconds, obdDistance, gpsDistance)
         ).asynchronously();
@@ -365,11 +355,26 @@ public class DatabaseService extends Thread {
         return getSettings().edit();
     }
 
-    /**
-     * Vymaže všechna nastavení (!)
-     */
-    public void eraseSettings() {
-        getSettings().edit().clear().commit();
+    public TripHelper getTripHelper() {
+        return tripHelper;
     }
+
+    public RecordHelper getRecordHelper() {
+        return recordHelper;
+    }
+
+    public UserHelper getUserHelper() {
+        return userHelper;
+    }
+
+
+    public ObdPidHelper getObdPidHelper() {
+        return obdPidHelper;
+    }
+
+    public FilterSettingHelper getFilterSettingHelper() {
+        return filterSettingHelper;
+    }
+
 }
 

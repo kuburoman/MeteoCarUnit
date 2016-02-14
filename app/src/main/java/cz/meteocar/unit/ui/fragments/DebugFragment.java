@@ -15,7 +15,6 @@ import android.widget.TextView;
 import net.engio.mbassy.listener.Handler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.UserController;
@@ -23,7 +22,7 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.model.ObdPidObject;
+import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 public class DebugFragment extends Fragment {
 
@@ -67,10 +66,10 @@ public class DebugFragment extends Fragment {
      * Zaloguje všechny pidy z databáze
      */
     private void BUTTON_LOG_PIDS() {
-        ArrayList<ObdPidObject> arr = DB.obdPidHelper.getAll();
+        ArrayList<ObdPidEntity> arr = DB.obdPidHelper.getAll();
         StringBuilder sb = new StringBuilder();
         sb.append("OBD PIDs count: " + arr.size() + "\n");
-        for (ObdPidObject obj : arr) {
+        for (ObdPidEntity obj : arr) {
             sb.append("ID: " + obj.getId() + " tag: " + obj.getTag() + " code: " + obj.getPidCode() + " formula: " + obj.getFormula() + "\n");
         }
         textView1.setText(sb.toString());
@@ -80,16 +79,6 @@ public class DebugFragment extends Fragment {
      * Uložení záznamu do souboru
      */
     private void BUTTON_NUKE_TRIPS() {
-
-        // všechny aktuální záznamy
-//        TripDetailObject.deleteAllRecords();
-
-        // všechny záznamy v souborech
-//        FileObject.deleteAllRecords();
-//
-//        // všechny soubory
-//        File tripsDir = new File(FileSystem.getTripLogDir());
-//        for (File file : tripsDir.listFiles()) file.delete();
 
     }
 

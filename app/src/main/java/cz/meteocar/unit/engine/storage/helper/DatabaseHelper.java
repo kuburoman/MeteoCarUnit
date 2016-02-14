@@ -6,10 +6,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
-import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
 /**
- * Created by Toms, 2014.
+ * SQLiteOpenHelper for managing DB.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -19,10 +18,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Vytvoření databáze
-     * - voláno automaticky
+     * Creation of database.
+     * Called automatically.
      *
-     * @param db Zapisovatelná SqLite DB
+     * @param db Writable database.
      */
     public void onCreate(SQLiteDatabase db) {
         AppLog.i(AppLog.LOG_TAG_DB, "DB onCreate");
@@ -38,10 +37,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Update databáze
-     * - voláno automaticky (pokud nesedí aktuální verze DB s verzí v konfiuraci)
+     * Update database.
+     * - is called automatically (if version of database is not same)
      *
-     * @param db Zapisovatelná SqLite DB
+     * @param db Writable database
      */
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(RecordHelper.SQL_DELETE_ENTRIES);
@@ -54,10 +53,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Update databáze na nižší verzy
-     * - voláno automaticky (pokud nesedí aktuální verze DB s verzí v konfiuraci)
+     * Update database on lower version.
+     * - is called automatically (if version of database is not same)
      *
-     * @param db Zapisovatelná SqLite DB
+     * @param db Writable database
      */
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);

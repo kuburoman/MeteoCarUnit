@@ -7,163 +7,173 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
-import cz.meteocar.unit.engine.storage.model.RecordEntity;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
 
 /**
- * Servisa starajici se o vsechny zaznamy z jizdy
+ * Helper for saving and loading {@link TripHelper}.
  */
 public class TripHelper {
 
-    /* Definice obsahu DB tabulky */
-    public static final String TABLE_NAME = "trip_details";
-    public static final String COLUMN_NAME_ID = "id";
-    public static final String COLUMN_NAME_JSON = "json";
+    private static final String TABLE_NAME = "trip_details";
+    private static final String COLUMN_NAME_ID = "id";
+    private static final String COLUMN_NAME_JSON = "json";
 
-    /* SQL statement pro vytvoreni tabulky */
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + MySQLiteConfig.TYPE_ID + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_JSON + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" +
                     " )";
 
-    /* SQL statement pro smazani tabulky */
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
+    private static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
+
+    private final DatabaseHelper helper;
+
+    public TripHelper(DatabaseHelper helper) {
+        this.helper = helper;
+    }
 
     /**
-     * Nacte vsechny zaznamy
-     * @return ArrayList vsech objektu
+     * Return all entities in database.
+     *
+     * @return List of {@link TripEntity}
      */
-    public ArrayList<TripEntity> getAll(){
+    public List<TripEntity> getAll() {
+        List<TripEntity> arr = new ArrayList<>();
 
-        //
-        ArrayList<TripEntity> arr = new ArrayList<>();
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
 
-        // pripravime kurzor k DB
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        try {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    arr.add(convert(cursor));
+                    cursor.moveToNext();
+                }
+            }
 
-        // projdeme po radcich
-        TripEntity obj;
-        if(cursor.moveToFirst()){
-            while(cursor.isAfterLast() == false){
+            return arr;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
 
-                obj = new TripEntity();
-                obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
-                arr.add(obj);
+    /**
+     * Inserts new entities into database.
+     *
+     * @param obj {@link TripEntity}
+     * @return id of entity
+     */
+    public int save(TripEntity obj) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_JSON, obj.getJson());
 
-                // dalsi
-                cursor.moveToNext();
+        SQLiteDatabase db = helper.getWritableDatabase();
+
+        if (obj.getId() > 0) {
+
+            values.put(COLUMN_NAME_ID, obj.getId());
+            return (int) db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
+        } else {
+
+            return (int) db.insert(TABLE_NAME, null, values);
+        }
+    }
+
+    /**
+     * Returns entity based on id.
+     *
+     * @param id of entity
+     * @return {@link TripEntity} or null
+     */
+    public TripEntity get(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                return convert(cursor);
+            } else {
+                return null;
+            }
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
             }
         }
 
-        // ok
-        return arr;
     }
 
     /**
-     * Vlozeni noveho objektu
-     * @param obj Vkladany objekt
-     * @return Pocet ovlivnenych radek
+     * Return one trip from database.
+     *
+     * @return {@link TripEntity}
      */
-    public int save(TripEntity obj){
+    public TripEntity getOneTrip() {
+        SQLiteDatabase db = helper.getReadableDatabase();
 
-        // nové values
-        ContentValues values = new ContentValues();
+        Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null, "1");
 
-        // nastavíme hodnoty
-        values.put(COLUMN_NAME_JSON, obj.getJson());
+        try {
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
 
-        // db
-        SQLiteDatabase db = DB.helper.getWritableDatabase();
+                return convert(cursor);
 
-        // vložíme nebo updatujeme v závislosti na ID
-        if(obj.getId() > 0){
-
-            // máme id, provedeme update
-            values.put(COLUMN_NAME_ID, obj.getId());
-            return (int)db.update(TABLE_NAME, values, "id = ?", new String[]{"" + obj.getId()});
-        }else{
-
-            // nemáme íd, vložíme nový záznam
-            return (int)db.insert(TABLE_NAME, null, values);    // nepředpokládáme přetečení int
+            } else {
+                return null;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
         }
     }
 
     /**
-     * Ziskani objektu z DB dle ID
-     * @param id ID objektu
-     * @return True - pokud se podarilo objekt nalazt, False - pokud ne
-     */
-    public TripEntity get(int id){
-
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        Cursor c = db.query(TABLE_NAME, null, "id = ?", new String[]{"" + id}, null, null, null);
-
-        if(c.getCount() > 0){
-            c.moveToFirst();
-
-            TripEntity obj = new TripEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
-            return obj;
-
-        }else{
-            return null;
-        }
-    }
-
-    public TripEntity getOneTrip(){
-
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null, "1");
-
-        if(c.getCount() > 0){
-            c.moveToFirst();
-
-            TripEntity obj = new TripEntity();
-            obj.setId(c.getInt(c.getColumnIndex(COLUMN_NAME_ID)));
-            obj.setJson(c.getString(c.getColumnIndex(COLUMN_NAME_JSON)));
-            return obj;
-
-        }else{
-            return null;
-        }
-    }
-    /**
-     * Vrati pocet radku tabulky
-     * @return Pocet radku
+     * Return number of records in database.
+     *
+     * @return Number of rows.
      */
     public int getNumberOfRecord() {
-
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+        SQLiteDatabase db = helper.getReadableDatabase();
 
         Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
         int cnt = cursor.getCount();
         cursor.close();
 
-        //
         return cnt;
     }
 
     /**
-     * Smaze vsechny zaznamy z tabulky
+     * Deletes all records from database.
      */
-    public void deleteAllRecords(){
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
+    public void deleteAllRecords() {
+        SQLiteDatabase db = helper.getReadableDatabase();
         db.delete(TABLE_NAME, null, null);
     }
 
-    public void delete(int id){
-        SQLiteDatabase db = DB.helper.getReadableDatabase();
-        db.delete(TABLE_NAME, "id = ?", new String[]{"" + id});
+    /**
+     * Deletes record from database based on id.
+     *
+     * @param id of entity
+     */
+    public void delete(int id) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
+    protected TripEntity convert(Cursor cursor) {
+        TripEntity obj = new TripEntity();
+        obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
+        obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
+        return obj;
+    }
 }
