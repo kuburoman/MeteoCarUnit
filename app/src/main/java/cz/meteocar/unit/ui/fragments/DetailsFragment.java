@@ -2,55 +2,118 @@ package cz.meteocar.unit.ui.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.PointsGraphSeries;
+
+import java.util.HashMap;
+import java.util.List;
+
+import cz.meteocar.unit.R;
+import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.TripDetailVO;
+import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
+
 public class DetailsFragment extends Fragment {
+
+    private static HashMap<String, DetailsFragment> fragments = new HashMap<>();
+
     /**
      * Create a new instance of DetailsFragment, initialized to
      * show the text at 'index'.
      */
-    public static DetailsFragment newInstance(int index) {
+    public static DetailsFragment newInstance(int index, TripDetailVO itemAtPosition) {
+
+        if (itemAtPosition != null && fragments.containsKey(itemAtPosition.getTripId())) {
+            return fragments.get(itemAtPosition.getTripId());
+        }
+
         DetailsFragment f = new DetailsFragment();
 
         // Supply index input as an argument.
         Bundle args = new Bundle();
         args.putInt("index", index);
+        if (itemAtPosition != null) {
+            args.putString("tripId", itemAtPosition.getTripId());
+            args.putLong("startTime", itemAtPosition.getStartTime());
+            args.putLong("endTime", itemAtPosition.getEndTime());
+            args.putString("type", "acc123");
+        }
+
         f.setArguments(args);
-
+        if (itemAtPosition != null) {
+            fragments.put(itemAtPosition.getTripId(), f);
+        }
         return f;
-    }
-
-    public int getShownIndex() {
-        return getArguments().getInt("index", 0);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         if (container == null) {
-            // We have different layouts, and in one of them this
-            // fragment's containing frame doesn't exist.  The fragment
-            // may still be created from its saved state, but there is
-            // no reason to try to create its view hierarchy because it
-            // won't be displayed.  Note this is not needed -- we could
-            // just run the code below, where we would create and return
-            // the view hierarchy; it would just never be used.
             return null;
         }
 
-        ScrollView scroller = new ScrollView(getActivity());
-        TextView text = new TextView(getActivity());
-        int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                4, getActivity().getResources().getDisplayMetrics());
-        text.setPadding(padding, padding, padding, padding);
-        scroller.addView(text);
 
-        text.setText("lol "+getShownIndex());
-        return scroller;
+        View rootView = inflater.inflate(R.layout.trip_graph, container, false);
+
+
+        GraphView graph = (GraphView) rootView.findViewById(R.id.graph);
+
+        String tripId = getArguments().getString("tripId");
+        String type = getArguments().getString("type");
+
+        if (tripId == null || type == null) {
+            return null;
+        }
+
+        TextView viewById = (TextView) rootView.findViewById(R.id.trip_graph_name);
+        viewById.setText(tripId + " " + type);
+
+        List<AccelerationVO> tripList = DB.recordHelper.getTripByType(tripId, type);
+
+        DataPoint[] pointsX = new DataPoint[tripList.size()];
+        DataPoint[] pointsY = new DataPoint[tripList.size()];
+        DataPoint[] pointsZ = new DataPoint[tripList.size()];
+
+        for (int i = 0; i < tripList.size(); i++) {
+            pointsX[i] = new DataPoint(tripList.get(i).getTime() - getArguments().getLong("startTime"), tripList.get(i).getX());
+            pointsY[i] = new DataPoint(tripList.get(i).getTime() - getArguments().getLong("startTime"), tripList.get(i).getY());
+            pointsZ[i] = new DataPoint(tripList.get(i).getTime() - getArguments().getLong("startTime"), tripList.get(i).getZ());
+        }
+
+
+        LineGraphSeries<DataPoint> seriesX = new LineGraphSeries<>(pointsX);
+        LineGraphSeries<DataPoint> seriesY = new LineGraphSeries<>(pointsY);
+        LineGraphSeries<DataPoint> seriesZ = new LineGraphSeries<>(pointsZ);
+        graph.addSeries(seriesX);
+        graph.addSeries(seriesY);
+        graph.addSeries(seriesZ);
+
+//        DataPoint[] pointsY = new DataPoint[100];
+//        for (int i = 0; i < pointsY.length; i++) {
+//            pointsY[i] = new DataPoint(i, Math.sin(i * 0.5) * 20 * (Math.random() * 10 + 1));
+//        }
+//        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>(pointsY);
+//        graph.addSeries(series2);
+
+        // enable scaling
+        graph.getViewport().setScalable(true);
+
+//        graph.getViewport().setScrollable(true);
+
+//        graph.getViewport().setXAxisBoundsManual(true);
+//        graph.getViewport().setMinX(getArguments().getLong("startTime"));
+//        graph.getViewport().setMaxX(getArguments().getLong("endTime"));
+
+
+        return rootView;
     }
 }

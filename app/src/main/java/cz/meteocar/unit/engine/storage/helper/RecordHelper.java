@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
+import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -165,6 +167,49 @@ public class RecordHelper {
         return arr;
     }
 
+    public List<AccelerationVO> getTripByType(String tripId, String type) {
+
+        RecordEntity obj;
+        List<AccelerationVO> arr = new ArrayList<>();
+
+        SQLiteDatabase db = DB.helper.getReadableDatabase();
+
+        Cursor cs = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ? and " + COLUMN_NAME_TYPE + " = ?", new String[]{tripId, type}, null, null, null);
+
+        if (cs.moveToFirst()) {
+            while (cs.isAfterLast() == false) {
+
+                obj = createEntity(cs);
+                arr.add(convertToAcceleration(obj));
+
+                // dalsi
+                cs.moveToNext();
+            }
+        }
+
+        return arr;
+    }
+
+    public AccelerationVO convertToAcceleration(RecordEntity entity) {
+        AccelerationVO obj = new AccelerationVO();
+        obj.setUserId(entity.getUserName());
+        obj.setTripId(entity.getTripId());
+        obj.setTime(entity.getTime());
+        obj.setType(entity.getType());
+
+        JSONObject jsonObject = null;
+        try {
+            jsonObject = new JSONObject(entity.getJson());
+            obj.setX(jsonObject.getDouble("x"));
+            obj.setY(jsonObject.getDouble("y"));
+            obj.setZ(jsonObject.getDouble("z"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return obj;
+    }
+
     /**
      * Vrati pocet radku tabulky
      *
@@ -251,7 +296,6 @@ public class RecordHelper {
     }
 
     protected List<String> getUserTrips(String userId) {
-
 
         SQLiteDatabase db = DB.helper.getReadableDatabase();
         List<String> tripIds = new ArrayList<>();

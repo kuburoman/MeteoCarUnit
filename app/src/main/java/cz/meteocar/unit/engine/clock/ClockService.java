@@ -82,7 +82,7 @@ public class ClockService extends Thread {
                 fireUpdateEvent();
             }
         } catch (InterruptedException e) {
-            // ok
+            threadRun = false;
         }
     }
 

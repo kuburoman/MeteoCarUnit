@@ -5,11 +5,9 @@ import android.app.FragmentTransaction;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.storage.DB;
@@ -25,23 +23,12 @@ public class TripsListFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        List<String> list = new ArrayList<>();
-        list.add("ahoj");
-        list.add("lol");
-
         String id = DB.userHelper.getLoggedUser().getUsername();
 
         ArrayList<TripDetailVO> userTripDetailList = DB.recordHelper.getUserTripDetailList(id);
 
-
-        // Populate list with our static array of titles.
-//        setListAdapter(new ArrayAdapter<String>(getActivity(),
-//                android.R.layout.simple_list_item_activated_1, list));
-
         setListAdapter(new TripAdapter(getActivity(), R.layout.trip_list_item, userTripDetailList));
 
-        // Check to see if we have a frame in which to embed the details
-        // fragment directly in the containing UI.
         View detailsFrame = getActivity().findViewById(R.id.details);
         mDualPane = detailsFrame != null && detailsFrame.getVisibility() == View.VISIBLE;
 
@@ -54,7 +41,7 @@ public class TripsListFragment extends ListFragment {
             // In dual-pane mode, the list view highlights the selected item.
             getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             // Make sure our UI is in the correct state.
-            showDetails(mCurCheckPosition);
+            showDetails(mCurCheckPosition, null);
         }
     }
 
@@ -66,8 +53,8 @@ public class TripsListFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        Object itemAtPosition = l.getItemAtPosition(position);
-        showDetails(position);
+        TripDetailVO itemAtPosition = (TripDetailVO) l.getItemAtPosition(position);
+        showDetails(position, itemAtPosition);
     }
 
     /**
@@ -75,7 +62,7 @@ public class TripsListFragment extends ListFragment {
      * displaying a fragment in-place in the current UI, or starting a
      * whole new activity in which it is displayed.
      */
-    void showDetails(int index) {
+    void showDetails(int index, TripDetailVO object) {
         mCurCheckPosition = index;
 
         getListView().setItemChecked(index, true);
@@ -84,7 +71,7 @@ public class TripsListFragment extends ListFragment {
         DetailsFragment details = (DetailsFragment) getFragmentManager().findFragmentById(R.id.details);
 
         // Make new fragment to show this selection.
-        details = DetailsFragment.newInstance(index);
+        details = DetailsFragment.newInstance(index, object);
 
         // Execute a transaction, replacing any existing fragment
         // with this one inside the frame.

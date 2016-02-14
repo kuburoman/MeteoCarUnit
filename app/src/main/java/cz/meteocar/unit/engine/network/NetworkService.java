@@ -188,10 +188,11 @@ public class NetworkService extends Thread {
 
                     // usneme na půl vteřiny, bez internetu stejně nemůžeme probíhat jiná komunikace
                     try {
-                        Thread.sleep(500);
+                        this.sleep(500);
                     } catch (Exception e) {
                         // no problem, pravděpodobně přišel nový požadavek na service
                         // a ten náš thread probudil
+                        threadRun = false;
                     }
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }

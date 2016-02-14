@@ -48,7 +48,7 @@ public class ConvertService extends Thread {
                 try {
                     this.sleep(30000);
                 } catch (Exception e) {
-                    // nevadí
+                    threadRun = false;
                 }
             }
 

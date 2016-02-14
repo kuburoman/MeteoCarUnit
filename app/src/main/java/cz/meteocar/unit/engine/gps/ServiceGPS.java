@@ -102,6 +102,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
                 try {
                      Thread.sleep(1000);
                 } catch (InterruptedException e) {
+                    threadRun = false;
                     // spaní přerušeno, nevadí
                 }
 

@@ -260,7 +260,7 @@ public class DatabaseService extends Thread {
             }else{
 
                 try{
-                    this.wait();
+                    this.sleep(200);
                 } catch(Exception e){
                     // nevadí
                 }

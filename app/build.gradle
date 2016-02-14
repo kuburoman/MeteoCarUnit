@@ -15,16 +15,41 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
         }
+        debug {
+            debuggable true
+            testCoverageEnabled = true
+        }
+
+
     }
 }
+
+
+apply plugin: 'sonar-runner'
+
+sonarRunner {
+    sonarProperties {
+        property "sonar.host.url", "http://localhost:9000" // Address of Sonar server
+        property "sonar.sources", "src/main/java" // Sources
+        property "sonar.projectName", "Meteocar" // Name of your project
+        property "sonar.projectVersion", "1.0.2" // Version of your project
+        property "sonar.projectDescription", "Sonar" // Description of your project
+        property "sonar.tests", "src/test/java"
+        property "sonar.junit.reportsPath", "build/test-results/debug"
+    }
+}
+
+
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/mbassador-1.2.0.jar')
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.android.support:support-v4:20.0.0'
-    compile  'org.apache.commons:commons-lang3:3.0'
+    compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.jjoe64:graphview:4.0.1'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
