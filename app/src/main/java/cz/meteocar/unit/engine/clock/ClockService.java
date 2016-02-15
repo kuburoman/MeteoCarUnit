@@ -1,11 +1,14 @@
 package cz.meteocar.unit.engine.clock;
 
+import android.util.Log;
+
 import net.engio.mbassy.bus.MBassador;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.log.AppLog;
 
 /**
  * Created by Toms, 2014
@@ -79,13 +82,11 @@ public class ClockService extends Thread {
     public void run() {
         try {
             while (threadRun) {
-                synchronized (this) {
-                    this.wait(1000);
-                }
+                this.sleep(1000);
                 fireUpdateEvent();
             }
         } catch (InterruptedException e) {
-
+            Log.e(AppLog.LOG_TAG_DEFAULT, "ClockService.sleep() caused error.", e);
         }
     }
 

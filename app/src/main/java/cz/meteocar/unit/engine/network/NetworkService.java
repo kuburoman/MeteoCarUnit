@@ -112,7 +112,7 @@ public class NetworkService extends Thread {
     }
 
     @Override
-    synchronized public void run() {
+    public void run() {
         try {
             while (threadRun) {
                 AppLog.i("Server thread running");
@@ -125,21 +125,17 @@ public class NetworkService extends Thread {
 
                     // usneme na půl vteřiny, bez internetu stejně nemůžeme probíhat jiná komunikace
                     try {
-                        synchronized (this) {
-                            this.wait(500);
-                        }
+                        this.sleep(500);
                     } catch (Exception e) {
-                        Log.e(AppLog.LOG_TAG_NETWORK, "Error in sleep", e);
+                        Log.e(AppLog.LOG_TAG_NETWORK, "NetowrkService.sleep() caused error.", e);
                     }
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }
 
                 sendTripsToServer();
 
-                AppLog.i("Server thread will wait");
-                synchronized (this) {
-                    this.wait(60000);
-                }
+                this.sleep(500);
+
             }
         } catch (Exception ex) {
             Log.e(AppLog.LOG_TAG_NETWORK, "Error in main thread.", ex);
@@ -244,7 +240,6 @@ public class NetworkService extends Thread {
         AppLog.i(null, "Starting updating net conn status");
         checkConnectingStatusRetries = 0;
         checkConnectingStatusFlag = true;
-        this.notify();
     }
 
     /**

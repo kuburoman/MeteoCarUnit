@@ -185,11 +185,9 @@ public class OBDService extends Thread {
         int btAdapterState;
         while (waitForAdapter) {
             try {
-                synchronized (this) {
-                    this.wait(1000);
-                }
+                this.sleep(1000);
             } catch (InterruptedException e) {
-                // no problem
+                Log.e(AppLog.LOG_TAG_OBD, "OBDService.sleep() caused error.", e);
             }
 
             // zkontrolujeme status
@@ -222,11 +220,9 @@ public class OBDService extends Thread {
 
             while (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE) {
                 try {
-                    synchronized (this) {
-                        this.wait(1000);
-                    }
+                    this.sleep(1000);
                 } catch (InterruptedException e) {
-                    // no problem
+                    Log.e(AppLog.LOG_TAG_OBD, "OBDService.sleep() caused error.", e);
                 }
                 AppLog.p(AppLog.LOG_TAG_OBD, "BT Discovery state: " + btAdapter.getScanMode());
             }
@@ -490,10 +486,7 @@ public class OBDService extends Thread {
                         reconnectNeeded = false;
 
                     } else {
-
-                        synchronized (this) {
-                            this.wait(1000);
-                        }
+                        this.sleep(1000);
                         continue;
                     }
                 }

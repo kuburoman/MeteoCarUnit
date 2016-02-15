@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import net.engio.mbassy.bus.MBassador;
 
@@ -97,23 +98,13 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         init();
 
         while (threadRun) {
-            //if(locationUpdated.get()){
-            //AppLog.i(AppLog.LOG_TAG_GPS, "GPS C");
             try {
-                synchronized (this) {
-                    this.wait(1000);
-                }
+                this.sleep(1000);
             } catch (InterruptedException e) {
-                // spaní přerušeno, nevadí
+                Log.e(AppLog.LOG_TAG_NETWORK, "ServiceGPS.sleep() caused error.", e);
             }
 
-            //AppLog.i(AppLog.LOG_TAG_GPS, "GPS D");
-            //latestLocation = locationManager.getLastKnownLocation(loctionProviderName);
-
-            //AppLog.i(AppLog.LOG_TAG_GPS, "Posting location");
             eventBus.post(new GPSPositionEvent(getLocation())).asynchronously();
-            // }
-            //locationUpdated.set(false);
         }
 
         //
