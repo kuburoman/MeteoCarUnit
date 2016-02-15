@@ -7,8 +7,6 @@ import net.engio.mbassy.listener.Handler;
 
 import org.json.JSONArray;
 
-import java.util.HashMap;
-
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
@@ -267,11 +265,11 @@ public class UserController {
     // -------------------------------------------------------------------------------------------
 
     public boolean logUser(String userName, String password) {
-        UserEntity user = DB.userHelper.getUser(userName, password);
+        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(userName, password);
         if (user == null) {
             return false;
         } else {
-            DB.userHelper.logUser(user);
+            ServiceManager.getInstance().db.getUserHelper().logUser(user);
             return true;
         }
     }

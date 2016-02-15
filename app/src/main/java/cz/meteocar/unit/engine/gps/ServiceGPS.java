@@ -21,7 +21,7 @@ import cz.meteocar.unit.engine.log.AppLog;
 /**
  * Created by Toms, 2014.
  */
-public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Listener{
+public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Listener {
 
     // stavy GPS
     public static final int STATUS_NO_HARDWARE = 0;
@@ -30,11 +30,11 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public static final int STATUS_FIXED = 3;
     private int status;
 
-    private LocationManager locationManager;        // manažer lokalizační služby služby
-    private LocationProvider locationProvider;      // gps lokalizační provider
-    private String loctionProviderName;             // - jeho jméno
-    private Criteria criteria;                      // kritéria pro výběr - (nejpřesnější provider)
-    private Location latestLocation;                // údaje polohy
+    private LocationManager locationManager;
+    private LocationProvider locationProvider;
+    private String loctionProviderName;
+    private Criteria criteria;
+    private Location latestLocation;
 
     private AtomicBoolean locationUpdated;
     private boolean threadRun;
@@ -71,21 +71,21 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     /**
      * Běží služba?
      */
-    public boolean isRunning(){
+    public boolean isRunning() {
         return threadRun;
     }
 
     /**
      * Byla služba ukončena?
      */
-    public boolean isFinalized(){
+    public boolean isFinalized() {
         return threadFinalized;
     }
 
     /**
      * Ukončí thread bezpečně
      */
-    public void exit(){
+    public void exit() {
         AppLog.i(AppLog.LOG_TAG_GPS, "GPS Exit reuqired");
         threadRun = false;
     }
@@ -96,21 +96,22 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         // inicializace
         init();
 
-        while(threadRun){
+        while (threadRun) {
             //if(locationUpdated.get()){
             //AppLog.i(AppLog.LOG_TAG_GPS, "GPS C");
-                try {
-                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    threadRun = false;
-                    // spaní přerušeno, nevadí
+            try {
+                synchronized (this) {
+                    this.wait(1000);
                 }
+            } catch (InterruptedException e) {
+                // spaní přerušeno, nevadí
+            }
 
-                //AppLog.i(AppLog.LOG_TAG_GPS, "GPS D");
-                //latestLocation = locationManager.getLastKnownLocation(loctionProviderName);
+            //AppLog.i(AppLog.LOG_TAG_GPS, "GPS D");
+            //latestLocation = locationManager.getLastKnownLocation(loctionProviderName);
 
-                //AppLog.i(AppLog.LOG_TAG_GPS, "Posting location");
-                eventBus.post(new GPSPositionEvent(getLocation())).asynchronously();
+            //AppLog.i(AppLog.LOG_TAG_GPS, "Posting location");
+            eventBus.post(new GPSPositionEvent(getLocation())).asynchronously();
             // }
             //locationUpdated.set(false);
         }
@@ -123,12 +124,12 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     /**
      * Inicializace GPS proměnných, nastavení listeneru polohy
      */
-    private void init(){
+    private void init() {
 
         // podíváme se, jestli máme vůbec GPS hardware v zařízení
         boolean presentGPS = context.getPackageManager()
                 .hasSystemFeature(PackageManager.FEATURE_LOCATION_GPS);
-        if(!presentGPS){
+        if (!presentGPS) {
             status = STATUS_NO_HARDWARE;
         }
 
@@ -142,7 +143,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         // získáme provider a přihlásíme listener
         // - tato opreace ovšem musí být volána z hlavního "looperu" / UI threadu
         final ServiceGPS thisObject = this;
-        new Handler(context.getMainLooper()).post(new Runnable(){
+        new Handler(context.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 loctionProviderName = locationManager.getBestProvider(criteria, true);
@@ -157,17 +158,17 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         //setLocation(locationManager.getLastKnownLocation(loctionProviderName));
     }
 
-    private synchronized void setLocation(Location location){
+    private synchronized void setLocation(Location location) {
         latestLocation = location;
         locationUpdated.set(true);
     }
 
-    public Location getLocation(){
+    public Location getLocation() {
         return latestLocation;
     }
 
     @Override
-    public void onLocationChanged(Location location){
+    public void onLocationChanged(Location location) {
         //AppLog.i(AppLog.LOG_TAG_GPS, "GPS updating: " + location.toString());
         setLocation(location);
     }
@@ -176,9 +177,13 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public void onStatusChanged(String s, int state, Bundle bundle) {
         AppLog.i(AppLog.LOG_TAG_GPS, "GPS Provider status: " + state);
         //eventBus.post(new GPSStatusEvent(i,true)).asynchronously();
-        if(state == LocationProvider.OUT_OF_SERVICE){status = STATUS_GPS_OFFLINE;}
+        if (state == LocationProvider.OUT_OF_SERVICE) {
+            status = STATUS_GPS_OFFLINE;
+        }
         //if(state == LocationProvider.AVAILABLE){status = STATUS_GPS_OFFLINE;} ???????
-        if(state == LocationProvider.OUT_OF_SERVICE){status = STATUS_GPS_OFFLINE;}
+        if (state == LocationProvider.OUT_OF_SERVICE) {
+            status = STATUS_GPS_OFFLINE;
+        }
         updateStatus();
     }
 
@@ -205,13 +210,19 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public void onGpsStatusChanged(int state) {
 
         // gps start
-        if(state == GpsStatus.GPS_EVENT_STARTED){status = STATUS_NO_FIX;}
+        if (state == GpsStatus.GPS_EVENT_STARTED) {
+            status = STATUS_NO_FIX;
+        }
 
         // gps exit
-        if(state == GpsStatus.GPS_EVENT_STOPPED){status = STATUS_GPS_OFFLINE;}
+        if (state == GpsStatus.GPS_EVENT_STOPPED) {
+            status = STATUS_GPS_OFFLINE;
+        }
 
         // první fix
-        if(state == GpsStatus.GPS_EVENT_FIRST_FIX){status = STATUS_FIXED;}
+        if (state == GpsStatus.GPS_EVENT_FIRST_FIX) {
+            status = STATUS_FIXED;
+        }
 
         // stav satelitu - ???
         //if(state == GpsStatus.GPS_EVENT_SATELLITE_STATUS){status = STATUS_FIXED;}
@@ -224,7 +235,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     /**
      * Odešle aktuální stav služby na bus
      */
-    public void updateStatus(){
+    public void updateStatus() {
         //AppLog.i(null, "Reporting gps status: "+status);
         eventBus.post(new GPSStatusEvent(status)).asynchronously();
     }
@@ -232,11 +243,11 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     /**
      * Vrátí aktuální stav služby
      */
-    public int getStatus(){
+    public int getStatus() {
         return status;
     }
 
-    public boolean isHardwareEnabled(){
+    public boolean isHardwareEnabled() {
         //AppLog.i(AppLog.LOG_TAG_GPS, "GPS Hardware enabled: "+locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }

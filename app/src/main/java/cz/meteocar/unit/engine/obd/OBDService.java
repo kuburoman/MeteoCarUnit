@@ -15,7 +15,6 @@ import java.util.UUID;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
@@ -186,7 +185,9 @@ public class OBDService extends Thread {
         int btAdapterState;
         while (waitForAdapter) {
             try {
-                Thread.sleep(1000);
+                synchronized (this) {
+                    this.wait(1000);
+                }
             } catch (InterruptedException e) {
                 // no problem
             }
@@ -221,7 +222,9 @@ public class OBDService extends Thread {
 
             while (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE) {
                 try {
-                    Thread.sleep(1000);
+                    synchronized (this) {
+                        this.wait(1000);
+                    }
                 } catch (InterruptedException e) {
                     // no problem
                 }
@@ -488,8 +491,9 @@ public class OBDService extends Thread {
 
                     } else {
 
-                        // připojení selhalo
-                        Thread.sleep(1000);
+                        synchronized (this) {
+                            this.wait(1000);
+                        }
                         continue;
                     }
                 }
@@ -510,10 +514,8 @@ public class OBDService extends Thread {
             }
         }
 
-        // uzavře spojení a uklidí
         disconnectAndCleanup();
 
-        //
         threadFinalized = true;
     }
 
@@ -523,7 +525,7 @@ public class OBDService extends Thread {
     private void initPIDQueue() {
 
         // přidáme všechny aktivní z DB
-        for (ObdPidEntity pid : DB.obdPidHelper.getAllActive()) {
+        for (ObdPidEntity pid : ServiceManager.getInstance().db.getObdPidHelper().getAllActive()) {
             queue.add(new OBDMessage(
                     pid.getPidCode(),
                     pid.getFormula(),

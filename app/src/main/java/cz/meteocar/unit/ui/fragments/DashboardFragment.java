@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import net.engio.mbassy.listener.Handler;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
@@ -19,7 +19,6 @@ import cz.meteocar.unit.engine.clock.ClockService;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.DatabaseService;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
@@ -98,10 +97,10 @@ public class DashboardFragment extends Fragment {
 
         // získáme min a max hodnoty pro tachometry
 
-        ArrayList<ObdPidEntity> all = DB.obdPidHelper.getAll();
+        List<ObdPidEntity> all = ServiceManager.getInstance().db.getObdPidHelper().getAll();
 
-        ObdPidEntity speed = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_SPEED);
-        ObdPidEntity rpm = DB.obdPidHelper.get(ObdPidHelper.OBD_PID_ID_RPM);
+        ObdPidEntity speed = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_SPEED);
+        ObdPidEntity rpm = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_RPM);
 
         // nastavíme je do tachometrů
         speedGauge.setMinMax(speed.getMin(), speed.getMax());
@@ -246,14 +245,14 @@ public class DashboardFragment extends Fragment {
 
         // přepočítáme dobu trvání jízdy na HH : MM
         int secs = evt.getTime();
-        int mins =  secs / 60;
-        secs -= mins*60;
+        int mins = secs / 60;
+        secs -= mins * 60;
         int hours = mins / 60;
-        mins -= hours*60;
+        mins -= hours * 60;
 
-        String h = ((hours > 9) ? ""+hours : "0"+hours);
-        String m = ((mins > 9) ? ""+mins : "0"+mins);
-        String s = ((secs > 9) ? ""+secs : "0"+secs);
+        String h = ((hours > 9) ? "" + hours : "0" + hours);
+        String m = ((mins > 9) ? "" + mins : "0" + mins);
+        String s = ((secs > 9) ? "" + secs : "0" + secs);
         String time = h + " : " + m + " : " + s;
         //AppLog.i(AppLog.LOG_TAG_UI, "time: "+time);
 

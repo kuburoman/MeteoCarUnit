@@ -21,6 +21,8 @@ import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
+import cz.meteocar.unit.engine.storage.helper.filter.Filter;
+import cz.meteocar.unit.engine.storage.helper.filter.RecordVO;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -53,9 +55,11 @@ public class RecordHelper {
     public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
 
     private DatabaseHelper helper;
+    private Filter filter;
 
-    public RecordHelper(DatabaseHelper helper) {
+    public RecordHelper(DatabaseHelper helper, FilterSettingHelper filterSettingHelper) {
         this.helper = helper;
+        this.filter = new Filter(filterSettingHelper, this);
     }
 
     /**
@@ -372,6 +376,26 @@ public class RecordHelper {
 
     }
 
+    protected void saveACC(ServiceManager.AppEvent evt, RecordEntity obj) {
+        JSONObject jsonObj = new JSONObject();
+
+        AccelService.AccelEvent accelEvent = (AccelService.AccelEvent) evt;
+
+        obj.setType(RecordTypeEnum.TYPE_ACCEL.getValue());
+
+        try {
+            jsonObj.put("x", accelEvent.getX());
+            jsonObj.put("y", accelEvent.getY());
+            jsonObj.put("z", accelEvent.getZ());
+        } catch (Exception e) {
+            Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
+        }
+
+        obj.setJson(jsonObj.toString());
+
+        save(obj);
+    }
+
     protected void saveGPS(ServiceManager.AppEvent evt, RecordEntity obj) {
         JSONObject jsonObj = new JSONObject();
 
@@ -402,44 +426,23 @@ public class RecordHelper {
     }
 
     protected void saveOBD(ServiceManager.AppEvent evt, RecordEntity obj) {
-        JSONObject jsonObj = new JSONObject();
         OBDService.OBDEventPID obdEvent = (OBDService.OBDEventPID) evt;
 
-        obj.setType(obdEvent.getMessage().getTag());
-
-        try {
-            jsonObj.put("value", obdEvent.getValue());
-        } catch (Exception e) {
-            Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
-        }
-
-        obj.setJson(jsonObj.toString());
+        RecordVO recordVO = new RecordVO();
+        recordVO.setUserId(evt.getUserId());
+        recordVO.setTripId(evt.getTripId());
+        recordVO.setType(((OBDService.OBDEventPID) evt).getMessage().getTag());
+        recordVO.setValue(obdEvent.getValue());
+        recordVO.setTime(obdEvent.getTimeCreated());
+        recordVO.setLastSaved(obdEvent.getTimeCreated());
+        recordVO.setSaved(false);
 
         if (obdEvent.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
             ServiceManager.getInstance().db.incrementObdDistance(obdEvent);
         }
 
-        save(obj);
-    }
-
-    protected void saveACC(ServiceManager.AppEvent evt, RecordEntity obj) {
-        JSONObject jsonObj = new JSONObject();
-
-        AccelService.AccelEvent accelEvent = (AccelService.AccelEvent) evt;
-
-        obj.setType(RecordTypeEnum.TYPE_ACCEL.getValue());
-
-        try {
-            jsonObj.put("x", accelEvent.getX());
-            jsonObj.put("y", accelEvent.getY());
-            jsonObj.put("z", accelEvent.getZ());
-        } catch (Exception e) {
-            Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
-        }
-
-        obj.setJson(jsonObj.toString());
-
-        save(obj);
+        filter.process(recordVO);
+//        save(obj);
     }
 
 }

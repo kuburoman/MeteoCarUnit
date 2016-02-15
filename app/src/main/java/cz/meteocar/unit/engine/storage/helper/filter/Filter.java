@@ -3,10 +3,10 @@ package cz.meteocar.unit.engine.storage.helper.filter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
-import java.util.List;
 
 import cz.meteocar.unit.engine.convertor.RecordVO2EntityConverter;
-import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
+import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
 
@@ -17,8 +17,13 @@ public class Filter {
 
     protected RecordVO2EntityConverter recordVO2EntityConverter = new RecordVO2EntityConverter();
 
-    public Filter() {
+    protected FilterSettingHelper filterSettingHelper;
+    protected RecordHelper recordHelper;
+
+    public Filter(FilterSettingHelper filterSettingHelper, RecordHelper recordHelper) {
         records = new HashMap<>();
+        this.filterSettingHelper = filterSettingHelper;
+        this.recordHelper = recordHelper;
     }
 
     public void process(RecordVO evt) {
@@ -91,11 +96,11 @@ public class Filter {
     }
 
     protected void saveIntoDB(RecordVO vo) {
-        DB.recordHelper.save(recordVO2EntityConverter.convert(vo));
+        recordHelper.save(recordVO2EntityConverter.convert(vo));
     }
 
     protected FilterSettingEntity getFilter(String obdCode) {
-        return DB.filterSettingHelper.getByCode(obdCode);
+        return filterSettingHelper.getByCode(obdCode);
     }
 
     protected double round(double value, int places) {

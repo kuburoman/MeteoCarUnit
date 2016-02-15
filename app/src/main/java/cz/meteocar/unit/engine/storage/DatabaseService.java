@@ -57,11 +57,10 @@ public class DatabaseService extends Thread {
         // helper
         helper = new DatabaseHelper(ctx);
         tripHelper = new TripHelper(helper);
-        recordHelper = new RecordHelper(helper);
         userHelper = new UserHelper(helper);
         obdPidHelper = new ObdPidHelper(helper);
         filterSettingHelper = new FilterSettingHelper(helper);
-
+        recordHelper = new RecordHelper(helper, filterSettingHelper);
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
 
@@ -75,6 +74,35 @@ public class DatabaseService extends Thread {
 
     // ---------- Záznam z jízdy -----------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
+
+
+    public DatabaseHelper getHelper() {
+        return helper;
+    }
+
+    public void setHelper(DatabaseHelper helper) {
+        this.helper = helper;
+    }
+
+    public void setTripHelper(TripHelper tripHelper) {
+        this.tripHelper = tripHelper;
+    }
+
+    public void setRecordHelper(RecordHelper recordHelper) {
+        this.recordHelper = recordHelper;
+    }
+
+    public void setUserHelper(UserHelper userHelper) {
+        this.userHelper = userHelper;
+    }
+
+    public void setObdPidHelper(ObdPidHelper obdPidHelper) {
+        this.obdPidHelper = obdPidHelper;
+    }
+
+    public void setFilterSettingHelper(FilterSettingHelper filterSettingHelper) {
+        this.filterSettingHelper = filterSettingHelper;
+    }
 
     private int seconds;
 
@@ -127,7 +155,7 @@ public class DatabaseService extends Thread {
         AppLog.i(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
         tripStart = System.currentTimeMillis();
-        userName = String.valueOf(DB.userHelper.getLoggedUser().getUsername());
+        userName = String.valueOf(ServiceManager.getInstance().db.getUserHelper().getLoggedUser().getUsername());
         tripId = String.valueOf(System.currentTimeMillis());
     }
 
@@ -247,7 +275,7 @@ public class DatabaseService extends Thread {
         evt.setTripId(tripId);
 
         // delegujeme na helper
-        DB.recordHelper.save(evt);
+        recordHelper.save(evt);
 
         // nový počet záznam
         // - nikde jej nepoužívám, je výhodnější používat odhad

@@ -21,7 +21,7 @@ public class ClockService extends Thread {
     /**
      * Inicializuje službu
      */
-    public ClockService(){
+    public ClockService() {
 
         // data format
         dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -44,23 +44,24 @@ public class ClockService extends Thread {
 
     /**
      * Je služba spuštěna?
+     *
      * @return True pokud ano, False pokud ne
      */
-    public boolean isRunning(){
+    public boolean isRunning() {
         return threadRun;
     }
 
     /**
      * Nastaví přízna ukončení služby
      */
-    public void exit(){
+    public void exit() {
         threadRun = false;
     }
 
     /**
      * Vytvoří časovou událost a odešle ji na bus
      */
-    private void fireUpdateEvent(){
+    private void fireUpdateEvent() {
 
         // datum
         Date now = new Date();
@@ -77,23 +78,27 @@ public class ClockService extends Thread {
     @Override
     public void run() {
         try {
-            while(threadRun) {
-                Thread.sleep(1000);
+            while (threadRun) {
+                synchronized (this) {
+                    this.wait(1000);
+                }
                 fireUpdateEvent();
             }
         } catch (InterruptedException e) {
-            threadRun = false;
+
         }
     }
 
     /**
      * Třída pro zprávy event busu
      */
-    public static class TimeEvent extends ServiceManager.AppEvent{
+    public static class TimeEvent extends ServiceManager.AppEvent {
         String time;
+
         public TimeEvent(String myTime) {
             time = myTime;
         }
+
         public String getTime() {
             return time;
         }

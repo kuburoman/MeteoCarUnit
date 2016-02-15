@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import cz.meteocar.unit.R;
@@ -31,6 +32,8 @@ import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
+import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
@@ -61,6 +64,9 @@ public class SettingsActivity extends PreferenceActivity
     private View filterDialogView;
     private int dialogDataID;
 
+    private FilterSettingHelper filterSettingHelper;
+    private ObdPidHelper obdPidHelper;
+
 
     @Override
     public void onContentChanged() {
@@ -72,6 +78,9 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        filterSettingHelper = ServiceManager.getInstance().db.getFilterSettingHelper();
+        obdPidHelper = ServiceManager.getInstance().db.getObdPidHelper();
 
         // načtene hierarchii z XML
         addPreferencesFromResource(R.xml.my_settings);
@@ -227,7 +236,7 @@ public class SettingsActivity extends PreferenceActivity
 
         // přidáme PID, jen pokud se aktuálně nepřidává
         if (!obdPidDialog.isShowing()) {
-            int newID = DB.obdPidHelper.addOneByCopying(1, "Nový PID");
+            int newID = obdPidHelper.addOneByCopying(1, "Nový PID");
             createObdPIDScreen();
         }
     }
@@ -305,7 +314,7 @@ public class SettingsActivity extends PreferenceActivity
         //checkBoxPreference.setChecked(true);
         //targetCategory.addPreference(checkBoxPreference);
 
-        ArrayList<ObdPidEntity> arr = DB.obdPidHelper.getAll();
+        List<ObdPidEntity> arr = obdPidHelper.getAll();
         int index = 0;
         for (ObdPidEntity pid : arr) {
 
@@ -349,7 +358,7 @@ public class SettingsActivity extends PreferenceActivity
         //txt.setText("Showing menu item: " + i);
 
         // načteme z DB PID
-        ObdPidEntity pid = DB.obdPidHelper.get(id);
+        ObdPidEntity pid = obdPidHelper.get(id);
 
         // pokud nebyl PID nalezen
         if (pid == null) {
@@ -429,7 +438,7 @@ public class SettingsActivity extends PreferenceActivity
         PreferenceScreen cat = (PreferenceScreen) findPreference(FILTER_SETTINGS);
         cat.removeAll();
 
-        ArrayList<FilterSettingEntity> arr = DB.filterSettingHelper.getAll();
+        ArrayList<FilterSettingEntity> arr = filterSettingHelper.getAll();
         int index = 0;
         for (FilterSettingEntity pid : arr) {
 
@@ -466,7 +475,7 @@ public class SettingsActivity extends PreferenceActivity
         dialogDataID = id;
 
         // načteme z DB PID
-        FilterSettingEntity filter = DB.filterSettingHelper.getById(id);
+        FilterSettingEntity filter = filterSettingHelper.getById(id);
 
         if (filter == null) {
             TextView txt = (TextView) filterDialogView.findViewById(R.id.dialog_obd_name_title);
@@ -594,7 +603,7 @@ public class SettingsActivity extends PreferenceActivity
                         }
 
                         // uložíme
-                        if (DB.obdPidHelper.save(obj) == 1) {
+                        if (obdPidHelper.save(obj) == 1) {
                             dialog.dismiss();
                         } else {
                             AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
@@ -608,13 +617,13 @@ public class SettingsActivity extends PreferenceActivity
                         dialog.dismiss();
 
                         // locked - nebudeme mazat
-                        if (DB.obdPidHelper.get(dialogDataID).getLocked() == 1) {
+                        if (obdPidHelper.get(dialogDataID).getLocked() == 1) {
                             return;
                         }
 
                         // vymažeme
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
-                        DB.obdPidHelper.delete(dialogDataID);
+                        obdPidHelper.delete(dialogDataID);
                         createObdPIDScreen();
 
 
@@ -689,7 +698,7 @@ public class SettingsActivity extends PreferenceActivity
                         }
 
                         // uložíme
-                        if (DB.filterSettingHelper.save(obj) == 1) {
+                        if (filterSettingHelper.save(obj) == 1) {
                             dialog.dismiss();
                         } else {
                             AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
@@ -704,7 +713,7 @@ public class SettingsActivity extends PreferenceActivity
 
                         // vymažeme
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
-                        DB.filterSettingHelper.delete(dialogDataID);
+                        filterSettingHelper.delete(dialogDataID);
                         createObdPIDScreen();
 
 

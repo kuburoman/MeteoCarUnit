@@ -10,13 +10,12 @@ import android.widget.TextView;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.PointsGraphSeries;
 
 import java.util.HashMap;
 import java.util.List;
 
 import cz.meteocar.unit.R;
-import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
 
@@ -77,7 +76,7 @@ public class DetailsFragment extends Fragment {
         TextView viewById = (TextView) rootView.findViewById(R.id.trip_graph_name);
         viewById.setText(tripId + " " + type);
 
-        List<AccelerationVO> tripList = DB.recordHelper.getTripByType(tripId, type);
+        List<AccelerationVO> tripList = ServiceManager.getInstance().db.getRecordHelper().getTripByType(tripId, type);
 
         DataPoint[] pointsX = new DataPoint[tripList.size()];
         DataPoint[] pointsY = new DataPoint[tripList.size()];

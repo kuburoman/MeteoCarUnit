@@ -15,6 +15,7 @@ import android.widget.TextView;
 import net.engio.mbassy.listener.Handler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.UserController;
@@ -58,21 +59,12 @@ public class DebugFragment extends Fragment {
      * Smazání záznamu jízdy
      */
     private void BUTTON_ERASE_TRIP_DETAILS() {
-        DB.obdPidHelper.deleteAll();
-        textView1.setText("Záznamy vymazány");
     }
 
     /**
      * Zaloguje všechny pidy z databáze
      */
     private void BUTTON_LOG_PIDS() {
-        ArrayList<ObdPidEntity> arr = DB.obdPidHelper.getAll();
-        StringBuilder sb = new StringBuilder();
-        sb.append("OBD PIDs count: " + arr.size() + "\n");
-        for (ObdPidEntity obj : arr) {
-            sb.append("ID: " + obj.getId() + " tag: " + obj.getTag() + " code: " + obj.getPidCode() + " formula: " + obj.getFormula() + "\n");
-        }
-        textView1.setText(sb.toString());
     }
 
     /**
@@ -94,9 +86,6 @@ public class DebugFragment extends Fragment {
      * Pošle uložený zaáznam na server
      */
     private void BUTTON_ERASE_PIDS() {
-        DB.obdPidHelper.deleteAll();
-        DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, false).commit();
-        textView1.setText("PIDy smazány");
     }
 
     /**

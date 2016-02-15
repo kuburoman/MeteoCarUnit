@@ -9,7 +9,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.helper.RecordHelper;
+import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
 
@@ -19,6 +22,8 @@ import cz.meteocar.unit.engine.storage.model.TripEntity;
 public class ConvertService extends Thread {
 
     private boolean threadRun;
+    private RecordHelper recordHelper;
+    private TripHelper tripHelper;
 
     public ConvertService() {
         this(true);
@@ -27,6 +32,8 @@ public class ConvertService extends Thread {
     public ConvertService(Boolean threadRun) {
         // start threadu
         this.threadRun = threadRun;
+        recordHelper = ServiceManager.getInstance().db.getRecordHelper();
+        tripHelper = ServiceManager.getInstance().db.getTripHelper();
         start();
     }
 
@@ -43,7 +50,7 @@ public class ConvertService extends Thread {
     @Override
     public void run() {
         while (threadRun) {
-            if (DB.recordHelper.getNumberOfRecord(false) > 0) {
+            if (recordHelper.getNumberOfRecord(false) > 0) {
                 createJsonRecords();
             } else {
 
@@ -51,7 +58,6 @@ public class ConvertService extends Thread {
                     this.sleep(30000);
                 } catch (Exception e) {
                     Log.e(AppLog.LOG_TAG_DEFAULT, "Error in convert run", e);
-                    threadRun = false;
                 }
             }
 
@@ -89,10 +95,10 @@ public class ConvertService extends Thread {
     }
 
     protected void createJsonRecords() {
-        List<String> userIds = DB.recordHelper.getUserIdStored();
+        List<String> userIds = recordHelper.getUserIdStored();
         for (String userId : userIds) {
             while (true) {
-                List<RecordEntity> entityList = DB.recordHelper.getByUserId(userId, 100, false);
+                List<RecordEntity> entityList = recordHelper.getByUserId(userId, 100, false);
                 if (entityList.size() < 1) {
                     break;
                 }
@@ -105,14 +111,14 @@ public class ConvertService extends Thread {
                     e.printStackTrace();
                 }
 
-                DB.tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
+                tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
 
                 List<Integer> integers = new ArrayList<>();
                 for (RecordEntity recordEntity : entityList) {
                     integers.add(recordEntity.getId());
                 }
 
-                DB.recordHelper.updateProcessed(integers, true);
+                recordHelper.updateProcessed(integers, true);
                 Log.d(AppLog.LOG_TAG_DB, "Successful creation of trip");
             }
 

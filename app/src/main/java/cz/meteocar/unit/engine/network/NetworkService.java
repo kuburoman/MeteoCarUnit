@@ -8,31 +8,21 @@ import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.NetworkRequestResultEnum;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.event.PostTripRecordsResultEvent;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
 
 /**
@@ -60,8 +50,9 @@ public class NetworkService extends Thread {
     private boolean checkConnectingStatusFlag;
     private int checkConnectingStatusRetries;
     private final int MAX_CONN_CHECK_RETRIES = 10; // 10s
+    private TripHelper tripHelper;
 
-    public boolean isConnected(){
+    public boolean isConnected() {
         return checkConnectingStatusFlag;
     }
 
@@ -74,6 +65,7 @@ public class NetworkService extends Thread {
         context = ctx;
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
+        tripHelper = ServiceManager.getInstance().db.getTripHelper();
         address = DB.get().getString("networkAddress", "meteocar.herokuapp.com");
         start();
     }
@@ -133,10 +125,11 @@ public class NetworkService extends Thread {
 
                     // usneme na půl vteřiny, bez internetu stejně nemůžeme probíhat jiná komunikace
                     try {
-                        this.sleep(500);
+                        synchronized (this) {
+                            this.wait(500);
+                        }
                     } catch (Exception e) {
                         Log.e(AppLog.LOG_TAG_NETWORK, "Error in sleep", e);
-                        threadRun = false;
                     }
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }
@@ -144,20 +137,22 @@ public class NetworkService extends Thread {
                 sendTripsToServer();
 
                 AppLog.i("Server thread will wait");
-                this.wait(60000);
+                synchronized (this) {
+                    this.wait(60000);
+                }
             }
         } catch (Exception ex) {
             Log.e(AppLog.LOG_TAG_NETWORK, "Error in main thread.", ex);
         }
     }
 
-    private void sendTripsToServer(){
+    private void sendTripsToServer() {
 
-        while(DB.tripHelper.getNumberOfRecord() > 0){
-            TripEntity oneTrip = DB.tripHelper.getOneTrip();
-            if(postTripRecords(oneTrip)){
-                DB.tripHelper.delete(oneTrip.getId());
-            }else{
+        while (tripHelper.getNumberOfRecord() > 0) {
+            TripEntity oneTrip = tripHelper.getOneTrip();
+            if (postTripRecords(oneTrip)) {
+                tripHelper.delete(oneTrip.getId());
+            } else {
                 return;
             }
 
@@ -168,7 +163,7 @@ public class NetworkService extends Thread {
     public boolean postTripRecords(TripEntity postTripRecord) {
         try {
             HttpClient client = new DefaultHttpClient();
-            HttpPost post = new HttpPost(baseURL+address+dataURL);
+            HttpPost post = new HttpPost(baseURL + address + dataURL);
             post.setHeader("Accept", "application/json");
             post.setHeader("Content-type", "application/json");
 
@@ -178,7 +173,7 @@ public class NetworkService extends Thread {
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords successful");
                 return true;
-            }else{
+            } else {
                 AppLog.i(AppLog.LOG_TAG_NETWORK, "PostTripRecords failed");
                 return false;
             }
@@ -249,7 +244,7 @@ public class NetworkService extends Thread {
         AppLog.i(null, "Starting updating net conn status");
         checkConnectingStatusRetries = 0;
         checkConnectingStatusFlag = true;
-        notifyAll();
+        this.notify();
     }
 
     /**

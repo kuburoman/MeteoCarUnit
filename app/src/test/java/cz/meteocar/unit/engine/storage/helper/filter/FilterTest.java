@@ -3,14 +3,15 @@ package cz.meteocar.unit.engine.storage.helper.filter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
+import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
+import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
 import static junit.framework.Assert.assertEquals;
@@ -19,14 +20,18 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FilterTest {
 
+    @Mock
+    private FilterSettingHelper filterSettingHelper;
+
+    @Mock
+    private RecordHelper recordHelper;
+
     @Spy
-    private Filter filter = new Filter();
+    private Filter filter = new Filter(filterSettingHelper, recordHelper);
 
     private FilterSettingEntity filterSetting;
 
@@ -61,8 +66,8 @@ public class FilterTest {
     }
 
     @Test
-    public void testProcessFirst(){
-        
+    public void testProcessFirst() {
+
         filter.process(mainRecord);
 
         verify(filter).saveIntoDB(mainRecord);
@@ -72,7 +77,7 @@ public class FilterTest {
     }
 
     @Test
-    public void testProcessSecondDifferentTrip(){
+    public void testProcessSecondDifferentTrip() {
         filter.records.put(mainRecord.getType(), mainRecord);
 
         RecordVO input = new RecordVO();
@@ -92,7 +97,7 @@ public class FilterTest {
     }
 
     @Test
-    public void testProcessSecondGreaterDifference(){
+    public void testProcessSecondGreaterDifference() {
         filter.records.put(mainRecord.getType(), mainRecord);
 
         RecordVO input = new RecordVO();
@@ -113,7 +118,7 @@ public class FilterTest {
     }
 
     @Test
-    public void testProcessTimeExceed(){
+    public void testProcessTimeExceed() {
         filter.records.put(mainRecord.getType(), mainRecord);
 
         RecordVO input = new RecordVO();
@@ -134,7 +139,7 @@ public class FilterTest {
     }
 
     @Test
-    public void testProcessRounding(){
+    public void testProcessRounding() {
         mainRecord.setLastSaved(1L);
         mainRecord.setTime(2L);
         mainRecord.setValue(8000.0);
@@ -157,7 +162,7 @@ public class FilterTest {
 
         RecordVO result = filter.records.get(input.getType());
         assertEquals(8200L, result.getValue(), 0);
-        assertEquals((Long)1L, result.getLastSaved());
+        assertEquals((Long) 1L, result.getLastSaved());
         assertEquals((Long) 4L, result.getTime());
 
         verify(filter, never()).saveIntoDB(any(RecordVO.class));
