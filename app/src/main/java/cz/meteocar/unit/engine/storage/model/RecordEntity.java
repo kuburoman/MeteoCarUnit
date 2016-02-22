@@ -3,23 +3,14 @@ package cz.meteocar.unit.engine.storage.model;
 /**
  * Entita drzici zaznamy o jizde.
  */
-public class RecordEntity {
+public class RecordEntity extends AbstractEntity {
 
-    private int id;
     private Long time;
     private String userName;
     private String tripId;
     private String type;
     private String json;
     private boolean processed;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public Long getTime() {
         return time;

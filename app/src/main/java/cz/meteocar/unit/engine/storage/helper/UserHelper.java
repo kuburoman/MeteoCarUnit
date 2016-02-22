@@ -4,16 +4,13 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 
 /**
  * Helper for saving and loading {@link UserEntity}.
  */
-public class UserHelper {
+public class UserHelper extends AbstractHelper<UserEntity> {
 
     private DatabaseHelper helper;
 
@@ -48,34 +45,7 @@ public class UserHelper {
      * @param helper {@Link DatabaseHelper}
      */
     public UserHelper(DatabaseHelper helper) {
-        this.helper = helper;
-    }
-
-    /**
-     * Returns all {@link UserEntity} stored in DB.
-     *
-     * @return List of {@link UserEntity}
-     */
-    public List<UserEntity> getAll() {
-        ArrayList<UserEntity> arr = new ArrayList<>();
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
-
-        try {
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    arr.add(convert(cursor));
-                    cursor.moveToNext();
-                }
-            }
-
-            return arr;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        super(helper);
     }
 
     /**
@@ -84,25 +54,15 @@ public class UserHelper {
      * @param obj {@link UserEntity}
      * @return Number of affected rows
      */
-    public UserEntity save(UserEntity obj) {
+    @Override
+    public int save(UserEntity obj) {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_USERNAME, obj.getUsername());
         values.put(COLUMN_NAME_PASSWORD, obj.getPassword());
         values.put(COLUMN_NAME_LOGGED, obj.getLogged());
 
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        if (obj.getId() > 0) {
-            values.put(COLUMN_NAME_ID, obj.getId());
-            int id = db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
-            obj.setId(id);
-            return obj;
-        } else {
-            int id = (int) db.insert(TABLE_NAME, null, values);
-            obj.setId(id);
-            return obj;
-        }
+        return this.innerSave(obj.getId(), values);
     }
 
     /**
@@ -134,33 +94,6 @@ public class UserHelper {
 
             userEntity.setLogged(true);
             save(userEntity);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-
-    /**
-     * Returns {@link UserEntity} based on id
-     *
-     * @param id of user entity
-     * @return {@link UserEntity}
-     */
-    public UserEntity get(int id) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                return convert(cursor);
-            } else {
-                return null;
-            }
-
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -219,29 +152,7 @@ public class UserHelper {
         }
     }
 
-    /**
-     * Return number of records.
-     *
-     * @return number of records
-     */
-    public int getNumberOfRecord() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
-        int cnt = cursor.getCount();
-        cursor.close();
-
-        return cnt;
-    }
-
-    /**
-     * Deletes all records in table
-     */
-    public void deleteAllRecords() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(TABLE_NAME, null, null);
-    }
-
+    @Override
     protected UserEntity convert(Cursor cursor) {
         UserEntity obj = new UserEntity();
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
@@ -250,6 +161,21 @@ public class UserHelper {
         obj.setLogged(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
         return obj;
 
+    }
+
+    @Override
+    protected String getAllSQL() {
+        return SQL_GET_ALL;
+    }
+
+    @Override
+    protected String getTableNameSQL() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    protected String getColumnNameIdSQL() {
+        return COLUMN_NAME_ID;
     }
 
 

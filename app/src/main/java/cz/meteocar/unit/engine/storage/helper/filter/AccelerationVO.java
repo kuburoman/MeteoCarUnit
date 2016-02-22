@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.helper.filter;
 
 /**
- * Created by Nell on 8.2.2016.
+ * Value object for acceleration;
  */
 public class AccelerationVO {
 

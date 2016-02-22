@@ -28,7 +28,7 @@ import cz.meteocar.unit.engine.storage.model.RecordEntity;
 /**
  * Helper for saving and loading {@link RecordEntity}.
  */
-public class RecordHelper {
+public class RecordHelper extends AbstractHelper<RecordEntity> {
 
     private static final String TABLE_NAME = "record_details";
     private static final String COLUMN_NAME_ID = "id";
@@ -54,20 +54,14 @@ public class RecordHelper {
 
     public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
 
-    private DatabaseHelper helper;
     private Filter filter;
 
     public RecordHelper(DatabaseHelper helper, FilterSettingHelper filterSettingHelper) {
-        this.helper = helper;
+        super(helper);
         this.filter = new Filter(filterSettingHelper, this);
     }
 
-    /**
-     * Insert entity into database.
-     *
-     * @param obj {@link RecordEntity}
-     * @return ID of new entity
-     */
+    @Override
     public int save(RecordEntity obj) {
         ContentValues values = new ContentValues();
 
@@ -78,43 +72,7 @@ public class RecordHelper {
         values.put(COLUMN_NAME_JSON, obj.getJson());
         values.put(COLUMN_NAME_PROCESSED, obj.isProcessed());
 
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        if (obj.getId() > 0) {
-            values.put(COLUMN_NAME_ID, obj.getId());
-            return db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
-        } else {
-            return (int) db.insert(TABLE_NAME, null, values);
-        }
-    }
-
-    /**
-     * Returns {@link RecordEntity} based on id.
-     *
-     * @param id ID of entity
-     * @return {@link RecordEntity} or null
-     */
-    public RecordEntity get(int id) {
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                RecordEntity obj = convert(cursor);
-                return obj;
-
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return this.innerSave(obj.getId(), values);
     }
 
     /**
@@ -203,30 +161,6 @@ public class RecordHelper {
         cursor.close();
 
         return count;
-    }
-
-    /**
-     * Deletes all entities from database.
-     */
-    public void deleteAllRecords() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(TABLE_NAME, null, null);
-    }
-
-    /**
-     * Deletes all entities with given ids.
-     *
-     * @param id of entities
-     */
-    public void deleteRecords(List<Integer> id) {
-        String[] array = new String[id.size()];
-
-        for (int i = 0; i < id.size(); i++) {
-            array[i] = String.valueOf(id.get(i));
-        }
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(TABLE_NAME, "id IN (" + makePlaceholders(id.size()) + ")", array);
     }
 
     /**
@@ -337,6 +271,7 @@ public class RecordHelper {
         return userIds;
     }
 
+    @Override
     protected RecordEntity convert(Cursor cursor) {
         RecordEntity obj = new RecordEntity();
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
@@ -347,6 +282,21 @@ public class RecordHelper {
         obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
         obj.setProcessed(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PROCESSED)) != 0);
         return obj;
+    }
+
+    @Override
+    protected String getAllSQL() {
+        return SQL_GET_ALL;
+    }
+
+    @Override
+    protected String getTableNameSQL() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    protected String getColumnNameIdSQL() {
+        return COLUMN_NAME_ID;
     }
 
     /**
@@ -442,7 +392,6 @@ public class RecordHelper {
         }
 
         filter.process(recordVO);
-//        save(obj);
     }
 
 }

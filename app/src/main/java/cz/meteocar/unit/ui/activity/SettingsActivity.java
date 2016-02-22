@@ -438,7 +438,7 @@ public class SettingsActivity extends PreferenceActivity
         PreferenceScreen cat = (PreferenceScreen) findPreference(FILTER_SETTINGS);
         cat.removeAll();
 
-        ArrayList<FilterSettingEntity> arr = filterSettingHelper.getAll();
+        List<FilterSettingEntity> arr = filterSettingHelper.getAll();
         int index = 0;
         for (FilterSettingEntity pid : arr) {
 
@@ -475,7 +475,7 @@ public class SettingsActivity extends PreferenceActivity
         dialogDataID = id;
 
         // načteme z DB PID
-        FilterSettingEntity filter = filterSettingHelper.getById(id);
+        FilterSettingEntity filter = filterSettingHelper.get(id);
 
         if (filter == null) {
             TextView txt = (TextView) filterDialogView.findViewById(R.id.dialog_obd_name_title);

@@ -4,8 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
-
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
@@ -13,7 +11,7 @@ import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 /**
  * Helper for saving and loading {@link FilterSettingEntity}.
  */
-public class FilterSettingHelper {
+public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
 
     private static final String TABLE_NAME = "filter_setting";
     private static final String COLUMN_NAME_ID = "id";
@@ -64,47 +62,13 @@ public class FilterSettingHelper {
 
     private static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
 
-    private DatabaseHelper helper;
-
     public FilterSettingHelper(DatabaseHelper helper) {
-        this.helper = helper;
+        super(helper);
     }
 
-    /**
-     * Returns all {@link FilterSettingEntity} in database.
-     *
-     * @return List of {@link FilterSettingEntity}
-     */
-    public ArrayList<FilterSettingEntity> getAll() {
-        ArrayList<FilterSettingEntity> arr = new ArrayList<>();
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(SQL_GET_ALL, null);
-
-        try {
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    arr.add(convert(cursor));
-                    cursor.moveToNext();
-                }
-            }
-            return arr;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    /**
-     * Inserts new {@link FilterSettingEntity} database.
-     *
-     * @param obj {@link FilterSettingEntity}
-     * @return Number of affected rows.
-     */
+    @Override
     public int save(FilterSettingEntity obj) {
         ContentValues values = new ContentValues();
-
         values.put(COLUMN_NAME_OBD_CODE, obj.getObdCode());
         values.put(COLUMN_NAME_ACTIVE, obj.isActive());
         values.put(COLUMN_NAME_REDUCE_TYPE, obj.getReduceType().getId());
@@ -112,41 +76,7 @@ public class FilterSettingHelper {
         values.put(COLUMN_NAME_ROUNDING, obj.isRounding());
         values.put(COLUMN_NAME_ROUNDING_DECIMAL, obj.getRoundingDecimal());
         values.put(COLUMN_NAME_MAX_TIME, obj.getMaxTime());
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        if (obj.getId() > 0) {
-            values.put(COLUMN_NAME_ID, obj.getId());
-            return (int) db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
-        } else {
-            return (int) db.insert(TABLE_NAME, null, values);
-        }
-    }
-
-    /**
-     * Returns {@link FilterSettingEntity} based on id.
-     *
-     * @param id of entity
-     * @return {@link FilterSettingEntity}
-     */
-    public FilterSettingEntity getById(int id) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                return convert(cursor);
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return this.innerSave(obj.getId(), values);
     }
 
     /**
@@ -175,16 +105,7 @@ public class FilterSettingHelper {
         }
     }
 
-    /**
-     * Deletes entity form database.
-     *
-     * @param id of entity
-     */
-    public void delete(int id) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(TABLE_NAME, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)});
-    }
-
+    @Override
     protected FilterSettingEntity convert(Cursor cursor) {
         FilterSettingEntity obj = new FilterSettingEntity();
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
@@ -197,6 +118,21 @@ public class FilterSettingHelper {
         obj.setMaxTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_MAX_TIME)));
         obj.setUpdateTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_UPDATE_TIME)));
         return obj;
+    }
+
+    @Override
+    protected String getAllSQL() {
+        return SQL_GET_ALL;
+    }
+
+    @Override
+    protected String getTableNameSQL() {
+        return TABLE_NAME;
+    }
+
+    @Override
+    protected String getColumnNameIdSQL() {
+        return COLUMN_NAME_ID;
     }
 
 }

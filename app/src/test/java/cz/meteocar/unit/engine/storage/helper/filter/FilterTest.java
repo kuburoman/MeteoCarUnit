@@ -4,22 +4,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.HashMap;
 
+import cz.meteocar.unit.engine.convertor.RecordVO2EntityConverter;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
+import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FilterTest {
@@ -30,15 +29,22 @@ public class FilterTest {
     @Mock
     private RecordHelper recordHelper;
 
-    @Spy
-    private Filter filter = new Filter(filterSettingHelper, recordHelper);
+    @Mock
+    private RecordVO2EntityConverter converter;
+
+    private Filter filter;
 
     private FilterSettingEntity filterSetting;
 
     private RecordVO mainRecord = new RecordVO();
 
+    private RecordEntity entityRecord = new RecordEntity();
+
     @Before
     public void setUp() {
+
+        filter = new Filter(filterSettingHelper, recordHelper);
+        filter.setConverter(converter);
 
         filterSetting = new FilterSettingEntity();
         filterSetting.setReduceValue(4.0);
@@ -50,12 +56,9 @@ public class FilterTest {
         filterSetting.setActive(true);
         filterSetting.setUpdateTime(2000L);
 
-        Mockito.doNothing().when(filter).saveIntoDB(any(RecordVO.class));
-
-        doReturn(filterSetting).when(filter).getFilter("type");
+        when(filterSettingHelper.getByCode(filterSetting.getObdCode())).thenReturn(filterSetting);
 
         filter.records = new HashMap<>();
-
         mainRecord.setUserId("user");
         mainRecord.setTripId("trip");
         mainRecord.setType("type");
@@ -67,10 +70,11 @@ public class FilterTest {
 
     @Test
     public void testProcessFirst() {
+        when(converter.convert(mainRecord)).thenReturn(entityRecord);
 
         filter.process(mainRecord);
 
-        verify(filter).saveIntoDB(mainRecord);
+        verify(recordHelper).save(entityRecord);
 
         assertTrue(filter.records.containsKey(mainRecord.getType()));
         assertTrue(filter.records.containsValue(mainRecord));
@@ -80,6 +84,7 @@ public class FilterTest {
     public void testProcessSecondDifferentTrip() {
         filter.records.put(mainRecord.getType(), mainRecord);
 
+
         RecordVO input = new RecordVO();
         input.setUserId("not");
         input.setTripId("not");
@@ -88,17 +93,21 @@ public class FilterTest {
         input.setValue(1.5);
         input.setSaved(false);
 
+        when(converter.convert(input)).thenReturn(entityRecord);
+
         filter.process(input);
 
         assertTrue(filter.records.containsKey(input.getType()));
         assertTrue(filter.records.containsValue(input));
 
-        verify(filter).saveIntoDB(input);
+        verify(recordHelper).save(entityRecord);
     }
 
     @Test
     public void testProcessSecondGreaterDifference() {
         filter.records.put(mainRecord.getType(), mainRecord);
+
+        RecordEntity secondEntity = new RecordEntity();
 
         RecordVO input = new RecordVO();
         input.setUserId("user");
@@ -108,13 +117,16 @@ public class FilterTest {
         input.setValue(5.5);
         input.setSaved(false);
 
+        when(converter.convert(mainRecord)).thenReturn(entityRecord);
+        when(converter.convert(input)).thenReturn(secondEntity);
+
         filter.process(input);
 
         assertTrue(filter.records.containsKey(input.getType()));
         assertTrue(filter.records.containsValue(input));
 
-        verify(filter).saveIntoDB(mainRecord);
-        verify(filter).saveIntoDB(input);
+        verify(recordHelper).save(entityRecord);
+        verify(recordHelper).save(secondEntity);
     }
 
     @Test
@@ -130,12 +142,14 @@ public class FilterTest {
         input.setValue(1.5);
         input.setSaved(false);
 
+        when(converter.convert(mainRecord)).thenReturn(entityRecord);
+
         filter.process(input);
 
         assertTrue(filter.records.containsKey(input.getType()));
         assertTrue(filter.records.containsValue(input));
 
-        verify(filter).saveIntoDB(mainRecord);
+        verify(recordHelper).save(entityRecord);
     }
 
     @Test
@@ -165,7 +179,7 @@ public class FilterTest {
         assertEquals((Long) 1L, result.getLastSaved());
         assertEquals((Long) 4L, result.getTime());
 
-        verify(filter, never()).saveIntoDB(any(RecordVO.class));
+        verifyNoMoreInteractions(recordHelper);
     }
 
     @Test
@@ -178,9 +192,11 @@ public class FilterTest {
         recordVO.setValue(1.5);
         recordVO.setSaved(false);
 
+        when(converter.convert(recordVO)).thenReturn(entityRecord);
+
         filter.saveNew(recordVO);
 
-        verify(filter).saveIntoDB(recordVO);
+        verify(recordHelper).save(entityRecord);
     }
 
     @Test
@@ -189,6 +205,4 @@ public class FilterTest {
 
         assertEquals(123456789.587, result);
     }
-
-
 }

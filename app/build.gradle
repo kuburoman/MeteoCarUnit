@@ -10,6 +10,7 @@ android {
         targetSdkVersion 20
         versionCode 3
         versionName "1.0.2"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -21,9 +22,10 @@ android {
             debuggable true
             testCoverageEnabled = true
         }
-
-
     }
+//    testOptions {
+//        unitTests.returnDefaultValues = true
+//    }
 }
 
 
@@ -57,4 +59,8 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     testCompile 'org.json:json:20140107'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile('com.android.support.test:runner:0.3') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
 }

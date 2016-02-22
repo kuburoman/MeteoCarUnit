@@ -5,9 +5,8 @@ import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 /**
  * Created by Nell on 25.1.2016.
  */
-public class FilterSettingEntity {
+public class FilterSettingEntity extends AbstractEntity {
 
-    private int id;
     private String obdCode;
     private boolean active;
     private ReducerType reduceType;
@@ -16,14 +15,6 @@ public class FilterSettingEntity {
     private int roundingDecimal;
     private Long maxTime;
     private Long updateTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getObdCode() {
         return obdCode;

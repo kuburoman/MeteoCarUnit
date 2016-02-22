@@ -26,14 +26,14 @@ public class ConvertService extends Thread {
     private TripHelper tripHelper;
 
     public ConvertService() {
-        this(true);
+        this(true, ServiceManager.getInstance().db.getRecordHelper(), ServiceManager.getInstance().db.getTripHelper());
     }
 
-    public ConvertService(Boolean threadRun) {
+    public ConvertService(Boolean threadRun, RecordHelper recordHelper, TripHelper tripHelper) {
         // start threadu
         this.threadRun = threadRun;
-        recordHelper = ServiceManager.getInstance().db.getRecordHelper();
-        tripHelper = ServiceManager.getInstance().db.getTripHelper();
+        this.recordHelper = recordHelper;
+        this.tripHelper = tripHelper;
         start();
     }
 

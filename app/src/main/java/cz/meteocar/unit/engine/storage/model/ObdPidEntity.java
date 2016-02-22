@@ -3,24 +3,8 @@ package cz.meteocar.unit.engine.storage.model;
 /**
  * Created by Toms, 2014.
  */
-public class ObdPidEntity {
+public class ObdPidEntity extends AbstractEntity {
 
-    public ObdPidEntity() {
-    }
-
-    public ObdPidEntity(int id, String name, String tag, String pidCode, String formula, int min, int max, int active, int locked) {
-        this.id = id;
-        this.name = name;
-        this.tag = tag;
-        this.pidCode = pidCode;
-        this.formula = formula;
-        this.min = min;
-        this.max = max;
-        this.active = active;
-        this.locked = locked;
-    }
-
-    public int id = -1;
     public String name;
     public String tag;
     public String pidCode;
@@ -29,14 +13,6 @@ public class ObdPidEntity {
     public int max;
     public int active;
     public int locked;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;

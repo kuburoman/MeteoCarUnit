@@ -3,20 +3,11 @@ package cz.meteocar.unit.engine.storage.model;
 /**
  * User entity
  */
-public class UserEntity {
+public class UserEntity extends AbstractEntity {
 
-    private int id;
     private String username;
     private String password;
     private Boolean logged;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getUsername() {
         return username;

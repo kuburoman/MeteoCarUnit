@@ -13,7 +13,7 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 /**
  * Helper for saving and loading {@link ObdPidEntity}.
  */
-public class ObdPidHelper {
+public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
 
     public static final int OBD_PID_ID_SPEED = 1;
     public static final int OBD_PID_ID_RPM = 2;
@@ -71,20 +71,22 @@ public class ObdPidHelper {
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-
-    private DatabaseHelper helper;
-
     public ObdPidHelper(DatabaseHelper helper) {
-        this.helper = helper;
+        super(helper);
     }
 
-    /**
-     * Return all entities in database.
-     *
-     * @return List of {@link ObdPidEntity}.
-     */
-    public List<ObdPidEntity> getAll() {
-        return getAll(false);
+    @Override
+    public int save(ObdPidEntity entity) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_NAME, entity.getName());
+        values.put(COLUMN_NAME_TAG, entity.getTag());
+        values.put(COLUMN_NAME_PID_CODE, entity.getPidCode());
+        values.put(COLUMN_NAME_FORMULA, entity.getFormula());
+        values.put(COLUMN_NAME_MIN, entity.getMin());
+        values.put(COLUMN_NAME_MAX, entity.getMax());
+        values.put(COLUMN_NAME_LOCKED, entity.getLocked());
+        values.put(COLUMN_NAME_ACTIVE, entity.getActive());
+        return innerSave(entity.getId(), values);
     }
 
     /**
@@ -92,20 +94,11 @@ public class ObdPidHelper {
      *
      * @return List of {@link ObdPidEntity}
      */
-    public ArrayList<ObdPidEntity> getAllActive() {
-        return getAll(true);
-    }
-
-    protected ArrayList<ObdPidEntity> getAll(boolean onlyActive) {
+    public List<ObdPidEntity> getAllActive() {
         ArrayList<ObdPidEntity> arr = new ArrayList<>();
 
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor;
-        if (!onlyActive) {
-            cursor = db.rawQuery(SQL_GET_ALL, null);
-        } else {
-            cursor = db.rawQuery(SQL_GET_ALL + " WHERE " + COLUMN_NAME_ACTIVE + " = 1", null);
-        }
+        Cursor cursor = db.rawQuery(SQL_GET_ALL + " WHERE " + COLUMN_NAME_ACTIVE + " = 1", null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -116,80 +109,6 @@ public class ObdPidHelper {
 
         cursor.close();
         return arr;
-    }
-
-    /**
-     * Insert new entity into database
-     *
-     * @param obj {@link ObdPidEntity}
-     * @return Number of affected rows.
-     */
-    public int save(ObdPidEntity obj) {
-        ContentValues values = new ContentValues();
-
-        values.put(COLUMN_NAME_NAME, obj.getName());
-        values.put(COLUMN_NAME_TAG, obj.getTag());
-        values.put(COLUMN_NAME_PID_CODE, obj.getPidCode());
-        values.put(COLUMN_NAME_FORMULA, obj.getFormula());
-        values.put(COLUMN_NAME_MIN, obj.getMin());
-        values.put(COLUMN_NAME_MAX, obj.getMax());
-        values.put(COLUMN_NAME_LOCKED, obj.getLocked());
-        values.put(COLUMN_NAME_ACTIVE, obj.getActive());
-
-        SQLiteDatabase db = helper.getWritableDatabase();
-
-        if (obj.getId() > 0) {
-            values.put(COLUMN_NAME_ID, obj.getId());
-            return (int) db.update(TABLE_NAME, values, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(obj.getId())});
-        } else {
-            return (int) db.insert(TABLE_NAME, null, values);
-        }
-    }
-
-    /**
-     * Returns entity from database based on id.
-     *
-     * @param id of entity
-     * @return {@link ObdPidEntity}
-     */
-    public ObdPidEntity get(int id) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                return convert(cursor);
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-    }
-
-    /**
-     * Deletes entity base on id.
-     *
-     * @param id of entity
-     * @return True - success, False - failed to delete
-     */
-    public boolean delete(int id) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        return db.delete(TABLE_NAME, COLUMN_NAME_ID + " = " + id, null) > 0;
-    }
-
-    /**
-     * Deletes all entities from databse.
-     */
-    public void deleteAll() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(TABLE_NAME, null, null);
     }
 
     /**
@@ -225,6 +144,21 @@ public class ObdPidHelper {
         obj.setLocked(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOCKED)));
         obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)));
         return obj;
+    }
+
+    @Override
+    protected String getAllSQL() {
+        return null;
+    }
+
+    @Override
+    protected String getTableNameSQL() {
+        return null;
+    }
+
+    @Override
+    protected String getColumnNameIdSQL() {
+        return null;
     }
 
 }

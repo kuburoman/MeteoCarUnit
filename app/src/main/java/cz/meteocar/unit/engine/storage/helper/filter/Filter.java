@@ -12,13 +12,15 @@ import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
 public class Filter {
 
-
     protected HashMap<String, RecordVO> records;
 
     protected RecordVO2EntityConverter recordVO2EntityConverter = new RecordVO2EntityConverter();
 
     protected FilterSettingHelper filterSettingHelper;
     protected RecordHelper recordHelper;
+
+    public Filter() {
+    }
 
     public Filter(FilterSettingHelper filterSettingHelper, RecordHelper recordHelper) {
         records = new HashMap<>();
@@ -109,5 +111,9 @@ public class Filter {
         BigDecimal bd = BigDecimal.valueOf(value);
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
+    }
+
+    protected void setConverter(RecordVO2EntityConverter converter) {
+        this.recordVO2EntityConverter = converter;
     }
 }

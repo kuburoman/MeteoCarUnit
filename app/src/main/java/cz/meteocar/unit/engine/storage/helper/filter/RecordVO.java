@@ -4,7 +4,8 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Created by Nell on 17.1.2016.
+ * Value object of Record.
+ * It used mainly for Filer.
  */
 public class RecordVO {
 
@@ -74,9 +75,13 @@ public class RecordVO {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
+        if (this == o) {
+            return true;
+        }
 
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         RecordVO recordVO = (RecordVO) o;
 
@@ -93,7 +98,7 @@ public class RecordVO {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37)
+        return new HashCodeBuilder()
                 .append(type)
                 .append(tripId)
                 .append(userId)

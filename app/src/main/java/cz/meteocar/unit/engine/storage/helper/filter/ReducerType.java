@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.helper.filter;
 
 /**
- * Created by Nell on 18.7.2015.
+ * Enum type for reduce type.
  */
 public enum ReducerType {
 
@@ -17,6 +17,12 @@ public enum ReducerType {
         return id;
     }
 
+    /**
+     * Returns enum type based on id.
+     *
+     * @param id of enum
+     * @return {@link ReducerType}
+     */
     public static ReducerType fromId(int id) {
         for (ReducerType type : ReducerType.values()) {
             if (type.getId() == id) {

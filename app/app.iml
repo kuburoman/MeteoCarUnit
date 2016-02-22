@@ -98,8 +98,8 @@
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="powermock-classloading-base-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="graphview-4.0.1" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="powermock-reflect-1.6.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="json-20140107" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="powermock-reflect-1.6.1" level="project" />
     <orderEntry type="library" exported="" name="mbassador-1.2.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="commons-lang3-3.0" level="project" />
@@ -112,8 +112,8 @@
     <orderEntry type="library" exported="" scope="TEST" name="powermock-module-javaagent-1.6.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="mockito-core-1.9.5" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="objenesis-2.1" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="mockito-all-1.10.8" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="powermock-module-junit4-1.6.1" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="mockito-all-1.10.8" level="project" />
   </component>
   <component name="sonarModuleSettings">
     <option name="localAnalysisScripName" value="&lt;PROJECT&gt;" />
