@@ -39,7 +39,10 @@ sonarRunner {
         property "sonar.projectVersion", "1.0.2" // Version of your project
         property "sonar.projectDescription", "Sonar" // Description of your project
         property "sonar.tests", "src/test/java"
+        property "sonar.jacoco.reportPath", "build/jacoco/testDebugUnitTest.exec"
         property "sonar.junit.reportsPath", "build/test-results/debug"
+        property "sonar.binaries", "build/intermediates/classes/debug"
+
     }
 }
 
@@ -62,5 +65,35 @@ dependencies {
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile('com.android.support.test:runner:0.3') {
         exclude group: 'com.android.support', module: 'support-annotations'
+    }
+}
+
+apply plugin: 'jacoco'
+
+jacoco {
+    version "0.7.1.201405082137"
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+    classDirectories = fileTree(
+            dir: 'build/intermediates/classes/debug/com/yourapppackagename',
+            excludes: ['**/R.class',
+                       '**/R$*.class',
+                       '**/BuildConfig.*',
+                       '**/Manifest*.*'])
+    sourceDirectories = files('src/main/java')
+    executionData = files('build/jacoco/testDebugUnitTest.exec')
+    doFirst {
+        files('build/intermediates/classes/debug').getFiles().each { file ->
+            if (file.name.contains('$$')) {
+                file.renameTo(file.path.replace('$$', '$'))
+            }
+        }
     }
 }
