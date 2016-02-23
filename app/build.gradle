@@ -82,7 +82,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
         html.enabled = true
     }
     classDirectories = fileTree(
-            dir: 'build/intermediates/classes/debug/com/yourapppackagename',
+            dir: 'build/intermediates/classes/debug/cz/meteocar',
             excludes: ['**/R.class',
                        '**/R$*.class',
                        '**/BuildConfig.*',
