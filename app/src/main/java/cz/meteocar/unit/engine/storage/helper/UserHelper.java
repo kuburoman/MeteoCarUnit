@@ -12,8 +12,6 @@ import cz.meteocar.unit.engine.storage.model.UserEntity;
  */
 public class UserHelper extends AbstractHelper<UserEntity> {
 
-    private DatabaseHelper helper;
-
     private static final String TABLE_NAME = "meteocar_users";
     private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_USERNAME = "username";

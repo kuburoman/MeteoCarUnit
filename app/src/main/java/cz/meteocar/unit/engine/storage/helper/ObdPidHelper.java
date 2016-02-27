@@ -148,17 +148,17 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
 
     @Override
     protected String getAllSQL() {
-        return null;
+        return SQL_GET_ALL;
     }
 
     @Override
     protected String getTableNameSQL() {
-        return null;
+        return TABLE_NAME;
     }
 
     @Override
     protected String getColumnNameIdSQL() {
-        return null;
+        return COLUMN_NAME_ID;
     }
 
 }

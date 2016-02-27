@@ -95,10 +95,6 @@ public class DashboardFragment extends Fragment {
         AppLog.i("TestFragment onStart");
         UIManager.getInstance().showActionBarFor(UIManager.FRAGMENT_DASHBOARD);
 
-        // získáme min a max hodnoty pro tachometry
-
-        List<ObdPidEntity> all = ServiceManager.getInstance().db.getObdPidHelper().getAll();
-
         ObdPidEntity speed = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_SPEED);
         ObdPidEntity rpm = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_RPM);
 
