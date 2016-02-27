@@ -8,6 +8,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.event.AppEvent;
+import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 
 /**
@@ -19,7 +21,7 @@ public class ClockService extends Thread {
     private Thread loopThread;
     private SimpleDateFormat dateFormat;
 
-    public MBassador<ServiceManager.AppEvent> eventBus;
+    public MBassador<AppEvent> eventBus;
 
     /**
      * Inicializuje službu
@@ -90,23 +92,4 @@ public class ClockService extends Thread {
         }
     }
 
-    /**
-     * Třída pro zprávy event busu
-     */
-    public static class TimeEvent extends ServiceManager.AppEvent {
-        String time;
-
-        public TimeEvent(String myTime) {
-            time = myTime;
-        }
-
-        public String getTime() {
-            return time;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_CLOCK;
-        }
-    }
 }

@@ -2,8 +2,8 @@ package cz.meteocar.unit.engine.convertor;
 
 import org.junit.Test;
 
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.obd.OBDMessage;
-import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.helper.filter.RecordVO;
 
 import static org.junit.Assert.assertEquals;
@@ -12,9 +12,9 @@ import static org.junit.Assert.assertNull;
 /**
  * Created by Nell on 23.1.2016.
  */
-public class OBDEventPID2RecordVOConverterTest {
+public class OBDPidEvent2RecordVOConverterTest {
 
-    OBDEventPID2RecordVOConverter converter = new OBDEventPID2RecordVOConverter();
+    private OBDEventPID2RecordVOConverter converter = new OBDEventPID2RecordVOConverter();
 
     @Test
     public void testNull() {
@@ -28,7 +28,7 @@ public class OBDEventPID2RecordVOConverterTest {
         OBDMessage obdMessage = new OBDMessage();
         obdMessage.setTag("tag");
 
-        OBDService.OBDEventPID input = new OBDService.OBDEventPID(obdMessage, 1.0, null);
+        OBDPidEvent input = new OBDPidEvent(obdMessage, 1.0, null);
         input.setTripId("trip");
         input.setUserId("user");
         input.setTimeCreated(7L);

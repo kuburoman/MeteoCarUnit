@@ -13,11 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.accel.AccelService;
 import cz.meteocar.unit.engine.enums.RecordTypeEnum;
-import cz.meteocar.unit.engine.gps.ServiceGPS;
+import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
+import cz.meteocar.unit.engine.event.AppEvent;
+import cz.meteocar.unit.engine.event.EventType;
+import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
@@ -304,7 +306,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
      *
      * @param evt to be stored
      */
-    public void save(ServiceManager.AppEvent evt) {
+    public void save(AppEvent evt) {
         RecordEntity obj = new RecordEntity();
 
         obj.setTime(evt.getTimeCreated());
@@ -312,24 +314,24 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         obj.setTripId(evt.getTripId());
         obj.setProcessed(false);
 
-        if (evt.getType() == ServiceManager.AppEvent.EVENT_GPS_POSITION) {
+        if (evt.getType() == EventType.EVENT_GPS_POSITION) {
             saveGPS(evt, obj);
         }
 
-        if (evt.getType() == ServiceManager.AppEvent.EVENT_OBD_PID) {
+        if (evt.getType() == EventType.EVENT_OBD_PID) {
             saveOBD(evt, obj);
         }
 
-        if (evt.getType() == ServiceManager.AppEvent.EVENT_ACCEL) {
+        if (evt.getType() == EventType.EVENT_ACCEL) {
             saveACC(evt, obj);
         }
 
     }
 
-    protected void saveACC(ServiceManager.AppEvent evt, RecordEntity obj) {
+    protected void saveACC(AppEvent evt, RecordEntity obj) {
         JSONObject jsonObj = new JSONObject();
 
-        AccelService.AccelEvent accelEvent = (AccelService.AccelEvent) evt;
+        AccelerationEvent accelEvent = (AccelerationEvent) evt;
 
         obj.setType(RecordTypeEnum.TYPE_ACCEL.getValue());
 
@@ -346,11 +348,11 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         save(obj);
     }
 
-    protected void saveGPS(ServiceManager.AppEvent evt, RecordEntity obj) {
+    protected void saveGPS(AppEvent evt, RecordEntity obj) {
         JSONObject jsonObj = new JSONObject();
 
         obj.setType(RecordTypeEnum.TYPE_GPS.getValue());
-        Location loc = ((ServiceGPS.GPSPositionEvent) evt).getLocation();
+        Location loc = ((GPSPositionEvent) evt).getLocation();
         if (loc == null) {
             return;
         }
@@ -375,13 +377,13 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         save(obj);
     }
 
-    protected void saveOBD(ServiceManager.AppEvent evt, RecordEntity obj) {
-        OBDService.OBDEventPID obdEvent = (OBDService.OBDEventPID) evt;
+    protected void saveOBD(AppEvent evt, RecordEntity obj) {
+        OBDPidEvent obdEvent = (OBDPidEvent) evt;
 
         RecordVO recordVO = new RecordVO();
         recordVO.setUserId(evt.getUserId());
         recordVO.setTripId(evt.getTripId());
-        recordVO.setType(((OBDService.OBDEventPID) evt).getMessage().getTag());
+        recordVO.setType(((OBDPidEvent) evt).getMessage().getTag());
         recordVO.setValue(obdEvent.getValue());
         recordVO.setTime(obdEvent.getTimeCreated());
         recordVO.setLastSaved(obdEvent.getTimeCreated());

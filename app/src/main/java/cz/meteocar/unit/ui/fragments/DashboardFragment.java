@@ -10,16 +10,18 @@ import android.widget.TextView;
 
 import net.engio.mbassy.listener.Handler;
 
-import java.util.List;
-
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.clock.ClockService;
+import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
+import cz.meteocar.unit.engine.gps.event.GPSStatusEvent;
+import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
-import cz.meteocar.unit.engine.storage.DatabaseService;
+import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.ui.UIManager;
@@ -117,7 +119,7 @@ public class DashboardFragment extends Fragment {
     }
 
     @Handler
-    public void handleLocationUpdate(ServiceGPS.GPSPositionEvent msg) {
+    public void handleLocationUpdate(GPSPositionEvent msg) {
         /*AppLog.i(AppLog.LOG_TAG_GPS, "Location delivered: ");
         line1gps = "LAT: "+msg.getLocation().getLatitude();
         line2gps = "LON: "+msg.getLocation().getLongitude();
@@ -140,7 +142,7 @@ public class DashboardFragment extends Fragment {
     }
 
     @Handler
-    public void handleGPSStatus(ServiceGPS.GPSStatusEvent msg) {
+    public void handleGPSStatus(GPSStatusEvent msg) {
         if ((msg.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE) |
                 (msg.getStatus() == ServiceGPS.STATUS_NO_HARDWARE)) {
             gpsText.setText("GPS OFF");
@@ -155,7 +157,7 @@ public class DashboardFragment extends Fragment {
 
 
     @Handler
-    public void handleTimeUpdate(ClockService.TimeEvent msg) {
+    public void handleTimeUpdate(TimeEvent msg) {
         //line4time = msg.getTime();
         //AppLog.i(null, "Time delivered: " + line4time);
         //postInvalidate();
@@ -170,7 +172,7 @@ public class DashboardFragment extends Fragment {
      * @param msg
      */
     @Handler
-    public void handleOBDStatus(OBDService.OBDEventStatus msg) {
+    public void handleOBDStatus(OBDStatusEvent msg) {
         if ((msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED) |
                 (msg.getStatusCode() == OBDService.OBD_STATE_NOT_CONNECTED)) {
             obdText.setText("OBD SEARCH");
@@ -189,7 +191,7 @@ public class DashboardFragment extends Fragment {
 
 
     @Handler
-    public void handleOBDPID(final OBDService.OBDEventPID evt) {
+    public void handleOBDPID(final OBDPidEvent evt) {
 
         // debug
         //AppLog.i(AppLog.LOG_TAG_UI, "PID received, tag: "+evt.getMessage().getTag()+" value: "+evt.getValue()+" id: "+evt.getMessage().getID());
@@ -232,7 +234,7 @@ public class DashboardFragment extends Fragment {
      * @param evt
      */
     @Handler
-    public void handleDatabaseEvent(DatabaseService.DBEvent evt) {
+    public void handleDatabaseEvent(DBEvent evt) {
         //line7db = "DB count: "+evt.getCount();
         // postInvalidate();
 

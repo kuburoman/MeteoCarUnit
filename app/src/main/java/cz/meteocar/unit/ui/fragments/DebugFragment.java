@@ -15,15 +15,13 @@ import android.widget.TextView;
 import net.engio.mbassy.listener.Handler;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 public class DebugFragment extends Fragment {
 
@@ -247,7 +245,7 @@ public class DebugFragment extends Fragment {
     }
 
     @Handler    //(delivery = Invoke.Asynchronously, rejectSubtypes = false)
-    public void handleLocationUpdate(final NetworkService.NetworkRequestEvent evt) {
+    public void handleLocationUpdate(final NetworkRequestEvent evt) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 /*AppLog.i(null, "Server event delivered: " + evt.getResponse().toString());

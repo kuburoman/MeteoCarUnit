@@ -12,7 +12,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -21,6 +20,7 @@ import java.util.HashMap;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
@@ -29,12 +29,6 @@ import cz.meteocar.unit.engine.storage.model.TripEntity;
  * Created by Toms, 2014.
  */
 public class NetworkService extends Thread {
-
-    // network status
-    public static final int STATUS_NONE = 0;
-    public static final int STATUS_WIFI = 1;
-    public static final int STATUS_MOBILE = 2;
-    public static final int STATUS_UNKNOWN = 3;
 
     // upload
     public static final String baseURL = "http://";
@@ -180,32 +174,6 @@ public class NetworkService extends Thread {
         }
     }
 
-    /**
-     * Událost - načtení odpovědi na JSON požadavek
-     */
-    public static class NetworkRequestEvent extends ServiceManager.AppEvent {
-        private String id;
-        private JSONObject response;
-
-        public NetworkRequestEvent(String myid, JSONObject myResponse) {
-            id = myid;
-            response = myResponse;
-        }
-
-        public String getID() {
-            return id;
-        }
-
-        public JSONObject getResponse() {
-            return response;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_NETWORK;
-        }
-    }
-
     // ---------- ZAPÍNANÍ 3G A MONITOROVANÍ KONEKTIVITY -----------------------------------------
     // -------------------------------------------------------------------------------------------
 
@@ -281,49 +249,40 @@ public class NetworkService extends Thread {
     }
 
     /**
-     * Získá event s aktuálním stavem připojení
+     * Return status of network and type of network connection.
      *
-     * @return evt
+     * @return {@link NetworkStatusEvent}
      */
     private NetworkStatusEvent getNetworkStatusEvent() {
 
-        // zeptáme se na aktivní připojení
         NetworkInfo activeNetwork = getActiveNetworkInfo();
 
-        //
         boolean isConnected = false;
-        int type = STATUS_NONE;
+        NetworkStatus type = NetworkStatus.STATUS_NONE;
 
-        //
         if (activeNetwork != null) {
-            type = STATUS_UNKNOWN;
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) type = STATUS_WIFI;
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) type = STATUS_MOBILE;
+            type = getNetworkStatus(activeNetwork);
             isConnected = activeNetwork.isConnected();
-
         }
 
-        //
         return new NetworkStatusEvent(type, isConnected);
     }
 
-    public int getCurrentConnectionType() {
-        // zeptáme se na aktivní připojení
-        NetworkInfo activeNetwork = getActiveNetworkInfo();
-
-        //
-        boolean isConnected = false;
-        int type = STATUS_NONE;
-
-        //
+    private NetworkStatus getNetworkStatus(NetworkInfo activeNetwork) {
         if (activeNetwork != null) {
-            type = STATUS_UNKNOWN;
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) type = STATUS_WIFI;
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE) type = STATUS_MOBILE;
-            isConnected = activeNetwork.isConnected();
+            switch (activeNetwork.getType()) {
+                case ConnectivityManager.TYPE_WIFI:
+                    return NetworkStatus.STATUS_WIFI;
+                case ConnectivityManager.TYPE_MOBILE:
+                    return NetworkStatus.STATUS_MOBILE;
+                default:
+                    return NetworkStatus.STATUS_UNKNOWN;
 
+            }
+        } else {
+            return NetworkStatus.STATUS_NONE;
         }
-        return type;
+
     }
 
     /**
@@ -364,33 +323,6 @@ public class NetworkService extends Thread {
             Log.e(AppLog.LOG_TAG_NETWORK, "Mobile network cannot be started.", e);
             // nepodařilo se - odešleme event, že není připojení
             updateNetworkStatus();
-        }
-    }
-
-
-    /**
-     * Událost - stav připojení k internetu
-     */
-    public static class NetworkStatusEvent extends ServiceManager.AppEvent {
-        private int connectionType;
-        private boolean connected;
-
-        public NetworkStatusEvent(int connType, boolean isConn) {
-            connectionType = connType;
-            connected = isConn;
-        }
-
-        public int getConnectionType() {
-            return connectionType;
-        }
-
-        public boolean isConnected() {
-            return connected;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_NETWORK;
         }
     }
 }

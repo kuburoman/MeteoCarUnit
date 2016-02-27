@@ -17,6 +17,9 @@ import net.engio.mbassy.bus.MBassador;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.event.AppEvent;
+import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
+import cz.meteocar.unit.engine.gps.event.GPSStatusEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 
 /**
@@ -42,7 +45,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     private boolean threadFinalized = false;
 
     private Context context;
-    private MBassador<ServiceManager.AppEvent> eventBus;
+    private MBassador<AppEvent> eventBus;
 
 
     public ServiceGPS(Context ctx) {
@@ -243,50 +246,4 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
-    /**
-     * Event - GPS pozice
-     */
-    public static class GPSPositionEvent extends ServiceManager.AppEvent {
-
-        /**
-         * GPS pozice
-         */
-        private Location location;
-
-        public GPSPositionEvent(Location myLocation) {
-            super();
-            location = myLocation;
-        }
-
-        public Location getLocation() {
-            return location;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_GPS_POSITION;
-        }
-    }
-
-    /**
-     * Event - Stav GPS
-     */
-    public static class GPSStatusEvent extends ServiceManager.AppEvent {
-
-        private int status; // stav GPS
-
-        public GPSStatusEvent(int stat) {
-            super();
-            status = stat;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_GPS_STATUS;
-        }
-    }
 }

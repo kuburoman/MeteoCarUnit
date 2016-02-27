@@ -8,10 +8,12 @@ import net.engio.mbassy.listener.Handler;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.gps.ServiceGPS;
+import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
+import cz.meteocar.unit.engine.network.NetworkStatus;
+import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
-import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.ui.UIManager;
 
 /**
@@ -114,7 +116,7 @@ public class TripController {
     // -------------------------------------------------------------------------------------------
 
     @Handler
-    public void handleLocationUpdate(ServiceGPS.GPSPositionEvent msg) {
+    public void handleLocationUpdate(GPSPositionEvent msg) {
         //AppLog.i(null, "Location delivered: ");
         /*line1gps = "LAT: "+msg.getLocation().getLatitude();
         line2gps = "LON: "+msg.getLocation().getLongitude();
@@ -123,7 +125,7 @@ public class TripController {
     }
 
     @Handler
-    public void handleOBDpid(OBDService.OBDEventPID evt) {
+    public void handleOBDpid(OBDPidEvent evt) {
         /*line6obd_pid = "OBD status: "+evt.getValue();
         //AppLog.i(null, "Time delivered: " + line4time);
         postInvalidate();*/
@@ -180,14 +182,7 @@ public class TripController {
     public void syncFilesToServer() {
 
         // uživatel žádá sync
-        userRequestedSync = true;
-
-        // máme internet?
-        if (ServiceManager.getInstance().network.getCurrentConnectionType() == NetworkService.STATUS_NONE) {
-            UIManager.getInstance().getMenuActivity().dialogNoInternet.show();
-        } else {
-            executeSync();
-        }
+        // TODO smazat tuhle blbost
     }
 
     public boolean userRequestedSync = false;
@@ -209,7 +204,7 @@ public class TripController {
      * @param evt
      */
     @Handler
-    public void handleNetworkStatusUpdate(final NetworkService.NetworkStatusEvent evt) {
+    public void handleNetworkStatusUpdate(final NetworkStatusEvent evt) {
 
         // vyžádána synchronizace?
         // ne = budeme enevt ignorovat

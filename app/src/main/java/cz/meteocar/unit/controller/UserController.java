@@ -8,8 +8,8 @@ import net.engio.mbassy.listener.Handler;
 import org.json.JSONArray;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 import cz.meteocar.unit.ui.UIManager;
@@ -175,7 +175,7 @@ public class UserController {
      * @param evt
      */
     @Handler
-    public void handleNetworkPidsResponse(final NetworkService.NetworkRequestEvent evt) {
+    public void handleNetworkPidsResponse(final NetworkRequestEvent evt) {
 
         // je to naše zpráva?
         AppLog.i(AppLog.LOG_TAG_NETWORK, "Response commin: " + evt.getResponse().toString());

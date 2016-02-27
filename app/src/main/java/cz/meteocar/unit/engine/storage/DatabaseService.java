@@ -11,11 +11,13 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.accel.AccelService;
-import cz.meteocar.unit.engine.clock.ClockService;
-import cz.meteocar.unit.engine.gps.ServiceGPS;
+import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
+import cz.meteocar.unit.engine.event.AppEvent;
+import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
@@ -33,7 +35,7 @@ public class DatabaseService extends Thread {
      * - zápisy do DB mohou chvíli trvat, proto je žádoucí je spuštět až ve vlastním vlákně,
      * které bude číst eventy z této fronty
      */
-    BlockingQueue<ServiceManager.AppEvent> queue;
+    BlockingQueue<AppEvent> queue;
 
     private boolean threadRun;
     private Context context;
@@ -52,7 +54,7 @@ public class DatabaseService extends Thread {
         context = ctx;
 
         // nová fronta na eventy
-        queue = new ArrayBlockingQueue<ServiceManager.AppEvent>(20);
+        queue = new ArrayBlockingQueue<AppEvent>(20);
 
         // helper
         helper = new DatabaseHelper(ctx);
@@ -131,7 +133,7 @@ public class DatabaseService extends Thread {
     }
 
     private Location gpsLastLocation;
-    private OBDService.OBDEventPID obdLastEvent;
+    private OBDPidEvent obdLastEvent;
     private String userName;
     private String tripId;
 
@@ -189,7 +191,7 @@ public class DatabaseService extends Thread {
         gpsLastLocation = loc;
     }
 
-    public void incrementObdDistance(OBDService.OBDEventPID evt) {
+    public void incrementObdDistance(OBDPidEvent evt) {
         double metersPerMilisecConvert = 1.0 / 3600.0;
 
         if (obdLastEvent != null) {
@@ -206,7 +208,7 @@ public class DatabaseService extends Thread {
      * @param evt
      */
     @Handler
-    public void handleLocationUpdate(ServiceGPS.GPSPositionEvent evt) {
+    public void handleLocationUpdate(GPSPositionEvent evt) {
         if (!tripRecordEnabled) {
             return;
         }
@@ -220,7 +222,7 @@ public class DatabaseService extends Thread {
      * @param evt
      */
     @Handler
-    public void handleLocationUpdate(OBDService.OBDEventPID evt) {
+    public void handleLocationUpdate(OBDPidEvent evt) {
         if (!tripRecordEnabled) {
             return;
         }
@@ -234,7 +236,7 @@ public class DatabaseService extends Thread {
      * @param evt
      */
     @Handler
-    public void handleAccelEvent(AccelService.AccelEvent evt) {
+    public void handleAccelEvent(AccelerationEvent evt) {
         if (!tripRecordEnabled) {
             return;
         }
@@ -248,7 +250,7 @@ public class DatabaseService extends Thread {
      * @param evt
      */
     @Handler
-    public void handleClockEvent(ClockService.TimeEvent evt) {
+    public void handleClockEvent(TimeEvent evt) {
         if (!tripRecordEnabled) {
             return;
         }
@@ -269,7 +271,7 @@ public class DatabaseService extends Thread {
      *
      * @param evt Příchozí událost
      */
-    public void storeTripMessage(ServiceManager.AppEvent evt) {
+    public void storeTripMessage(AppEvent evt) {
 
         evt.setUserId(userName);
         evt.setTripId(tripId);
@@ -322,42 +324,6 @@ public class DatabaseService extends Thread {
         }
         //
         AppLog.i(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
-    }
-
-    public static class DBEvent extends ServiceManager.AppEvent {
-
-        private long count;
-        private int time;
-        private double gpsDistance;
-        private double obdDistance;
-
-        public DBEvent(long count, int time, double obdDistance, double gpsDistance) {
-            this.count = count;
-            this.time = time;
-            this.obdDistance = obdDistance;
-            this.gpsDistance = gpsDistance;
-        }
-
-        public long getCount() {
-            return count;
-        }
-
-        public int getTime() {
-            return time;
-        }
-
-        public double getGpsDistance() {
-            return gpsDistance;
-        }
-
-        public double getObdDistance() {
-            return obdDistance;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_DB;
-        }
     }
 
     // ---------- PERSISTENCE NASTAVENÍ ----------------------------------------------------------

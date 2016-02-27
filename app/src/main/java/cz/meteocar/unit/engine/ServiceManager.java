@@ -6,8 +6,9 @@ import android.util.Log;
 import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.config.BusConfiguration;
 
-import cz.meteocar.unit.engine.accel.AccelService;
+import cz.meteocar.unit.engine.accel.AccelerationService;
 import cz.meteocar.unit.engine.clock.ClockService;
+import cz.meteocar.unit.engine.event.AppEvent;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
@@ -39,7 +40,7 @@ public class ServiceManager {
     public OBDService obd;
     public DatabaseService db;
     public NetworkService network;
-    public AccelService accel;
+    public AccelerationService accel;
     public ConvertService convert;
 
     // bus
@@ -62,7 +63,7 @@ public class ServiceManager {
         obd = new OBDService(context);
         db = new DatabaseService(context);
         network = new NetworkService(context);
-        accel = new AccelService(context);
+        accel = new AccelerationService(context);
         convert = new ConvertService();
     }
 
@@ -121,68 +122,5 @@ public class ServiceManager {
     public void exitApp(){
         exitServices();
         System.exit(0);
-    }
-
-    /**
-     * Vnitřní třída představující změnu stavu služby
-     */
-    abstract public static class AppEvent {
-        public static final int EVENT_GPS_POSITION = 0;
-        public static final int EVENT_GPS_STATUS = 1;
-        public static final int EVENT_OBD_PID = 2;
-        public static final int EVENT_OBD_STATUS = 3;
-        public static final int EVENT_CLOCK = 4;
-        public static final int EVENT_POWER_STATUS = 5;
-        public static final int EVENT_NFC = 6;
-        public static final int EVENT_VIDEO = 7;
-        public static final int EVENT_ACCEL = 8;
-        public static final int EVENT_DB = 9;
-        public static final int EVENT_NETWORK = 10;
-
-        private String userId;
-        private String tripId;
-
-        /**
-         * Čas vytvoření eventu
-         */
-        protected Long timeCreated;
-
-        /**
-         * Super-konstruktor inicializující čas vytvoření
-         */
-        public AppEvent(){
-            timeCreated = System.currentTimeMillis();
-        }
-
-        /**
-         * Vrací čas vytvoření eventu
-         * @return Časová známka
-         */
-        public Long getTimeCreated(){
-            return timeCreated;
-        }
-
-        /**
-         * Vrací typ "globální" typ eventu
-         * @return Typ eventu
-         */
-        abstract public int getType();
-
-        public String getUserId() {
-            return userId;
-        }
-
-        public void setUserId(String userId) {
-            this.userId = userId;
-        }
-
-        public String getTripId() {
-            return tripId;
-        }
-
-        public void setTripId(String tripId) {
-            this.tripId = tripId;
-        }
-
     }
 }

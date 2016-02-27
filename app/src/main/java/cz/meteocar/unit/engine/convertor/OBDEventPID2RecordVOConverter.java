@@ -1,15 +1,15 @@
 package cz.meteocar.unit.engine.convertor;
 
-import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.helper.filter.RecordVO;
 
 /**
  * Created by Nell on 23.1.2016.
  */
-public class OBDEventPID2RecordVOConverter extends AbstractConverter<OBDService.OBDEventPID, RecordVO> {
+public class OBDEventPID2RecordVOConverter extends AbstractConverter<OBDPidEvent, RecordVO> {
 
     @Override
-    protected RecordVO innerConvert(OBDService.OBDEventPID input) {
+    protected RecordVO innerConvert(OBDPidEvent input) {
         RecordVO recordVO = new RecordVO();
         recordVO.setUserId(input.getUserId());
         recordVO.setTripId(input.getTripId());

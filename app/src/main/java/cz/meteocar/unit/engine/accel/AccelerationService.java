@@ -7,16 +7,16 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
 
 /**
  * Created by Toms, 2014.
  */
-public class AccelService implements SensorEventListener {
+public class AccelerationService implements SensorEventListener {
 
-    MeanFilterSmoothing filter;
+    private MeanFilterSmoothing filter;
 
-    public AccelService(Context ctx) {
+    public AccelerationService(Context ctx) {
         init(ctx);
     }
 
@@ -32,12 +32,12 @@ public class AccelService implements SensorEventListener {
     private long frequency = 200;
     private int count = 0;
 
-    float xSum = 0;
-    float ySum = 0;
-    float zSum = 0;
+    private float xSum = 0;
+    private float ySum = 0;
+    private float zSum = 0;
 
-    long newTime = 0;
-    long oldTime = 0;
+    private long newTime = 0;
+    private long oldTime = 0;
 
 
     @Override
@@ -69,7 +69,7 @@ public class AccelService implements SensorEventListener {
 
                 // odešleme událost
                 ServiceManager.getInstance().eventBus.post(
-                        new AccelEvent(floats[0], floats[1], floats[2])
+                        new AccelerationEvent(floats[0], floats[1], floats[2])
                 ).asynchronously();
 
                 // vymažeme prům. hodnoty
@@ -85,38 +85,5 @@ public class AccelService implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         //
-    }
-
-    /**
-     * Událost akcelerometru
-     */
-    public static class AccelEvent extends ServiceManager.AppEvent {
-        private double x;
-        private double y;
-        private double z;
-
-        public AccelEvent(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public double getX() {
-            return x;
-        }
-
-        public double getY() {
-            return y;
-        }
-
-        public double getZ() {
-            return z;
-        }
-
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_ACCEL;
-        }
     }
 }

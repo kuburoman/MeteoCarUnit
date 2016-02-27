@@ -26,8 +26,9 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
+import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.UIManager;
 
@@ -191,7 +192,7 @@ public class LoginActivity extends Activity {
      * @param evt
      */
     @Handler
-    public void handleNetworkResponse(final NetworkService.NetworkRequestEvent evt) {
+    public void handleNetworkResponse(final NetworkRequestEvent evt) {
 
         AppLog.i(AppLog.LOG_TAG_NETWORK, "Response commin: " + evt.getResponse().toString());
 
@@ -215,7 +216,7 @@ public class LoginActivity extends Activity {
      * @param evt
      */
     @Handler    //(delivery = Invoke.Asynchronously, rejectSubtypes = false)
-    public void handleNetworkStatusUpdate(final NetworkService.NetworkStatusEvent evt) {
+    public void handleNetworkStatusUpdate(final NetworkStatusEvent evt) {
         /*getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 AppLog.i(null, "Server event delivered: " + evt.getResponse().toString());

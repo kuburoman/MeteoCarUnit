@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
@@ -570,7 +572,7 @@ public class OBDService extends Thread {
      * @param value Naměřená hodnota
      */
     private void firePIDEvent(OBDMessage msg, double value, String rawResponse) {
-        ServiceManager.getInstance().eventBus.post(new OBDEventPID(msg, value, rawResponse)).asynchronously();
+        ServiceManager.getInstance().eventBus.post(new OBDPidEvent(msg, value, rawResponse)).asynchronously();
     }
 
     /**
@@ -581,73 +583,7 @@ public class OBDService extends Thread {
      * @param txt        Text popisující nový stav (pro účely ladění)
      */
     private void fireStatusEvent(int statusCode, String txt) {
-        ServiceManager.getInstance().eventBus.post(new OBDEventStatus(statusCode, txt)).asynchronously();
-    }
-
-    /**
-     * Vnitřní třída představující změnu hodnoty sledovaného ukazatele PID
-     * - např. informuje o nové rychlosti vozidla
-     */
-    public static class OBDEventPID extends ServiceManager.AppEvent {
-        private OBDMessage msg;
-        private double value;
-        private String rawResponse;
-
-        public OBDEventPID(OBDMessage msg, double val, String rawResp) {
-            this.msg = msg;
-            this.value = val;
-            this.rawResponse = rawResp;
-            rawResponse = rawResp;
-
-        }
-
-        public void setTimeCreated(Long timeCreated) {
-            this.timeCreated = timeCreated;
-        }
-
-        public OBDMessage getMessage() {
-            return msg;
-        }
-
-        public double getValue() {
-            return value;
-        }
-
-        public String getRawResponse() {
-            return rawResponse;
-        }
-
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_OBD_PID;
-        }
-    }
-
-    /**
-     * Vnitřní třída představující změnu stavu služby
-     */
-    public static class OBDEventStatus extends ServiceManager.AppEvent {
-        private int statusCode;
-        private String statusText;
-
-        public OBDEventStatus(int statCode, String statText) {
-            statusCode = statCode;
-            statusText = statText;
-        }
-
-        public int getStatusCode() {
-            return statusCode;
-        }
-
-        public String getStatusText() {
-            return statusText;
-        }
-
-        @Override
-        public int getType() {
-            return ServiceManager.AppEvent.EVENT_OBD_STATUS;
-        }
+        ServiceManager.getInstance().eventBus.post(new OBDStatusEvent(statusCode, txt)).asynchronously();
     }
 
 }
