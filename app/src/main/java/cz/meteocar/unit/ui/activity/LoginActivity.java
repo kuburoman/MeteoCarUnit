@@ -26,9 +26,11 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.network.dto.LoginResponse;
+import cz.meteocar.unit.engine.network.event.LoginEvent;
 import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
-import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.UIManager;
 
@@ -39,6 +41,9 @@ public class LoginActivity extends Activity {
     private AlertDialog dialogNoInternet; // dialog když chybí internet. spoj.
 
     private static final String NETWORK_LOGIN_RESPONSE = "network_login_resp";
+
+    private static String username;
+    private static String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,34 +162,42 @@ public class LoginActivity extends Activity {
      * Akce po kliknutí na tlačítko přihlásit
      */
     public void onLoginButtonClick() {
-        //ServiceManager.getInstance().network.updateNetworkStatus();
-        //UIManager.getInstance().showMenuActivity();
-        AppLog.i("Login clicked");
+        username = ((TextView) findViewById(R.id.nameEditText)).getText().toString();
+        password = ((TextView) findViewById(R.id.pwdEditText)).getText().toString();
 
-        // přečteme jméno a heslo
-        final String name = ((TextView) findViewById(R.id.nameEditText)).getText().toString();
-        final String pwd = ((TextView) findViewById(R.id.pwdEditText)).getText().toString();
-
-
-        if (MasterController.getInstance().user.logUser(name, pwd)) {
-            AppLog.i(AppLog.LOG_TAG_UI, "User logged");
-
-            // ok
-            DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, true).commit();
-
-            // pokračujeme
-            UIManager.getInstance().showMenuActivity();
-        } else {
-            AppLog.i(AppLog.LOG_TAG_UI, "User not found");
-            final String finalWarningText = getResources().getString(R.string.login_check_no_user);
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    showWarningDialog(finalWarningText);
-                }
-            });
+        if (ServiceManager.getInstance().network.isOnline()) {
+            ServiceManager.getInstance().network.loginUser(username, password);
+            return;
         }
+        if (MasterController.getInstance().user.verifyUser(username, password)) {
+            boolean isAdmin = MasterController.getInstance().user.isUserAdmin(username);
+            ServiceManager.getInstance().eventBus.post(new LoginEvent(new LoginResponse("OK", isAdmin))).asynchronously();
+            return;
+        }
+
+        showWarningDialog("User not found locally.");
+
     }
 
+
+    /**
+     * Zpracování příchozí odpovědi na JSON dotaz
+     *
+     * @param evt
+     */
+    @Handler
+    public void handleLoginEvent(final LoginEvent evt) {
+
+        DB.setLoggedUser(username);
+
+        MasterController.getInstance().user.updateUser(username, password, evt.getResponse().getIsAdmin());
+
+        // ok
+        DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, true).commit();
+
+        // pokračujeme
+        UIManager.getInstance().showMenuActivity();
+    }
 
     /**
      * Zpracování příchozí odpovědi na JSON dotaz

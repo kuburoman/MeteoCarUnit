@@ -12,11 +12,11 @@ import java.util.concurrent.BlockingQueue;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
+import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.event.AppEvent;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
-import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
-import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
@@ -157,7 +157,7 @@ public class DatabaseService extends Thread {
         AppLog.i(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
         tripStart = System.currentTimeMillis();
-        userName = String.valueOf(ServiceManager.getInstance().db.getUserHelper().getLoggedUser().getUsername());
+        userName = DB.getLoggedUser();
         tripId = String.valueOf(System.currentTimeMillis());
     }
 

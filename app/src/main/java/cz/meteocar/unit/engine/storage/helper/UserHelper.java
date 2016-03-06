@@ -15,23 +15,23 @@ public class UserHelper extends AbstractHelper<UserEntity> {
     private static final String TABLE_NAME = "meteocar_users";
     private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_USERNAME = "username";
-    private static final String COLUMN_NAME_PASSWORD = "password";
-    private static final String COLUMN_NAME_LOGGED = "logged";
+    private static final String COLUMN_NAME_PASSWORD = "pwn";
+    private static final String COLUMN_NAME_ADMIN = "password";
 
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
                     COLUMN_NAME_ID + MySQLiteConfig.TYPE_ID + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_USERNAME + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_PASSWORD + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_LOGGED + MySQLiteConfig.TYPE_BOOLEAN + " DEFAULT ''" +
+                    COLUMN_NAME_ADMIN + MySQLiteConfig.TYPE_BOOLEAN + " DEFAULT ''" +
                     " )";
 
     public static final String CREATE_DEFAULT_USER = "INSERT INTO " + TABLE_NAME + " (" +
             COLUMN_NAME_ID + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_USERNAME + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_PASSWORD + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_LOGGED + ") VALUES(" +
-            "1, 'Johny', 'root', 0)";
+            COLUMN_NAME_ADMIN + ") VALUES(" +
+            "1, 'Johny', 'root', 1)";
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
@@ -58,45 +58,9 @@ public class UserHelper extends AbstractHelper<UserEntity> {
 
         values.put(COLUMN_NAME_USERNAME, obj.getUsername());
         values.put(COLUMN_NAME_PASSWORD, obj.getPassword());
-        values.put(COLUMN_NAME_LOGGED, obj.getLogged());
+        values.put(COLUMN_NAME_ADMIN, obj.isAdmin());
 
         return this.innerSave(obj.getId(), values);
-    }
-
-    /**
-     * Set user logged.
-     *
-     * @param userEntity user to log
-     */
-    public void logUser(UserEntity userEntity) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null);
-
-        try {
-
-            UserEntity obj;
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-
-                    obj = new UserEntity();
-                    obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
-                    obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
-                    obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
-                    obj.setLogged(false);
-                    save(obj);
-
-                    cursor.moveToNext();
-                }
-            }
-
-            userEntity.setLogged(true);
-            save(userEntity);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
     }
 
     /**
@@ -114,9 +78,7 @@ public class UserHelper extends AbstractHelper<UserEntity> {
         try {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-
                 return convert(cursor);
-
             } else {
                 return null;
             }
@@ -128,14 +90,16 @@ public class UserHelper extends AbstractHelper<UserEntity> {
     }
 
     /**
-     * Return logged users
+     * Return user for given username and password
      *
+     * @param username of user
      * @return {@link UserEntity}
      */
-    public UserEntity getLoggedUser() {
+    public UserEntity getUser(String username) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_LOGGED + " = ?", new String[]{"1"}, null, null, null, "1");
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ?", new String[]{username}, null, null, null);
+
         try {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
@@ -156,7 +120,7 @@ public class UserHelper extends AbstractHelper<UserEntity> {
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
         obj.setUsername(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USERNAME)));
         obj.setPassword(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_PASSWORD)));
-        obj.setLogged(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOGGED)) != 0);
+        obj.setAdmin(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ADMIN)) != 0);
         return obj;
 
     }

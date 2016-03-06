@@ -20,7 +20,9 @@ import java.util.HashMap;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.network.dto.LoginRequest;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
+import cz.meteocar.unit.engine.network.task.LoginTask;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
@@ -34,11 +36,14 @@ public class NetworkService extends Thread {
     public static final String baseURL = "http://";
     public static final String dataURL = "/data/accept";
 
+
     // thread
     private boolean threadRun = true;
     private Context context;
 
     private String address;
+    private final String boardUnitName;
+    private final String secretKey;
 
     // proměnné pro sledování stavu připojování
     private boolean checkConnectingStatusFlag;
@@ -50,6 +55,9 @@ public class NetworkService extends Thread {
         return checkConnectingStatusFlag;
     }
 
+    private LoginTask loginTask;
+
+
     /**
      * Konstr., předává aplikační kontext, inicializuje fronty síťových požadavků
      *
@@ -60,23 +68,18 @@ public class NetworkService extends Thread {
         requestQueue = new ArrayList();
         checkConnectingStatusFlag = false;
         tripHelper = ServiceManager.getInstance().db.getTripHelper();
-        address = DB.get().getString("networkAddress", "meteocar.herokuapp.com");
+        address = DB.get().getString("networkAddress", "http://meteocar.herokuapp.com");
+        boardUnitName = "android2";
+        secretKey = "Ninjahash";
         start();
+    }
+
+    public void loginUser(String username, String password) {
+        new LoginTask(context, address, boardUnitName, secretKey).execute(new LoginRequest(username, password));
     }
 
     public void setAddress(String address) {
         this.address = address;
-    }
-
-// ---------- Bezpečnost ---------------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    private int userID;
-    private String userKey;
-
-    public void setUser(int id, String key) {
-        userID = id;
-        userKey = key;
     }
 
 
@@ -246,6 +249,16 @@ public class NetworkService extends Thread {
             checkConnectingStatusFlag = false;
             updateNetworkStatus();
         }
+    }
+
+    public boolean isOnline() {
+        NetworkInfo activeNetwork = getActiveNetworkInfo();
+
+        if (activeNetwork != null) {
+            return activeNetwork.isConnected();
+        }
+
+        return false;
     }
 
     /**

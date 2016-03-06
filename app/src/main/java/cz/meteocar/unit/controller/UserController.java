@@ -8,8 +8,8 @@ import net.engio.mbassy.listener.Handler;
 import org.json.JSONArray;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 import cz.meteocar.unit.ui.UIManager;
@@ -77,9 +77,6 @@ public class UserController {
                     .commit();
 
         }
-
-        // nastavíme uživatele v síťové službě
-        ServiceManager.getInstance().network.setUser(getUserID(), getUploadKey());
 
         // updatujeme stav služeb podle uložených nastavení
         updateGPSstate();
@@ -264,14 +261,34 @@ public class UserController {
     // ---------- Data přihlášeného uživatele ----------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
-    public boolean logUser(String userName, String password) {
-        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(userName, password);
+    /**
+     * @param password Password of user
+     * @return True - if user exist and we set him as active. Otherwise false.
+     */
+    public void updateUser(String username, String password, boolean isAdmin) {
+        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username);
+        if (user == null) {
+            user = new UserEntity();
+        }
+        user.setUsername(username);
+        user.setPassword(password);
+        user.setAdmin(isAdmin);
+
+        ServiceManager.getInstance().db.getUserHelper().save(user);
+    }
+
+    public boolean isUserAdmin(String username) {
+        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username);
         if (user == null) {
             return false;
-        } else {
-            ServiceManager.getInstance().db.getUserHelper().logUser(user);
-            return true;
         }
+        return user.isAdmin();
+    }
+
+
+    public boolean verifyUser(String username, String password) {
+        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username, password);
+        return user != null;
     }
 
     /**

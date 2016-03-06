@@ -11,6 +11,7 @@ import java.util.ArrayList;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.ui.activity.TripAdapter;
 
@@ -23,7 +24,7 @@ public class TripsListFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        String id = ServiceManager.getInstance().db.getUserHelper().getLoggedUser().getUsername();
+        String id = DB.getLoggedUser();
 
         ArrayList<TripDetailVO> userTripDetailList = ServiceManager.getInstance().db.getRecordHelper().getUserTripDetailList(id);
 

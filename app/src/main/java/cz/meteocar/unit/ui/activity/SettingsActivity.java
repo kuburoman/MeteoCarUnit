@@ -22,7 +22,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -105,7 +104,7 @@ public class SettingsActivity extends PreferenceActivity
         obdCheckBox.setChecked(obdEnabled);
 
         networkEditText = (EditTextPreference) findPreference(NETWORK_ADDRESS);
-        networkEditText.setText(DB.get().getString("networkAddress", "meteocar.herokuapp.com"));
+        networkEditText.setText(DB.get().getString("networkAddress", "http://meteocar.herokuapp.com"));
 
 
         // načteme do listu obd zařízení data, pokud je OBD povoleno, jinak zakážeme
