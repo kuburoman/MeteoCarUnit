@@ -44,9 +44,6 @@ public class ConvertService extends Thread {
         threadRun = false;
     }
 
-    /**
-     * Hlavní cyklus vlákna
-     */
     @Override
     public void run() {
         while (threadRun) {
@@ -98,6 +95,9 @@ public class ConvertService extends Thread {
         List<String> userIds = recordHelper.getUserIdStored();
         for (String userId : userIds) {
             while (true) {
+                if (userId == null) {
+                    continue;
+                }
                 List<RecordEntity> entityList = recordHelper.getByUserId(userId, 100, false);
                 if (entityList.size() < 1) {
                     break;

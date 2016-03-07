@@ -16,11 +16,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.dto.ErrorResponse;
+import cz.meteocar.unit.engine.storage.DB;
 
 /**
  * Created by Nell on 6.3.2016.
@@ -41,11 +41,16 @@ public abstract class NetworkTask<IN, OUT> extends AsyncTask<IN, String, OUT> {
 
     abstract protected Class<OUT> getClassOUT();
 
-    public NetworkTask(Context context, String baseURL, String unitName, String secretKey) {
+    public NetworkTask(Context context) {
         this.context = context;
-        this.baseURL = baseURL;
-        this.unitName = unitName;
-        this.secretKey = secretKey;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        this.baseURL = DB.getNetworkAddress();
+        this.unitName = DB.getBoardUnitName();
+        this.secretKey = DB.getBoardUnitSecretKey();
     }
 
     protected OUT post(IN request) {

@@ -14,6 +14,7 @@
     <string name="login_email_hint">username</string>
     <string name="login_password_hint">heslo</string>
     <string name="login_ok_button_text">Přihlásit</string>
+    <string name="login_settings">Přejít do nastavení</string>
     <string name="login_note"></string>
 
     <!-- Login - internet -->
@@ -92,7 +93,8 @@
     <string name="settings_obd_devices">OBD Zařízení</string>
     <string name="settings_obd_devices_none">Žádné zařízení nevybráno</string>
 
-    <string name="settings_network_settings">OBD Nastavení sítě</string>
+    <string name="settings_network_settings">Nastavení sítě</string>
+    <string name="settings_board_unit">Nastavení palubní jednotky</string>
 
     <!-- Nastavení - OBD PIDs -->
     <string name="settings_obd_pids_title">OBD PID příkazy</string>

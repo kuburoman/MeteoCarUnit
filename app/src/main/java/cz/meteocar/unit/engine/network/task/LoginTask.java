@@ -13,8 +13,8 @@ import cz.meteocar.unit.engine.network.event.LoginEvent;
  */
 public class LoginTask extends NetworkTask<LoginRequest, LoginResponse> {
 
-    public LoginTask(Context context, String baseURL, String unitName, String secretKey) {
-        super(context, baseURL, unitName, secretKey);
+    public LoginTask(Context context) {
+        super(context);
     }
 
     @Override

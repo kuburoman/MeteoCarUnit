@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +45,7 @@ public class LoginActivity extends Activity {
 
     private static String username;
     private static String password;
+    private static Boolean goToSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,6 +166,13 @@ public class LoginActivity extends Activity {
     public void onLoginButtonClick() {
         username = ((TextView) findViewById(R.id.nameEditText)).getText().toString();
         password = ((TextView) findViewById(R.id.pwdEditText)).getText().toString();
+        goToSettings = ((CheckBox) findViewById(R.id.settingCheckbox)).isChecked();
+
+        if (goToSettings && validateBoardUnit(username, password)) {
+            UIManager.getInstance().showSettingsActivity();
+            return;
+        }
+
 
         if (ServiceManager.getInstance().network.isOnline()) {
             ServiceManager.getInstance().network.loginUser(username, password);
@@ -172,6 +181,11 @@ public class LoginActivity extends Activity {
         if (MasterController.getInstance().user.verifyUser(username, password)) {
             boolean isAdmin = MasterController.getInstance().user.isUserAdmin(username);
             ServiceManager.getInstance().eventBus.post(new LoginEvent(new LoginResponse("OK", isAdmin))).asynchronously();
+            return;
+        }
+
+        if (goToSettings && validateBoardUnit(username, password)) {
+            UIManager.getInstance().showSettingsActivity();
             return;
         }
 
@@ -188,6 +202,14 @@ public class LoginActivity extends Activity {
     @Handler
     public void handleLoginEvent(final LoginEvent evt) {
 
+        if (goToSettings) {
+            if (evt.getResponse().getIsAdmin() || validateBoardUnit(username, password)) {
+                UIManager.getInstance().showSettingsActivity();
+                return;
+            }
+        }
+
+
         DB.setLoggedUser(username);
 
         MasterController.getInstance().user.updateUser(username, password, evt.getResponse().getIsAdmin());
@@ -197,6 +219,10 @@ public class LoginActivity extends Activity {
 
         // pokračujeme
         UIManager.getInstance().showMenuActivity();
+    }
+
+    private boolean validateBoardUnit(String name, String secretKey) {
+        return DB.getBoardUnitName().equals(name) && DB.getBoardUnitSecretKey().equals(secretKey);
     }
 
     /**

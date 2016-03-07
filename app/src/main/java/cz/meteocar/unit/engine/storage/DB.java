@@ -12,6 +12,10 @@ public class DB {
 
     private static final String LOGGED_USER = "logged_user";
     private static final String LOGGED_USER_TIME = "LOGGED_USER_TIME";
+    private static final String BOARD_UNIT_NAME = "board_unit_name";
+    private static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
+    private static final String NETWORK_ADDRESS = "network_address";
+
 
     // persistence key-value
     public static SharedPreferences get() {
@@ -22,20 +26,44 @@ public class DB {
         return ServiceManager.getInstance().db.editSettings();
     }
 
-    public static void setLoggedUser(String username) {
-        set().putString(LOGGED_USER, username);
+    public static void setLoggedUser(String value) {
+        set().putString(LOGGED_USER, value).commit();
     }
 
     public static String getLoggedUser() {
         return get().getString(LOGGED_USER, null);
     }
 
-    public static void setLoggedUserTime(String username) {
-        set().putString(LOGGED_USER_TIME, username);
+    public static void setLoggedUserTime(String value) {
+        set().putString(LOGGED_USER_TIME, value).commit();
     }
 
     public static Long getLoggedUserTime() {
         return get().getLong(LOGGED_USER_TIME, 0L);
+    }
+
+    public static void setBoardUnitName(String value) {
+        set().putString(BOARD_UNIT_NAME, value).commit();
+    }
+
+    public static String getBoardUnitName() {
+        return get().getString(BOARD_UNIT_NAME, "root");
+    }
+
+    public static void setBoardUnitSecretKey(String value) {
+        set().putString(BOARD_UNIT_SECRET_KEY, value).commit();
+    }
+
+    public static String getBoardUnitSecretKey() {
+        return get().getString(BOARD_UNIT_SECRET_KEY, "root");
+    }
+
+    public static void setNetworkAddress(String value) {
+        set().putString(NETWORK_ADDRESS, value).commit();
+    }
+
+    public static String getNetworkAddress() {
+        return get().getString(NETWORK_ADDRESS, "http://meteocar.herokuapp.com");
     }
 
 

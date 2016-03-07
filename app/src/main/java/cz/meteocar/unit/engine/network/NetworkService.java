@@ -75,7 +75,7 @@ public class NetworkService extends Thread {
     }
 
     public void loginUser(String username, String password) {
-        new LoginTask(context, address, boardUnitName, secretKey).execute(new LoginRequest(username, password));
+        new LoginTask(context).execute(new LoginRequest(username, password));
     }
 
     public void setAddress(String address) {

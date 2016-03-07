@@ -14,6 +14,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -36,6 +37,7 @@ import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
+import cz.meteocar.unit.ui.UIManager;
 
 /**
  * Created by Toms, 2014.
@@ -51,11 +53,16 @@ public class SettingsActivity extends PreferenceActivity
     public static final String SETTINGS_ID_OBD_PID_CAT = "button_obd_pids_category";
     public static final String NETWORK_ADDRESS = "network_address";
     public static final String FILTER_SETTINGS = "filter_settings";
+    public static final String BOARD_UNIT_NAME = "board_unit_name";
+    public static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
     private CheckBoxPreference gpsCheckBox;
     private EditTextPreference networkEditText;
+
+    private EditTextPreference boardUnitNameEditText;
+    private EditTextPreference boardUnitSecretKeyEditText;
 
     private AlertDialog obdPidDialog;
     private View obdPidDialogView;
@@ -66,13 +73,19 @@ public class SettingsActivity extends PreferenceActivity
     private FilterSettingHelper filterSettingHelper;
     private ObdPidHelper obdPidHelper;
 
-
     @Override
     public void onContentChanged() {
         super.onContentChanged();
-        AppLog.i("S changed");
+        Log.e(AppLog.LOG_TAG_DEFAULT, "onContentChanged");
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        UIManager.getInstance().showLoginActivity();
+        Log.e(AppLog.LOG_TAG_DEFAULT, "onDestroy");
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,6 +118,12 @@ public class SettingsActivity extends PreferenceActivity
 
         networkEditText = (EditTextPreference) findPreference(NETWORK_ADDRESS);
         networkEditText.setText(DB.get().getString("networkAddress", "http://meteocar.herokuapp.com"));
+
+        boardUnitNameEditText = (EditTextPreference) findPreference(BOARD_UNIT_NAME);
+        boardUnitNameEditText.setText(DB.getBoardUnitName());
+
+        boardUnitSecretKeyEditText = (EditTextPreference) findPreference(BOARD_UNIT_SECRET_KEY);
+        boardUnitSecretKeyEditText.setText(DB.getBoardUnitSecretKey());
 
 
         // načteme do listu obd zařízení data, pokud je OBD povoleno, jinak zakážeme
@@ -763,9 +782,18 @@ public class SettingsActivity extends PreferenceActivity
         }
 
         if (key.equals(NETWORK_ADDRESS)) {
-            String address = sharedPreferences.getString(key, "meteocar.herokuapp.com");
-            DB.set().putString("networkAddress", address).commit();
-            ServiceManager.getInstance().network.setAddress(address);
+            String value = sharedPreferences.getString(key, "http://meteocar.herokuapp.com");
+            DB.setNetworkAddress(value);
+        }
+
+        if (key.equals(BOARD_UNIT_NAME)) {
+            String value = sharedPreferences.getString(key, "root");
+            DB.setBoardUnitName(value);
+        }
+
+        if (key.equals(BOARD_UNIT_SECRET_KEY)) {
+            String value = sharedPreferences.getString(key, "root");
+            DB.setBoardUnitSecretKey(value);
         }
     }
 }
