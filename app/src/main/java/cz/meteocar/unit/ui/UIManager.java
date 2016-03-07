@@ -28,8 +28,6 @@ import cz.meteocar.unit.ui.activity.MenuActivity;
 import cz.meteocar.unit.ui.activity.SettingsActivity;
 import cz.meteocar.unit.ui.activity.TripDetailActivity;
 import cz.meteocar.unit.ui.fragments.DashboardFragment;
-import cz.meteocar.unit.ui.fragments.DebugFragment;
-import cz.meteocar.unit.ui.fragments.RecordsFragment;
 
 /**
  * Created by Toms, 2014.
@@ -61,12 +59,8 @@ public class UIManager {
 
     // fragmenty - konstanty
     public static final int FRAGMENT_DASHBOARD = 1;
-    public static final int FRAGMENT_RECORDS = 2;
-    public static final int FRAGMENT_SYNC = 3;
-    public static final int FRAGMENT_SETTINGS = 4;
-    public static final int FRAGMENT_DEBUG = 5;
-    public static final int FRAGMENT_TRIPS = 6;
-    public static final int FRAGMENT_EXIT = 7;
+    public static final int FRAGMENT_TRIPS = 2;
+    public static final int FRAGMENT_EXIT = 3;
 
     //
     public static final int DEFAULT_FRAGMENT = FRAGMENT_DASHBOARD;
@@ -161,11 +155,7 @@ public class UIManager {
      * Instanciuje fragmenty do hashmapy
      */
     private void initFragments() {
-        AppLog.i(AppLog.LOG_TAG_UI, "initFragments()");
         fragments.put(UIManager.FRAGMENT_DASHBOARD, new DashboardFragment());
-        fragments.put(UIManager.FRAGMENT_RECORDS, new RecordsFragment());
-        //fragments.put(UIManager.FRAGMENT_SETTINGS, new SettingsFragment());
-        fragments.put(UIManager.FRAGMENT_DEBUG, new DebugFragment());
     }
 
     /**
@@ -284,20 +274,8 @@ public class UIManager {
     public boolean onMenuItemSelected(int position, FragmentManager fragmentManager, Context ctx) {
         AppLog.log(AppLog.LOG_MSG_INFO, "Položka vybrána: " + position);
 
-        // nastavení - vlastní aktivita
-        if (position == FRAGMENT_SETTINGS) {
-            showSettingsActivity();
-            return true;
-        }
-
         if (position == FRAGMENT_TRIPS) {
             showTripsActivity();
-            return true;
-        }
-
-        // synchronizace - nemá UI
-        if (position == FRAGMENT_SYNC) {
-            MasterController.getInstance().trip.syncFilesToServer();
             return true;
         }
 

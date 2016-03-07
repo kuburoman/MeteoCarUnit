@@ -44,12 +44,8 @@
     <!-- Položky navigace - Názvy -->
     <string-array name="array_menu_item_names">
         <item>Přístrojovka</item>
-        <item>Záznamy</item>
-        <item>Synchronizovat</item>
-        <item>Nastavení</item>
-        <item>Debug</item>
         <item>Trips</item>
-        <item>Ukončit</item>
+        <item>Odhlásit</item>
     </string-array>
 
     <!-- Položky navigace - Ikony -->
