@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
@@ -19,47 +20,26 @@ import cz.meteocar.unit.engine.storage.model.TripEntity;
 /**
  * Created by Nell on 13.12.2015.
  */
-public class ConvertService extends Thread {
+public class ConvertService extends TimerTask {
 
-    private boolean threadRun;
     private RecordHelper recordHelper;
     private TripHelper tripHelper;
 
     public ConvertService() {
-        this(true, ServiceManager.getInstance().db.getRecordHelper(), ServiceManager.getInstance().db.getTripHelper());
+        this(ServiceManager.getInstance().db.getRecordHelper(), ServiceManager.getInstance().db.getTripHelper());
     }
 
-    public ConvertService(Boolean threadRun, RecordHelper recordHelper, TripHelper tripHelper) {
-        // start threadu
-        this.threadRun = threadRun;
+    public ConvertService(RecordHelper recordHelper, TripHelper tripHelper) {
         this.recordHelper = recordHelper;
         this.tripHelper = tripHelper;
-        start();
-    }
-
-    /**
-     * Ukonci thread.
-     */
-    public void exit() {
-        threadRun = false;
     }
 
     @Override
     public void run() {
-        while (threadRun) {
-            if (recordHelper.getNumberOfRecord(false) > 0) {
-                createJsonRecords();
-            } else {
-
-                try {
-                    this.sleep(30000);
-                } catch (Exception e) {
-                    Log.e(AppLog.LOG_TAG_DEFAULT, "Error in convert run", e);
-                }
-            }
-
+        Log.e(AppLog.LOG_TAG_NETWORK, "WTF");
+        if (recordHelper.getNumberOfRecord(false) > 0) {
+            createJsonRecords();
         }
-        AppLog.i(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
     }
 
     protected JSONObject createJsonTrip(List<RecordEntity> recordList) throws JSONException {
@@ -82,8 +62,6 @@ public class ConvertService extends Thread {
 
 
         JSONObject main = new JSONObject();
-        main.put("boardUnitId", "android2");
-        main.put("secretKey", "Ninjahash");
         main.put("trip", tripId);
         main.put("user", userName);
         main.put("records", jsonArray);
@@ -94,36 +72,32 @@ public class ConvertService extends Thread {
     protected void createJsonRecords() {
         List<String> userIds = recordHelper.getUserIdStored();
         for (String userId : userIds) {
-            while (true) {
-                if (userId == null) {
-                    continue;
-                }
-                List<RecordEntity> entityList = recordHelper.getByUserId(userId, 100, false);
-                if (entityList.size() < 1) {
-                    break;
-                }
-
-                JSONObject jsonTrip = new JSONObject();
-                try {
-                    jsonTrip = createJsonTrip(entityList);
-                } catch (JSONException e) {
-                    Log.e(AppLog.LOG_TAG_DEFAULT, "Cannot convert trip", e);
-                    e.printStackTrace();
-                }
-
-                tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
-
-                List<Integer> integers = new ArrayList<>();
-                for (RecordEntity recordEntity : entityList) {
-                    integers.add(recordEntity.getId());
-                }
-
-                recordHelper.updateProcessed(integers, true);
-                Log.d(AppLog.LOG_TAG_DB, "Successful creation of trip");
+            if (userId == null) {
+                recordHelper.deleteUserNullRecords();
+                continue;
+            }
+            List<RecordEntity> entityList = recordHelper.getByUserId(userId, 100, false);
+            if (entityList.size() < 1) {
+                break;
             }
 
+            JSONObject jsonTrip = new JSONObject();
+            try {
+                jsonTrip = createJsonTrip(entityList);
+            } catch (JSONException e) {
+                Log.e(AppLog.LOG_TAG_DEFAULT, "Cannot convert trip", e);
+                e.printStackTrace();
+            }
+
+            tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
+
+            List<Integer> integers = new ArrayList<>();
+            for (RecordEntity recordEntity : entityList) {
+                integers.add(recordEntity.getId());
+            }
+
+            recordHelper.updateProcessed(integers, true);
+            Log.d(AppLog.LOG_TAG_DB, "Successful creation of trip");
         }
     }
-
-
 }

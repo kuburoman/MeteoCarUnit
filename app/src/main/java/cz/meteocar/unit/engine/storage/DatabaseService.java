@@ -272,8 +272,11 @@ public class DatabaseService extends Thread {
      * @param evt Příchozí událost
      */
     public void storeTripMessage(AppEvent evt) {
+        if (DB.getLoggedUser() == null) {
+            return;
+        }
 
-        evt.setUserId(userName);
+        evt.setUserId(DB.getLoggedUser());
         evt.setTripId(tripId);
 
         // delegujeme na helper

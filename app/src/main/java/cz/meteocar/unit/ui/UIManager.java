@@ -23,6 +23,7 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.activity.LoginActivity;
 import cz.meteocar.unit.ui.activity.MenuActivity;
 import cz.meteocar.unit.ui.activity.SettingsActivity;
@@ -290,8 +291,10 @@ public class UIManager {
                 return true;
             }
 
+            DB.setLoggedUser(null);
+
             // ukončíme aplikaci
-            ServiceManager.getInstance().exitApp();
+            UIManager.getInstance().showLoginActivity();
             return true;
         }
 

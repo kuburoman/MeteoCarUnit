@@ -7,20 +7,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import net.engio.mbassy.listener.Handler;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.clock.event.TimeEvent;
+import cz.meteocar.unit.engine.event.ErrorViewType;
+import cz.meteocar.unit.engine.event.NetworkErrorEvent;
+import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.gps.event.GPSStatusEvent;
-import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
-import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
-import cz.meteocar.unit.engine.clock.event.TimeEvent;
-import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
@@ -87,6 +90,18 @@ public class DashboardFragment extends Fragment {
 
         //ok
         return view;
+    }
+
+    @Handler
+    public void handleErrorNetworkEvent(final NetworkErrorEvent evt) {
+        if (ErrorViewType.DASHBOARD.equals(evt.getView())) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(getActivity(), evt.getErrorResponse().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     /**

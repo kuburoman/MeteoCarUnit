@@ -14,5 +14,7 @@ public enum EventType {
     EVENT_VIDEO,
     EVENT_ACCEL,
     EVENT_DB,
-    EVENT_NETWORK
+    EVENT_NETWORK,
+    EVENT_ERROR_LOGIN,
+    EVENT_ERROR_DASHBOARD
 }

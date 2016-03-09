@@ -17,12 +17,18 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.dto.LoginRequest;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
-import cz.meteocar.unit.engine.network.task.LoginTask;
+import cz.meteocar.unit.engine.network.task.PostLoginTask;
+import cz.meteocar.unit.engine.network.task.PostTripTask;
+import cz.meteocar.unit.engine.storage.ConvertService;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
@@ -55,7 +61,7 @@ public class NetworkService extends Thread {
         return checkConnectingStatusFlag;
     }
 
-    private LoginTask loginTask;
+    private PostLoginTask postLoginTask;
 
 
     /**
@@ -72,10 +78,14 @@ public class NetworkService extends Thread {
         boardUnitName = "android2";
         secretKey = "Ninjahash";
         start();
+
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
+        ScheduledFuture<?> scheduledFuture = service.scheduleAtFixedRate(new PostTripTask(), 0, 10, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture2 = service.scheduleAtFixedRate(new ConvertService(), 0, 10, TimeUnit.SECONDS);
     }
 
     public void loginUser(String username, String password) {
-        new LoginTask(context).execute(new LoginRequest(username, password));
+        new PostLoginTask().execute(new LoginRequest(username, password));
     }
 
     public void setAddress(String address) {
@@ -112,7 +122,6 @@ public class NetworkService extends Thread {
     public void run() {
         try {
             while (threadRun) {
-                AppLog.i("Server thread running");
 
                 // flag pro kontrolu stavu připojování
                 if (checkConnectingStatusFlag) {
@@ -129,7 +138,7 @@ public class NetworkService extends Thread {
                     continue; // nesmíme nechat thread usnout, jinak by nedošlo k další kontrole
                 }
 
-                sendTripsToServer();
+//                sendTripsToServer();
 
                 this.sleep(500);
 

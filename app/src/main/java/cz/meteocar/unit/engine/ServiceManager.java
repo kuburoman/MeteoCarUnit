@@ -78,7 +78,6 @@ public class ServiceManager {
         obd.exit();
         db.exit();
         network.exit();
-        convert.exit();
 
         // teď jen voláme na jejich vláknech joiny
         try{

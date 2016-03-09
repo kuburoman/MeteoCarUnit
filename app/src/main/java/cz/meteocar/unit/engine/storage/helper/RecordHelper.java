@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.RecordTypeEnum;
 import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
+import cz.meteocar.unit.engine.enums.RecordTypeEnum;
 import cz.meteocar.unit.engine.event.AppEvent;
 import cz.meteocar.unit.engine.event.EventType;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
-import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
@@ -271,6 +271,11 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         }
         cursor.close();
         return userIds;
+    }
+
+    public void deleteUserNullRecords() {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        db.delete(getTableNameSQL(), COLUMN_NAME_USER_ID + " is NULL OR trim(" + COLUMN_NAME_USER_ID + ") = ''", null);
     }
 
     @Override

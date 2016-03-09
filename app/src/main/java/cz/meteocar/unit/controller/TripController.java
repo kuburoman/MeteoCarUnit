@@ -9,11 +9,9 @@ import net.engio.mbassy.listener.Handler;
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
-import cz.meteocar.unit.engine.network.NetworkStatus;
+import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
-import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.ui.UIManager;
 
 /**
