@@ -8,8 +8,8 @@ android {
         applicationId "cz.meteocar.unit"
         minSdkVersion 16
         targetSdkVersion 20
-        versionCode 3
-        versionName "1.0.2"
+        versionCode 4
+        versionName "1.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -52,9 +52,10 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/mbassador-1.2.0.jar')
     compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-v4:20.0.0'
+    compile 'com.android.support:support-v4:21.0.0'
     compile 'org.apache.commons:commons-lang3:3.0'
     compile 'com.jjoe64:graphview:4.0.1'
+    compile 'com.google.code.gson:gson:2.4'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.9.5'
     testCompile 'org.powermock:powermock-api-mockito:1.6.1'
