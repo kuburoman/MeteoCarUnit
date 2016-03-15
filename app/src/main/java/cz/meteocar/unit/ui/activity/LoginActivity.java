@@ -28,13 +28,13 @@ import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.event.ErrorViewType;
+import cz.meteocar.unit.engine.event.NetworkErrorEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.dto.LoginResponse;
 import cz.meteocar.unit.engine.network.event.LoginEvent;
 import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.event.NetworkErrorEvent;
 import cz.meteocar.unit.ui.UIManager;
 
 
@@ -226,7 +226,11 @@ public class LoginActivity extends Activity {
     @Handler
     public void handleErrorNetworkEvent(final NetworkErrorEvent evt) {
         if (ErrorViewType.LOGIN.equals(evt.getView())) {
-            Toast.makeText(LoginActivity.this, evt.getErrorResponse().getMessage(), Toast.LENGTH_SHORT).show();
+            runOnUiThread(new Runnable() {
+                public void run() {
+                    Toast.makeText(LoginActivity.this, evt.getErrorResponse().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

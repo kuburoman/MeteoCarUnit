@@ -294,7 +294,7 @@ public class UIManager {
             DB.setLoggedUser(null);
 
             // ukončíme aplikaci
-            UIManager.getInstance().showLoginActivity();
+            this.showLoginActivity();
             return true;
         }
 

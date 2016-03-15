@@ -26,6 +26,7 @@ public class PostTripTask extends TimerTask {
                 tripHelper.delete(oneTrip.getId());
             } catch (NetworkException e) {
                 ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+                break;
             }
 
         }

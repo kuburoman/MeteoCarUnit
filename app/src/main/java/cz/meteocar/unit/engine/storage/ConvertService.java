@@ -36,7 +36,6 @@ public class ConvertService extends TimerTask {
 
     @Override
     public void run() {
-        Log.e(AppLog.LOG_TAG_NETWORK, "WTF");
         if (recordHelper.getNumberOfRecord(false) > 0) {
             createJsonRecords();
         }
