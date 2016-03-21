@@ -18,6 +18,7 @@ import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
+import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
@@ -48,6 +49,7 @@ public class DatabaseService extends Thread {
     private UserHelper userHelper;
     private ObdPidHelper obdPidHelper;
     private FilterSettingHelper filterSettingHelper;
+    private CarSettingHelper carSettingHelper;
 
 
     public DatabaseService(Context ctx) {
@@ -62,6 +64,7 @@ public class DatabaseService extends Thread {
         userHelper = new UserHelper(helper);
         obdPidHelper = new ObdPidHelper(helper);
         filterSettingHelper = new FilterSettingHelper(helper);
+        carSettingHelper = new CarSettingHelper(helper);
         recordHelper = new RecordHelper(helper, filterSettingHelper);
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
@@ -104,6 +107,10 @@ public class DatabaseService extends Thread {
 
     public void setFilterSettingHelper(FilterSettingHelper filterSettingHelper) {
         this.filterSettingHelper = filterSettingHelper;
+    }
+
+    public CarSettingHelper getCarSettingHelper() {
+        return carSettingHelper;
     }
 
     private int seconds;

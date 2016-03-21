@@ -26,6 +26,9 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.dto.LoginRequest;
 import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
+import cz.meteocar.unit.engine.network.task.CarSettingTask;
+import cz.meteocar.unit.engine.network.task.FilterSettingTask;
+import cz.meteocar.unit.engine.network.task.OBDPidsTask;
 import cz.meteocar.unit.engine.network.task.PostLoginTask;
 import cz.meteocar.unit.engine.network.task.PostTripTask;
 import cz.meteocar.unit.engine.storage.ConvertService;
@@ -79,9 +82,18 @@ public class NetworkService extends Thread {
         secretKey = "Ninjahash";
         start();
 
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
-        ScheduledFuture<?> scheduledFuture = service.scheduleAtFixedRate(new PostTripTask(), 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture2 = service.scheduleAtFixedRate(new ConvertService(), 0, 10, TimeUnit.SECONDS);
+        FilterSettingTask filterSettingTask = new FilterSettingTask();
+        ConvertService convertService = new ConvertService();
+        PostTripTask postTripTask = new PostTripTask();
+        OBDPidsTask obdPidsTask = new OBDPidsTask();
+        CarSettingTask carSettingTask = new CarSettingTask();
+
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(1);
+        ScheduledFuture<?> scheduledFuture = service.scheduleAtFixedRate(postTripTask, 0, 10, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture2 = service.scheduleAtFixedRate(convertService, 0, 10, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture3 = service.scheduleAtFixedRate(filterSettingTask, 0, 10, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture4 = service.scheduleAtFixedRate(obdPidsTask, 0, 10, TimeUnit.SECONDS);
+        ScheduledFuture<?> scheduledFuture5 = service.scheduleAtFixedRate(carSettingTask, 0, 10, TimeUnit.SECONDS);
     }
 
     public void loginUser(String username, String password) {

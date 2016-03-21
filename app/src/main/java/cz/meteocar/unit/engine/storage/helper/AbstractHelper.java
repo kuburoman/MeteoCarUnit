@@ -28,6 +28,12 @@ public abstract class AbstractHelper<E extends AbstractEntity> {
      */
     public abstract int save(E entity);
 
+    public void saveAll(List<E> entities) {
+        for (E entity : entities) {
+            save(entity);
+        }
+    }
+
 
     /**
      * Inner save for new entity into database.

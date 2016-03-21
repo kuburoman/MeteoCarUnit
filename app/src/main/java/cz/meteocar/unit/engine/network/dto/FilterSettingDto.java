@@ -1,15 +1,15 @@
-package cz.meteocar.unit.engine.storage.model;
+package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Nell on 25.1.2016.
+ * Created by Nell on 14.3.2016.
  */
-public class FilterSettingEntity extends AbstractEntity {
+public class FilterSettingDto {
 
     private String algorithm;
     private String tag;
     private Double value;
-    private boolean active;
     private Long updateTime;
+    private boolean active;
 
     public String getAlgorithm() {
         return algorithm;
@@ -35,19 +35,19 @@ public class FilterSettingEntity extends AbstractEntity {
         this.value = value;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     public Long getUpdateTime() {
         return updateTime;
     }
 
     public void setUpdateTime(Long updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

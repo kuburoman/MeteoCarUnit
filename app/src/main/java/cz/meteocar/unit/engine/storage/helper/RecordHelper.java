@@ -24,7 +24,6 @@ import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
 import cz.meteocar.unit.engine.storage.helper.filter.Filter;
-import cz.meteocar.unit.engine.storage.helper.filter.RecordVO;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -385,20 +384,23 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     protected void saveOBD(AppEvent evt, RecordEntity obj) {
         OBDPidEvent obdEvent = (OBDPidEvent) evt;
 
-        RecordVO recordVO = new RecordVO();
-        recordVO.setUserId(evt.getUserId());
-        recordVO.setTripId(evt.getTripId());
-        recordVO.setType(((OBDPidEvent) evt).getMessage().getTag());
-        recordVO.setValue(obdEvent.getValue());
-        recordVO.setTime(obdEvent.getTimeCreated());
-        recordVO.setLastSaved(obdEvent.getTimeCreated());
-        recordVO.setSaved(false);
+        obj.setType(obdEvent.getMessage().getTag());
+
+        JSONObject jsonObj = new JSONObject();
+
+        try {
+            jsonObj.put("value", ((OBDPidEvent) evt).getValue());
+        } catch (Exception e) {
+            Log.e(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
+        }
+
+        obj.setJson(jsonObj.toString());
 
         if (obdEvent.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
             ServiceManager.getInstance().db.incrementObdDistance(obdEvent);
         }
 
-        filter.process(recordVO);
+        save(obj);
     }
 
 }

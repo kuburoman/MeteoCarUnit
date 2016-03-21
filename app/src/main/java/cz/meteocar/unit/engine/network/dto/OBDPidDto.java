@@ -1,34 +1,33 @@
-package cz.meteocar.unit.engine.storage.model;
+package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Toms, 2014.
+ * Created by Nell on 2.3.2016.
  */
-public class ObdPidEntity extends AbstractEntity {
+public class OBDPidDto {
 
-    public String name;
-    public String tag;
-    public String pidCode;
-    public String formula;
-    public int min;
-    public int max;
-    public int active;
-    public int locked;
-    public Long updateTime;
+    private String name;
+    private String tag;
+    private String pidCode;
+    private String formula;
+    private int min;
+    private int max;
+    private boolean active;
+    private Long updateTime;
 
     public String getName() {
         return name;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTag() {
         return tag;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public String getPidCode() {
@@ -63,11 +62,11 @@ public class ObdPidEntity extends AbstractEntity {
         this.max = max;
     }
 
-    public int getActive() {
+    public boolean isActive() {
         return active;
     }
 
-    public void setActive(int active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 

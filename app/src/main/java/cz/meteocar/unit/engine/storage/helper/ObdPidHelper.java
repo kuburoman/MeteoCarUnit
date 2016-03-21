@@ -30,7 +30,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
     private static final String COLUMN_NAME_MIN = "min";
     private static final String COLUMN_NAME_MAX = "max";
     private static final String COLUMN_NAME_ACTIVE = "active";
-    private static final String COLUMN_NAME_LOCKED = "locked";
+    private static final String COLUMN_NAME_UPDATE_TIME = "update_time";
 
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -42,7 +42,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
                     COLUMN_NAME_MIN + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_MAX + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_ACTIVE + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_LOCKED + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" +
+                    COLUMN_NAME_UPDATE_TIME + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" +
                     " )";
 
     private static final String INSERT_INTO_START = "INSERT INTO " + TABLE_NAME + " (" +
@@ -54,17 +54,17 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
             COLUMN_NAME_MIN + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_MAX + MySQLiteConfig.COMMA_SEP +
             COLUMN_NAME_ACTIVE + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_LOCKED +
+            COLUMN_NAME_UPDATE_TIME +
             " ) VALUES ";
 
     public static final String INSERT_INTO_ALL =
             "" +
                     INSERT_INTO_START +
-                    "(1, 'Rychlost'      , 'obd_speed'      , '010D1', 'A'              , 0  , 255  , 1, 1)," +
-                    "(2, 'Otacky'        , 'obd_rpm'        , '010C2', '((A*256)+B)/4'  , 0  , 16384, 1, 1)," +
-                    "(3, 'Pozice plynu'  , 'obd_throttle'   , '01111', '(A*100)/255'    , 0  , 100  , 1, 1)," +
-                    "(4, 'Teplota motoru', 'obd_engine_temp', '01051', 'A-40'           , -40, 215  , 1, 1)," +
-                    "(5, 'Aiflow'        , 'obf_airflow'    , '01102', '((A*256)+B)/100', 0  , 656  , 1, 1);";
+                    "(1, 'Rychlost'      , 'obd_speed'      , '010D1', 'A'              , 0  , 255  , 1, 1451602800000)," +
+                    "(2, 'Otacky'        , 'obd_rpm'        , '010C2', '((A*256)+B)/4'  , 0  , 16384, 1, 1451602800000)," +
+                    "(3, 'Pozice plynu'  , 'obd_throttle'   , '01111', '(A*100)/255'    , 0  , 100  , 1, 1451602800000)," +
+                    "(4, 'Teplota motoru', 'obd_engine_temp', '01051', 'A-40'           , -40, 215  , 1, 1451602800000)," +
+                    "(5, 'Aiflow'        , 'obf_airflow'    , '01102', '((A*256)+B)/100', 0  , 656  , 1, 1451602800000);";
 
 
     private static final String SQL_GET_ALL = "SELECT * FROM " + TABLE_NAME;
@@ -84,7 +84,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
         values.put(COLUMN_NAME_FORMULA, entity.getFormula());
         values.put(COLUMN_NAME_MIN, entity.getMin());
         values.put(COLUMN_NAME_MAX, entity.getMax());
-        values.put(COLUMN_NAME_LOCKED, entity.getLocked());
+        values.put(COLUMN_NAME_UPDATE_TIME, entity.getUpdateTime());
         values.put(COLUMN_NAME_ACTIVE, entity.getActive());
         return innerSave(entity.getId(), values);
     }
@@ -127,7 +127,6 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
 
         obj.setId(-1);
         obj.setActive(0);
-        obj.setLocked(0);
 
         return save(obj);
     }
@@ -141,7 +140,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
         obj.setFormula(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_FORMULA)));
         obj.setMin(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MIN)));
         obj.setMax(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MAX)));
-        obj.setLocked(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_LOCKED)));
+        obj.setUpdateTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_UPDATE_TIME)));
         obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)));
         return obj;
     }

@@ -34,7 +34,6 @@ import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
-import cz.meteocar.unit.engine.storage.helper.filter.ReducerType;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.ui.UIManager;
@@ -117,7 +116,7 @@ public class SettingsActivity extends PreferenceActivity
         obdCheckBox.setChecked(obdEnabled);
 
         networkEditText = (EditTextPreference) findPreference(NETWORK_ADDRESS);
-        networkEditText.setText(DB.get().getString("networkAddress", "http://meteocar.herokuapp.com"));
+        networkEditText.setText(DB.get().getString(NETWORK_ADDRESS, "http://meteocar.herokuapp.com"));
 
         boardUnitNameEditText = (EditTextPreference) findPreference(BOARD_UNIT_NAME);
         boardUnitNameEditText.setText(DB.getBoardUnitName());
@@ -401,11 +400,6 @@ public class SettingsActivity extends PreferenceActivity
         if (editTag != null) {
             editTag.setText(pid.getTag());
         }
-        if (pid.getLocked() == 1) {
-            editTag.setEnabled(false);
-        } else {
-            editTag.setEnabled(true);
-        }
 
         // kód
         EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
@@ -433,17 +427,13 @@ public class SettingsActivity extends PreferenceActivity
 
         // aktivní? - podle toho zda je zamčený nebo aktivovaný
         CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
-        if (pid.getLocked() == 1) {
+        active.setEnabled(true);
+        if (pid.getActive() == 1) {
             active.setChecked(true);
-            active.setEnabled(true);
         } else {
-            active.setEnabled(true);
-            if (pid.getActive() == 1) {
-                active.setChecked(true);
-            } else {
-                active.setChecked(false);
-            }
+            active.setChecked(false);
         }
+
 
         obdPidDialog.show();
     }
@@ -460,13 +450,11 @@ public class SettingsActivity extends PreferenceActivity
         int index = 0;
         for (FilterSettingEntity pid : arr) {
 
-            //
-            AppLog.i(AppLog.LOG_TAG_UI, "Adding filter setting code: " + pid.getObdCode());
+            Log.d(AppLog.LOG_TAG_UI, "Adding filter setting code: " + pid.getTag());
 
-            // vytvoříme tlačítko
             final int myID = pid.getId();
             Preference btn = new Preference(this);
-            btn.setTitle(pid.getObdCode());
+            btn.setTitle(pid.getTag());
             btn.setIcon(R.drawable.icon_tacho);
             btn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -476,23 +464,20 @@ public class SettingsActivity extends PreferenceActivity
                 }
             });
 
-            // přidáme do kategorie
             cat.addPreference(btn);
             index++;
         }
     }
 
     /**
-     * Zobrazí dialog k editaci OBD PIDu
+     * Show dialog for filter edit
      *
-     * @param id ID PIDu kt. editujeme
+     * @param id of filter to edit
      */
     private void showFilterDialog(int id) {
 
-        // id kt. editujeme
         dialogDataID = id;
 
-        // načteme z DB PID
         FilterSettingEntity filter = filterSettingHelper.get(id);
 
         if (filter == null) {
@@ -506,40 +491,26 @@ public class SettingsActivity extends PreferenceActivity
             return;
         }
 
-        EditText code = (EditText) filterDialogView.findViewById(R.id.dialog_02_filter_code_edit);
-        if (code != null) {
-            code.setText(filter.getObdCode());
+        EditText algorithm = (EditText) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
+        if (algorithm != null) {
+            algorithm.setText(filter.getAlgorithm());
         }
 
-        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_06_filter_active_edit);
+        EditText tag = (EditText) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
+        if (tag != null) {
+            tag.setText(filter.getTag());
+        }
+
+        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
+        if (roundingDecimal != null) {
+            roundingDecimal.setText(String.valueOf(filter.getValue()));
+        }
+
+        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_filter_active_edit);
         if (active != null) {
             active.setChecked(filter.isActive());
         }
 
-        ToggleButton reduceType = (ToggleButton) filterDialogView.findViewById(R.id.dialog_08_filter_reduce_type_edit);
-        if (reduceType != null) {
-            reduceType.setChecked(filter.getReduceType().getId() != 0);
-        }
-
-        EditText editFormula = (EditText) filterDialogView.findViewById(R.id.dialog_10_filter_reduce_value_edit);
-        if (editFormula != null) {
-            editFormula.setText(String.valueOf(filter.getReduceValue()));
-        }
-
-        ToggleButton rounding = (ToggleButton) filterDialogView.findViewById(R.id.dialog_12_filter_rounding_edit);
-        if (rounding != null) {
-            rounding.setChecked(filter.isRounding());
-        }
-
-        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_14_filter_rounding_decimal_edit);
-        if (roundingDecimal != null) {
-            roundingDecimal.setText(String.valueOf(filter.getRoundingDecimal()));
-        }
-
-        EditText editMax = (EditText) filterDialogView.findViewById(R.id.dialog_16_filter_max_time_edit);
-        if (editMax != null) {
-            editMax.setText(String.valueOf(filter.getMaxTime()));
-        }
 
         filterDialog.show();
     }
@@ -572,55 +543,45 @@ public class SettingsActivity extends PreferenceActivity
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
-                        // připravíme si objekt
                         ObdPidEntity obj = new ObdPidEntity();
 
-                        // id
                         obj.setId(dialogDataID);
 
-                        // jméno PIDu
                         EditText editName = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_name_edit);
                         if (editName != null) {
                             obj.setName(editName.getText().toString());
                         }
 
-                        // tag
                         EditText editTag = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_tag_edit);
                         if (editTag != null) {
                             obj.setTag(editTag.getText().toString());
                         }
 
-                        // kód
                         EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
                         if (editCode != null) {
                             obj.setPidCode(editCode.getText().toString());
                         }
 
-                        // vzorec
                         EditText editFormula = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_formula_edit);
                         if (editFormula != null) {
                             obj.setFormula(editFormula.getText().toString());
                         }
 
-                        // min
                         EditText editMin = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_min_edit);
                         if (editMin != null) {
                             obj.setMin(Integer.parseInt(editMin.getText().toString()));
                         }
 
-                        // max
                         EditText editMax = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_max_edit);
                         if (editMax != null) {
                             obj.setMax(Integer.parseInt(editMax.getText().toString()));
                         }
 
-                        // active
                         CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
                         if (active.isEnabled()) {
                             obj.setActive(active.isChecked() ? 1 : 0);
                         }
 
-                        // uložíme
                         if (obdPidHelper.save(obj) == 1) {
                             dialog.dismiss();
                         } else {
@@ -634,12 +595,6 @@ public class SettingsActivity extends PreferenceActivity
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
-                        // locked - nebudeme mazat
-                        if (obdPidHelper.get(dialogDataID).getLocked() == 1) {
-                            return;
-                        }
-
-                        // vymažeme
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         obdPidHelper.delete(dialogDataID);
                         createObdPIDScreen();
@@ -680,40 +635,27 @@ public class SettingsActivity extends PreferenceActivity
                         // id
                         obj.setId(dialogDataID);
 
-                        EditText code = (EditText) filterDialogView.findViewById(R.id.dialog_02_filter_code_edit);
-                        if (code != null) {
-                            obj.setObdCode(code.getText().toString());
+                        EditText algorithm = (EditText) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
+                        if (algorithm != null) {
+                            obj.setAlgorithm(algorithm.getText().toString());
                         }
 
-                        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_06_filter_active_edit);
+                        EditText tag = (EditText) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
+                        if (tag != null) {
+                            obj.setTag(tag.getText().toString());
+                        }
+
+                        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
+                        if (roundingDecimal != null) {
+                            obj.setValue(Double.valueOf(roundingDecimal.getText().toString()));
+                        }
+
+                        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_filter_active_edit);
                         if (active != null) {
                             obj.setActive(active.isChecked());
                         }
 
-                        ToggleButton reduceType = (ToggleButton) filterDialogView.findViewById(R.id.dialog_08_filter_reduce_type_edit);
-                        if (reduceType != null) {
-                            obj.setReduceType(ReducerType.fromId(reduceType.isChecked() == false ? 0 : 1));
-                        }
-
-                        EditText editFormula = (EditText) filterDialogView.findViewById(R.id.dialog_10_filter_reduce_value_edit);
-                        if (editFormula != null) {
-                            obj.setReduceValue(Double.valueOf(editFormula.getText().toString()));
-                        }
-
-                        ToggleButton rounding = (ToggleButton) filterDialogView.findViewById(R.id.dialog_12_filter_rounding_edit);
-                        if (rounding != null) {
-                            obj.setRounding(rounding.isChecked());
-                        }
-
-                        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_14_filter_rounding_decimal_edit);
-                        if (roundingDecimal != null) {
-                            obj.setRoundingDecimal(Integer.valueOf(roundingDecimal.getText().toString()));
-                        }
-
-                        EditText editMax = (EditText) filterDialogView.findViewById(R.id.dialog_16_filter_max_time_edit);
-                        if (editMax != null) {
-                            obj.setMaxTime(Long.valueOf(editMax.getText().toString()));
-                        }
+                        obj.setUpdateTime(System.currentTimeMillis());
 
                         // uložíme
                         if (filterSettingHelper.save(obj) == 1) {

@@ -1,5 +1,6 @@
 package cz.meteocar.unit.engine.network.task;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.google.gson.Gson;
@@ -16,6 +17,8 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkException;
@@ -23,7 +26,7 @@ import cz.meteocar.unit.engine.network.dto.ErrorResponse;
 import cz.meteocar.unit.engine.storage.DB;
 
 /**
- * Created by Nell on 6.3.2016.
+ * Network connector to rest.
  */
 public class NetworkConnector<IN, OUT> {
     private Gson gson = new Gson();
@@ -41,7 +44,7 @@ public class NetworkConnector<IN, OUT> {
         this.dataUrl = dataUrl;
     }
 
-    protected OUT post(IN request) throws NetworkException {
+    public OUT post(IN request) throws NetworkException {
 
         this.baseURL = DB.getNetworkAddress();
         this.unitName = DB.getBoardUnitName();
@@ -51,6 +54,7 @@ public class NetworkConnector<IN, OUT> {
         post.setHeader("Accept", "application/json");
         post.setHeader("Content-type", "application/json");
         post.setHeader("Secret-Key", secretKey);
+
         try {
             if (!inClass.equals(Void.class)) {
                 if (inClass.equals(String.class)) {
@@ -65,24 +69,37 @@ public class NetworkConnector<IN, OUT> {
         return getData(post);
     }
 
-    protected OUT get(IN request) throws NetworkException {
+    public OUT get(IN request) throws NetworkException {
+        return get(request, new ArrayList<QueryParameter>());
+    }
+
+    public OUT get(IN request, List<QueryParameter> params) throws NetworkException {
 
         this.baseURL = DB.getNetworkAddress();
         this.unitName = DB.getBoardUnitName();
         this.secretKey = DB.getBoardUnitSecretKey();
 
-        HttpGet post = new HttpGet(baseURL + "/" + unitName + "/" + dataUrl);
+        Uri.Builder b = Uri.parse(baseURL + "/boardUnit/" + unitName + "/" + dataUrl).buildUpon();
+
+        for (QueryParameter param : params) {
+            b.appendQueryParameter(param.getKey(), param.getValue());
+        }
+
+        HttpGet post = new HttpGet(b.build().toString());
+
         post.setHeader("Accept", "application/json");
         post.setHeader("Content-type", "application/json");
         post.setHeader("Secret-Key", secretKey);
+
         return getData(post);
     }
 
-    public OUT getData(HttpRequestBase requestBase) throws NetworkException {
+    protected OUT getData(HttpRequestBase requestBase) throws NetworkException {
 
         try {
             HttpClient client = new DefaultHttpClient();
             HttpResponse response = client.execute(requestBase);
+
 
             String body = EntityUtils.toString(response.getEntity());
 
@@ -98,7 +115,7 @@ public class NetworkConnector<IN, OUT> {
                     throw new NetworkException(new ErrorResponse("ERROR", "Response code: " + response.getStatusLine().getStatusCode()));
             }
 
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             throw new NetworkException(new ErrorResponse("ERROR", e.getMessage()));
         }
     }
