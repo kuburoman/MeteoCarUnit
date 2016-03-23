@@ -19,73 +19,73 @@
             android:text="@string/settings_filter_algorithm"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <EditText
+        <Spinner
             android:id="@+id/dialog_filter_algorithm_edit"
-            android:layout_below="@+id/dialog_filter_algorithm_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_algorithm_title"
             android:inputType="text" />
 
         <TextView
             android:id="@+id/dialog_filter_tag_title"
-            android:layout_below="@+id/dialog_filter_algorithm_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_algorithm_edit"
             android:layout_marginTop="@dimen/fragment_padding"
             android:text="@string/settings_filter_tag"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <EditText
+        <Spinner
             android:id="@+id/dialog_filter_tag_edit"
-            android:layout_below="@+id/dialog_filter_tag_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_tag_title"
             android:inputType="text" />
 
         <TextView
             android:id="@+id/dialog_filter_value_title"
-            android:layout_below="@+id/dialog_filter_tag_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_tag_edit"
             android:layout_marginTop="@dimen/fragment_padding"
             android:text="@string/settings_filter_value"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <EditText
             android:id="@+id/dialog_filter_value_edit"
-            android:layout_below="@+id/dialog_filter_value_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_value_title"
             android:inputType="number" />
 
         <TextView
             android:id="@+id/dialog_filter_active_title"
-            android:layout_below="@+id/dialog_filter_value_edit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_value_edit"
             android:layout_marginTop="@dimen/fragment_padding"
             android:text="@string/settings_filter_value"
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <ToggleButton
             android:id="@+id/dialog_filter_active_edit"
-            android:layout_below="@+id/dialog_filter_active_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
+            android:layout_below="@+id/dialog_filter_active_title"
             android:textOff="@string/settings_filter_active_off"
             android:textOn="@string/settings_filter_active_on" />
 

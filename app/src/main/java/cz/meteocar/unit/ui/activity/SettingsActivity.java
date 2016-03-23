@@ -16,13 +16,17 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +34,8 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.enums.FilterEnum;
+import cz.meteocar.unit.engine.enums.NonObdFilterTagEnum;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
@@ -491,14 +497,21 @@ public class SettingsActivity extends PreferenceActivity
             return;
         }
 
-        EditText algorithm = (EditText) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
+        Spinner algorithm = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
         if (algorithm != null) {
-            algorithm.setText(filter.getAlgorithm());
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, getNames(FilterEnum.values()));
+            algorithm.setSelection(adapter.getPosition(filter.getAlgorithm()));
+            algorithm.setAdapter(adapter);
         }
 
-        EditText tag = (EditText) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
+
+        Spinner tag = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
         if (tag != null) {
-            tag.setText(filter.getTag());
+            List<String> possibleTags = getPossibleTags();
+            possibleTags.add(filter.getTag());
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, possibleTags);
+            tag.setSelection(adapter.getPosition(filter.getTag()));
+            tag.setAdapter(adapter);
         }
 
         EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
@@ -635,14 +648,14 @@ public class SettingsActivity extends PreferenceActivity
                         // id
                         obj.setId(dialogDataID);
 
-                        EditText algorithm = (EditText) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
+                        Spinner algorithm = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
                         if (algorithm != null) {
-                            obj.setAlgorithm(algorithm.getText().toString());
+                            obj.setAlgorithm(algorithm.getSelectedItem().toString());
                         }
 
-                        EditText tag = (EditText) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
+                        Spinner tag = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
                         if (tag != null) {
-                            obj.setTag(tag.getText().toString());
+                            obj.setTag(tag.getSelectedItem().toString());
                         }
 
                         EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
@@ -737,5 +750,38 @@ public class SettingsActivity extends PreferenceActivity
             String value = sharedPreferences.getString(key, "root");
             DB.setBoardUnitSecretKey(value);
         }
+    }
+
+    protected static <E> List<String> getNames(E[] e) {
+        List<String> names = new ArrayList<>();
+        for (E value : e) {
+            names.add(value.toString());
+        }
+        return names;
+    }
+
+
+    protected List<String> getPossibleTags() {
+        List<FilterSettingEntity> filters = filterSettingHelper.getAll();
+        List<ObdPidEntity> pids = obdPidHelper.getAll();
+
+        List<String> possibleTags = new ArrayList<>();
+        for (ObdPidEntity pid : pids) {
+            possibleTags.add(pid.getTag());
+        }
+        possibleTags.addAll(getNames(NonObdFilterTagEnum.values()));
+
+        Iterator<String> it = possibleTags.iterator();
+        while (it.hasNext()) {
+            String tag = it.next();
+            for (FilterSettingEntity filter : filters) {
+                if (filter.getTag().equals(tag)) {
+                    it.remove();
+                    break;
+                }
+            }
+        }
+
+        return possibleTags;
     }
 }
