@@ -114,9 +114,12 @@
     <string name="settings_filter_active">Aktivní</string>
     <string name="settings_filter_rounding">Zaokrouhlování</string>
     <string name="settings_filter_update_time">Čas poslední změny</string>
-
     <string name="settings_filter_active_on">Aktivní filter</string>
     <string name="settings_filter_active_off">Neaktivní filter</string>
+
+    <!-- Setting - Board unit -->
+    <string name="settings_board_unit_name">Jméno palubní jednotky</string>
+    <string name="settings_board_unit_secret_key">Heslo</string>
 
     <!-- Nastavení - GPS -->
     <string name="settings_gps_settings">GPS Nastavení</string>

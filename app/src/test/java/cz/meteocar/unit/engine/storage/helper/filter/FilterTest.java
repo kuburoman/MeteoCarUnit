@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 public class FilterTest {
 
 //    @Mock
-//    private FilterSettingHelper filterSettingHelper;
+//    private FilterSettingActivityHelper filterSettingHelper;
 //
 //    @Mock
 //    private RecordHelper recordHelper;

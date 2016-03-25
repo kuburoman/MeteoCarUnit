@@ -1,12 +1,7 @@
 package cz.meteocar.unit.ui.activity;
 
-import android.app.ActionBar;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.bluetooth.BluetoothDevice;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -15,34 +10,18 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
 import android.util.Log;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.FilterEnum;
-import cz.meteocar.unit.engine.enums.NonObdFilterTagEnum;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
-import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
-import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
-import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.ui.UIManager;
+import cz.meteocar.unit.ui.activity.helpers.FilterSettingActivityHelper;
+import cz.meteocar.unit.ui.activity.helpers.ObdPidSettingActivityHelper;
 
 /**
  * Created by Toms, 2014.
@@ -69,14 +48,8 @@ public class SettingsActivity extends PreferenceActivity
     private EditTextPreference boardUnitNameEditText;
     private EditTextPreference boardUnitSecretKeyEditText;
 
-    private AlertDialog obdPidDialog;
-    private View obdPidDialogView;
-    private AlertDialog filterDialog;
-    private View filterDialogView;
-    private int dialogDataID;
-
-    private FilterSettingHelper filterSettingHelper;
-    private ObdPidHelper obdPidHelper;
+    private FilterSettingActivityHelper filterDialog;
+    private ObdPidSettingActivityHelper obdPidDialog;
 
     @Override
     public void onContentChanged() {
@@ -95,9 +68,6 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        filterSettingHelper = ServiceManager.getInstance().db.getFilterSettingHelper();
-        obdPidHelper = ServiceManager.getInstance().db.getObdPidHelper();
 
         // načtene hierarchii z XML
         addPreferencesFromResource(R.xml.my_settings);
@@ -150,13 +120,19 @@ public class SettingsActivity extends PreferenceActivity
         gpsCheckBox.setChecked(
                 DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false));
 
-        // inicializujeme editovací dialog pro PIDy
-        initObdPidDialog();
-        initFilterDialog();
+        obdPidDialog = new ObdPidSettingActivityHelper(this,
+                getLayoutInflater().inflate(R.layout.obd_pid_editor, null), (PreferenceScreen) findPreference(SETTINGS_ID_OBD_PID_CAT));
+        obdPidDialog.initDialog();
+        obdPidDialog.createScreen();
 
-        // vytvoříme kategorii OBD PIDů
-        createObdPIDScreen();
-        createFilterSettingScreen();
+        filterDialog = new FilterSettingActivityHelper(this,
+                getLayoutInflater().inflate(R.layout.filter_setting, null), (PreferenceScreen) findPreference(FILTER_SETTINGS));
+        filterDialog.initDialog();
+        filterDialog.createScreen();
+
+
+
+
     }
 
     /**
@@ -176,10 +152,6 @@ public class SettingsActivity extends PreferenceActivity
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         super.onPreferenceTreeClick(preferenceScreen, preference);
 
-        //AppLog.i(AppLog.LOG_TAG_UI, "TreeClick preferenceScreen.getKey(): "+preferenceScreen.getKey());
-        //AppLog.i(AppLog.LOG_TAG_UI, "TreeClick preference.getKey(): " + preference.getKey());
-        //invalidateOptionsMenu();
-
         // nemáme již inicializováno?
         if (obdPidScreenOptionsInitialized) {
             return false;
@@ -192,77 +164,18 @@ public class SettingsActivity extends PreferenceActivity
         if (preference.getKey() == null) {
             return false;
         }
-        if (!preference.getKey().equals(SETTINGS_ID_OBD_PID_CAT)) {
+        if (preference.getKey().equals(SETTINGS_ID_OBD_PID_CAT)) {
+            obdPidDialog.treeClick((PreferenceScreen) preference);
+            return false;
+        }
+        if (preference.getKey().equals(FILTER_SETTINGS)) {
+            filterDialog.treeClick((PreferenceScreen) preference);
             return false;
         }
 
-        // vycastujeme preference na screen (bezpečné - známe key)
-        PreferenceScreen myScreen = (PreferenceScreen) preference;
-
-        // připravíme si layout
-        RelativeLayout layout = new RelativeLayout(this);
-        layout.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.MATCH_PARENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT));
-
-        // naplníme obsah
-        Button btn = new Button(this, null, android.R.attr.buttonStyleSmall);
-        btn.setText(getResources().getString(R.string.settings_obd_pids_add));
-        btn.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ((RelativeLayout.LayoutParams) btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        ((RelativeLayout.LayoutParams) btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        //((RelativeLayout.LayoutParams)btn.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_END);
-        btn.setBackgroundColor(Color.TRANSPARENT);
-        layout.addView(btn);
-        TextView txt = new TextView(this);
-        txt.setText(getResources().getString(R.string.settings_obd_pids_title));
-        txt.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-        txt.setLayoutParams(new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-        ((RelativeLayout.LayoutParams) txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-        ((RelativeLayout.LayoutParams) txt.getLayoutParams()).addRule(RelativeLayout.ALIGN_PARENT_TOP);
-        int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
-        txt.setPadding(padding, padding * 3 / 4, 0, 0);
-        //((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.CENTER_HORIZONTAL);
-        //((RelativeLayout.LayoutParams)txt.getLayoutParams()).addRule(RelativeLayout.CENTER_IN_PARENT);
-        layout.addView(txt);
-
-        // najdeme action bar a vložíme do něj nový layout
-        Dialog dialog = myScreen.getDialog();
-
-        //
-        if (dialog == null) {
-            return false;
-        }
-        dialog.getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        dialog.getActionBar().setCustomView(layout);
-
-        // přidáme akci ke tlačíku
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onAddButtonClick();
-            }
-        });
-
-        // ok
-        obdPidScreenOptionsInitialized = true;
         return false;
     }
 
-    /**
-     * Handler kliknutí na tlačítko přidat u OBD PID obrazovky
-     */
-    private void onAddButtonClick() {
-        AppLog.i(AppLog.LOG_TAG_UI, "Add button clicked");
-
-        // přidáme PID, jen pokud se aktuálně nepřidává
-        if (!obdPidDialog.isShowing()) {
-            int newID = obdPidHelper.addOneByCopying(1, "Nový PID");
-            createObdPIDScreen();
-        }
-    }
 
     /**
      * Naplní list obd zařízení
@@ -322,380 +235,6 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     /**
-     * Vytvořé obsah obrazovky nastavení OBD PIDů načtením z databáze
-     */
-    private void createObdPIDScreen() {
-
-        // získáme a přemažeme kategorii
-        PreferenceScreen cat = (PreferenceScreen) findPreference(SETTINGS_ID_OBD_PID_CAT);
-        cat.removeAll();
-
-        //create one check box for each setting you need
-        //CheckBoxPreference checkBoxPreference = new CheckBoxPreference(this);
-        //make sure each key is unique
-        //checkBoxPreference.setKey("keyName");
-        //checkBoxPreference.setChecked(true);
-        //targetCategory.addPreference(checkBoxPreference);
-
-        List<ObdPidEntity> arr = obdPidHelper.getAll();
-        int index = 0;
-        for (ObdPidEntity pid : arr) {
-
-            //
-            AppLog.i(AppLog.LOG_TAG_UI, "Adding obd pid button: " + pid.getName());
-            AppLog.i(AppLog.LOG_TAG_UI, "PID id: " + pid.getId());
-            AppLog.i(AppLog.LOG_TAG_UI, "PID tag: " + pid.getTag());
-
-            // vytvoříme tlačítko
-            final int myID = pid.getId();
-            Preference btn = new Preference(this);
-            btn.setTitle(pid.getName());
-            btn.setIcon(R.drawable.icon_tacho);
-            btn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    showObdDialog(myID);
-                    return false;
-                }
-            });
-
-            // přidáme do kategorie
-            cat.addPreference(btn);
-            index++;
-        }
-    }
-
-    /**
-     * Zobrazí dialog k editaci OBD PIDu
-     *
-     * @param id ID PIDu kt. editujeme
-     */
-    private void showObdDialog(int id) {
-
-        // id kt. editujeme
-        dialogDataID = id;
-
-        // změníme text
-        //TextView txt = (TextView) obdPidDialogView.findViewById(R.id.dialog_obd_name_title);
-        //if(txt == null){ AppLog.p("UI - Prefs OBD dialog editor view is NULL"); return; }
-        //txt.setText("Showing menu item: " + i);
-
-        // načteme z DB PID
-        ObdPidEntity pid = obdPidHelper.get(id);
-
-        // pokud nebyl PID nalezen
-        if (pid == null) {
-            TextView txt = (TextView) obdPidDialogView.findViewById(R.id.dialog_obd_name_title);
-            if (txt == null) {
-                AppLog.p("UI - Prefs OBD dialog editor view is NULL");
-                return;
-            }
-            txt.setText("PID not found, ID: " + id);
-            obdPidDialog.show();
-            return;
-        }
-
-        // jméno PIDu
-        EditText editName = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_name_edit);
-        if (editName != null) {
-            editName.setText(pid.getName());
-        }
-
-        // JSON tag
-        EditText editTag = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_tag_edit);
-        if (editTag != null) {
-            editTag.setText(pid.getTag());
-        }
-
-        // kód
-        EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
-        if (editCode != null) {
-            editCode.setText(pid.getPidCode());
-        }
-
-        // vzorec
-        EditText editFormula = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_formula_edit);
-        if (editFormula != null) {
-            editFormula.setText(pid.getFormula());
-        }
-
-        // min
-        EditText editMin = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_min_edit);
-        if (editMin != null) {
-            editMin.setText("" + pid.getMin());
-        }
-
-        // max
-        EditText editMax = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_max_edit);
-        if (editMax != null) {
-            editMax.setText("" + pid.getMax());
-        }
-
-        // aktivní? - podle toho zda je zamčený nebo aktivovaný
-        CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
-        active.setEnabled(true);
-        if (pid.getActive() == 1) {
-            active.setChecked(true);
-        } else {
-            active.setChecked(false);
-        }
-
-
-        obdPidDialog.show();
-    }
-
-    /**
-     * Vytvořé obsah obrazovky nastavení OBD PIDů načtením z databáze
-     */
-    private void createFilterSettingScreen() {
-
-        PreferenceScreen cat = (PreferenceScreen) findPreference(FILTER_SETTINGS);
-        cat.removeAll();
-
-        List<FilterSettingEntity> arr = filterSettingHelper.getAll();
-        int index = 0;
-        for (FilterSettingEntity pid : arr) {
-
-            Log.d(AppLog.LOG_TAG_UI, "Adding filter setting code: " + pid.getTag());
-
-            final int myID = pid.getId();
-            Preference btn = new Preference(this);
-            btn.setTitle(pid.getTag());
-            btn.setIcon(R.drawable.icon_tacho);
-            btn.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    showFilterDialog(myID);
-                    return false;
-                }
-            });
-
-            cat.addPreference(btn);
-            index++;
-        }
-    }
-
-    /**
-     * Show dialog for filter edit
-     *
-     * @param id of filter to edit
-     */
-    private void showFilterDialog(int id) {
-
-        dialogDataID = id;
-
-        FilterSettingEntity filter = filterSettingHelper.get(id);
-
-        if (filter == null) {
-            TextView txt = (TextView) filterDialogView.findViewById(R.id.dialog_obd_name_title);
-            if (txt == null) {
-                AppLog.p("UI - Prefs OBD dialog editor view is NULL");
-                return;
-            }
-            txt.setText("PID not found, ID: " + id);
-            obdPidDialog.show();
-            return;
-        }
-
-        Spinner algorithm = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
-        if (algorithm != null) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, getNames(FilterEnum.values()));
-            algorithm.setSelection(adapter.getPosition(filter.getAlgorithm()));
-            algorithm.setAdapter(adapter);
-        }
-
-
-        Spinner tag = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
-        if (tag != null) {
-            List<String> possibleTags = getPossibleTags();
-            possibleTags.add(filter.getTag());
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, possibleTags);
-            tag.setSelection(adapter.getPosition(filter.getTag()));
-            tag.setAdapter(adapter);
-        }
-
-        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
-        if (roundingDecimal != null) {
-            roundingDecimal.setText(String.valueOf(filter.getValue()));
-        }
-
-        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_filter_active_edit);
-        if (active != null) {
-            active.setChecked(filter.isActive());
-        }
-
-
-        filterDialog.show();
-    }
-
-    /**
-     * Připravíme dialog žádající uživatele o zapnutí GPS
-     */
-    private void initObdPidDialog() {
-
-        // nacháme "nafouknout" view
-        obdPidDialogView = getLayoutInflater().inflate(R.layout.obd_pid_editor, null);
-
-        // uděláme builder, nastavíme text a titulek
-        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
-        builder.setTitle(getResources().getString(R.string.settings_obd_edit_window_title));
-        builder.setView(obdPidDialogView);
-
-        obdPidDialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-
-                    }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        ObdPidEntity obj = new ObdPidEntity();
-
-                        obj.setId(dialogDataID);
-
-                        EditText editName = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_name_edit);
-                        if (editName != null) {
-                            obj.setName(editName.getText().toString());
-                        }
-
-                        EditText editTag = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_tag_edit);
-                        if (editTag != null) {
-                            obj.setTag(editTag.getText().toString());
-                        }
-
-                        EditText editCode = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_code_edit);
-                        if (editCode != null) {
-                            obj.setPidCode(editCode.getText().toString());
-                        }
-
-                        EditText editFormula = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_formula_edit);
-                        if (editFormula != null) {
-                            obj.setFormula(editFormula.getText().toString());
-                        }
-
-                        EditText editMin = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_min_edit);
-                        if (editMin != null) {
-                            obj.setMin(Integer.parseInt(editMin.getText().toString()));
-                        }
-
-                        EditText editMax = (EditText) obdPidDialogView.findViewById(R.id.dialog_obd_max_edit);
-                        if (editMax != null) {
-                            obj.setMax(Integer.parseInt(editMax.getText().toString()));
-                        }
-
-                        CheckBox active = (CheckBox) obdPidDialogView.findViewById(R.id.dialog_obd_enabled);
-                        if (active.isEnabled()) {
-                            obj.setActive(active.isChecked() ? 1 : 0);
-                        }
-
-                        if (obdPidHelper.save(obj) == 1) {
-                            dialog.dismiss();
-                        } else {
-                            AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
-                        }
-
-                    }
-                }).setNegativeButton(R.string.settings_obd_edit_btn_delete, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
-                        obdPidHelper.delete(dialogDataID);
-                        createObdPIDScreen();
-
-
-                    }
-                }).setCancelable(true).create();
-    }
-
-    private void initFilterDialog() {
-
-        // nacháme "nafouknout" view
-        filterDialogView = getLayoutInflater().inflate(R.layout.filter_setting, null);
-
-        // uděláme builder, nastavíme text a titulek
-        AlertDialog.Builder builder = new AlertDialog.Builder(SettingsActivity.this);
-        builder.setTitle(getResources().getString(R.string.settings_obd_edit_window_title));
-        builder.setView(filterDialogView);
-
-        filterDialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-
-                    }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        // připravíme si objekt
-                        FilterSettingEntity obj = new FilterSettingEntity();
-
-                        // id
-                        obj.setId(dialogDataID);
-
-                        Spinner algorithm = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_algorithm_edit);
-                        if (algorithm != null) {
-                            obj.setAlgorithm(algorithm.getSelectedItem().toString());
-                        }
-
-                        Spinner tag = (Spinner) filterDialogView.findViewById(R.id.dialog_filter_tag_edit);
-                        if (tag != null) {
-                            obj.setTag(tag.getSelectedItem().toString());
-                        }
-
-                        EditText roundingDecimal = (EditText) filterDialogView.findViewById(R.id.dialog_filter_value_edit);
-                        if (roundingDecimal != null) {
-                            obj.setValue(Double.valueOf(roundingDecimal.getText().toString()));
-                        }
-
-                        ToggleButton active = (ToggleButton) filterDialogView.findViewById(R.id.dialog_filter_active_edit);
-                        if (active != null) {
-                            obj.setActive(active.isChecked());
-                        }
-
-                        obj.setUpdateTime(System.currentTimeMillis());
-
-                        // uložíme
-                        if (filterSettingHelper.save(obj) == 1) {
-                            dialog.dismiss();
-                        } else {
-                            AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
-                        }
-
-                    }
-                }).setNegativeButton(R.string.settings_obd_edit_btn_delete, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        // vymažeme
-                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
-                        filterSettingHelper.delete(dialogDataID);
-                        createObdPIDScreen();
-
-
-                    }
-                }).setCancelable(true).create();
-    }
-
-
-    /**
      * Handler změny nastavení
      *
      * @param sharedPreferences Objekt sdílených nastavení do kt. se uložila nová hodnota
@@ -750,38 +289,5 @@ public class SettingsActivity extends PreferenceActivity
             String value = sharedPreferences.getString(key, "root");
             DB.setBoardUnitSecretKey(value);
         }
-    }
-
-    protected static <E> List<String> getNames(E[] e) {
-        List<String> names = new ArrayList<>();
-        for (E value : e) {
-            names.add(value.toString());
-        }
-        return names;
-    }
-
-
-    protected List<String> getPossibleTags() {
-        List<FilterSettingEntity> filters = filterSettingHelper.getAll();
-        List<ObdPidEntity> pids = obdPidHelper.getAll();
-
-        List<String> possibleTags = new ArrayList<>();
-        for (ObdPidEntity pid : pids) {
-            possibleTags.add(pid.getTag());
-        }
-        possibleTags.addAll(getNames(NonObdFilterTagEnum.values()));
-
-        Iterator<String> it = possibleTags.iterator();
-        while (it.hasNext()) {
-            String tag = it.next();
-            for (FilterSettingEntity filter : filters) {
-                if (filter.getTag().equals(tag)) {
-                    it.remove();
-                    break;
-                }
-            }
-        }
-
-        return possibleTags;
     }
 }
