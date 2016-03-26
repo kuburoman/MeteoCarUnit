@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Toms, 2014.
+ * OBD pid entity.
  */
 public class ObdPidEntity extends AbstractEntity {
 
@@ -12,7 +12,6 @@ public class ObdPidEntity extends AbstractEntity {
     public int min;
     public int max;
     public int active;
-    public int locked;
     public Long updateTime;
 
     public String getName() {

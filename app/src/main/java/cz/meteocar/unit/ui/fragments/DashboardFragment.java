@@ -26,7 +26,6 @@ import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
-import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.view.SpeedMeterView;
 
@@ -112,12 +111,9 @@ public class DashboardFragment extends Fragment {
         AppLog.i("TestFragment onStart");
         UIManager.getInstance().showActionBarFor(UIManager.FRAGMENT_DASHBOARD);
 
-        ObdPidEntity speed = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_SPEED);
-        ObdPidEntity rpm = ServiceManager.getInstance().db.getObdPidHelper().get(ObdPidHelper.OBD_PID_ID_RPM);
-
         // nastavíme je do tachometrů
-        speedGauge.setMinMax(speed.getMin(), speed.getMax());
-        rpmGauge.setMinMax(rpm.getMin(), rpm.getMax());
+        speedGauge.setMinMax(0, 255);
+        rpmGauge.setMinMax(0, 16384);
         rpmGauge.setDisplayInThousands(true);
 
         // event bus

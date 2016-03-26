@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Entita drzici zaznamy o jizde.
+ * Record entity.
  */
 public class RecordEntity extends AbstractEntity {
 

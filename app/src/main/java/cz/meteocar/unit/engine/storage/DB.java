@@ -15,6 +15,7 @@ public class DB {
     private static final String BOARD_UNIT_NAME = "board_unit_name";
     private static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
     private static final String NETWORK_ADDRESS = "network_address";
+    private static final String TRIP_ID = "trip_id";
 
 
     // persistence key-value
@@ -66,5 +67,12 @@ public class DB {
         return get().getString(NETWORK_ADDRESS, "http://meteocar.herokuapp.com");
     }
 
+    public static void setTripId(String value) {
+        set().putString(TRIP_ID, value).commit();
+    }
+
+    public static String getTripId() {
+        return get().getString(TRIP_ID, "s");
+    }
 
 }

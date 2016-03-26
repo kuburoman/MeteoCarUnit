@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Nell on 17.2.2016.
+ * Abstract entity.
  */
 public abstract class AbstractEntity {
 

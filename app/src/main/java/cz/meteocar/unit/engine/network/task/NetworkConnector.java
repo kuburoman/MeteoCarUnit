@@ -108,6 +108,7 @@ public class NetworkConnector<IN, OUT> {
                     if (!outClass.equals(Void.class)) {
                         return gson.fromJson(body, outClass);
                     }
+                    return null;
                 case HttpStatus.SC_BAD_REQUEST:
                 case HttpStatus.SC_FORBIDDEN:
                     throw new NetworkException(gson.fromJson(body, ErrorResponse.class));

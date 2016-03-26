@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * User entity
+ * User entity.
  */
 public class UserEntity extends AbstractEntity {
 

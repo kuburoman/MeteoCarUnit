@@ -59,9 +59,9 @@ public class UIManager {
     private SettingsActivity settingsActivity;
 
     // fragmenty - konstanty
-    public static final int FRAGMENT_DASHBOARD = 1;
-    public static final int FRAGMENT_TRIPS = 2;
-    public static final int FRAGMENT_EXIT = 3;
+    public static final int FRAGMENT_DASHBOARD = 0;
+    public static final int FRAGMENT_TRIPS = 1;
+    public static final int FRAGMENT_EXIT = 2;
 
     //
     public static final int DEFAULT_FRAGMENT = FRAGMENT_DASHBOARD;

@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Nell on 21.3.2016.
+ * Car settings entity.
  */
 public class CarSettingEntity extends AbstractEntity {
 

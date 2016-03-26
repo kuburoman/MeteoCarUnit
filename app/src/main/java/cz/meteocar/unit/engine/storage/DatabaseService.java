@@ -14,11 +14,13 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.accel.event.AccelerationEvent;
 import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.event.AppEvent;
+import cz.meteocar.unit.engine.event.EventType;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
 import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
+import cz.meteocar.unit.engine.storage.helper.DTCHelper;
 import cz.meteocar.unit.engine.storage.helper.DatabaseHelper;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
@@ -50,6 +52,7 @@ public class DatabaseService extends Thread {
     private ObdPidHelper obdPidHelper;
     private FilterSettingHelper filterSettingHelper;
     private CarSettingHelper carSettingHelper;
+    private DTCHelper dtcHelper;
 
 
     public DatabaseService(Context ctx) {
@@ -66,6 +69,7 @@ public class DatabaseService extends Thread {
         filterSettingHelper = new FilterSettingHelper(helper);
         carSettingHelper = new CarSettingHelper(helper);
         recordHelper = new RecordHelper(helper, filterSettingHelper);
+        dtcHelper = new DTCHelper(helper);
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);
 
@@ -79,39 +83,6 @@ public class DatabaseService extends Thread {
 
     // ---------- Záznam z jízdy -----------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
-
-
-    public DatabaseHelper getHelper() {
-        return helper;
-    }
-
-    public void setHelper(DatabaseHelper helper) {
-        this.helper = helper;
-    }
-
-    public void setTripHelper(TripHelper tripHelper) {
-        this.tripHelper = tripHelper;
-    }
-
-    public void setRecordHelper(RecordHelper recordHelper) {
-        this.recordHelper = recordHelper;
-    }
-
-    public void setUserHelper(UserHelper userHelper) {
-        this.userHelper = userHelper;
-    }
-
-    public void setObdPidHelper(ObdPidHelper obdPidHelper) {
-        this.obdPidHelper = obdPidHelper;
-    }
-
-    public void setFilterSettingHelper(FilterSettingHelper filterSettingHelper) {
-        this.filterSettingHelper = filterSettingHelper;
-    }
-
-    public CarSettingHelper getCarSettingHelper() {
-        return carSettingHelper;
-    }
 
     private int seconds;
 
@@ -141,8 +112,6 @@ public class DatabaseService extends Thread {
 
     private Location gpsLastLocation;
     private OBDPidEvent obdLastEvent;
-    private String userName;
-    private String tripId;
 
     /**
      * Mají být jízdní události zaznamenány
@@ -164,8 +133,7 @@ public class DatabaseService extends Thread {
         AppLog.i(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
         tripStart = System.currentTimeMillis();
-        userName = DB.getLoggedUser();
-        tripId = String.valueOf(System.currentTimeMillis());
+        DB.setTripId(DB.getLoggedUser() + String.valueOf(System.currentTimeMillis()));
     }
 
     /**
@@ -274,9 +242,9 @@ public class DatabaseService extends Thread {
     // -------------------------------------------------------------------------------------------
 
     /**
-     * Uloží událost do databáze
+     * Saves event into database
      *
-     * @param evt Příchozí událost
+     * @param evt
      */
     public void storeTripMessage(AppEvent evt) {
         if (DB.getLoggedUser() == null) {
@@ -284,17 +252,21 @@ public class DatabaseService extends Thread {
         }
 
         evt.setUserId(DB.getLoggedUser());
-        evt.setTripId(tripId);
+        evt.setTripId(DB.getTripId());
 
-        // delegujeme na helper
-        recordHelper.save(evt);
+        if (EventType.EVENT_OBD_PID.equals(evt.getType())) {
+            OBDPidEvent input = (OBDPidEvent) evt;
+            if ("03".equals(input.getMessage().getCommand())) {
+                dtcHelper.save((OBDPidEvent) evt);
+            } else {
+                recordHelper.save(evt);
+            }
+        } else {
+            recordHelper.save(evt);
+        }
 
-        // nový počet záznam
-        // - nikde jej nepoužívám, je výhodnější používat odhad
-        // - dotaz chvíli trvá
         count++;
 
-        // odešleme event o přidání záznamu
         ServiceManager.getInstance().eventBus.post(
                 new DBEvent(count, seconds, obdDistance, gpsDistance)
         ).asynchronously();
@@ -371,7 +343,6 @@ public class DatabaseService extends Thread {
         return userHelper;
     }
 
-
     public ObdPidHelper getObdPidHelper() {
         return obdPidHelper;
     }
@@ -380,5 +351,12 @@ public class DatabaseService extends Thread {
         return filterSettingHelper;
     }
 
+    public DTCHelper getDTCHelper() {
+        return dtcHelper;
+    }
+
+    public CarSettingHelper getCarSettingHelper() {
+        return carSettingHelper;
+    }
 }
 

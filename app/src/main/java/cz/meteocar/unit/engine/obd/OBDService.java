@@ -6,17 +6,21 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
+import net.engio.mbassy.listener.Handler;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
-import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.obd.event.DTCRequestEvent;
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
@@ -92,12 +96,15 @@ public class OBDService extends Thread {
     // obd
     private boolean reconnectNeeded = false;
 
+    private boolean addedDTC = false;
 
     /**
      * Vytvoří novou prázdnou službu
      */
     public OBDService(Context appContext) {
         context = appContext;
+
+        ServiceManager.getInstance().eventBus.subscribe(this);
 
         // BT
         btSocket = null;
@@ -493,17 +500,32 @@ public class OBDService extends Thread {
                     }
                 }
 
-                // zpracujeme celou frontu
-                for (OBDMessage msg : queue) {
+                Iterator<OBDMessage> it = queue.iterator();
 
-                    // odešleme obd zprávu
+                while (it.hasNext()) {
+
+                    OBDMessage msg = it.next();
+
+                    // sends message
                     if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
+                        // NO DATA response can be caused by request on DTC (03)
                         AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");
                         firePIDEvent(msg, -5.0, msgResolver.getLastResponse());
                     }
+
+                    // Deletes requests on DTC
+                    if ("03".equals(msg.getCommand())) {
+                        it.remove();
+                    }
+
                 }
+
+                if (addedDTC) {
+                    addDTC();
+                }
+
             } catch (Exception e) {
                 Log.e(AppLog.LOG_TAG_OBD, "Error in run of OBDService", e);
             }
@@ -519,6 +541,8 @@ public class OBDService extends Thread {
      */
     private void initPIDQueue() {
 
+        queue.clear();
+
         // přidáme všechny aktivní z DB
         for (ObdPidEntity pid : ServiceManager.getInstance().db.getObdPidHelper().getAllActive()) {
             queue.add(new OBDMessage(
@@ -529,29 +553,6 @@ public class OBDService extends Thread {
                     pid.getName()
             ));
         }
-
-        /*
-        // rychlost
-        ObdPidEntity speedPID = ObdPidEntity.get(1);
-        if(speedPID == null){AppLog.i(AppLog.LOG_TAG_OBD, "speedPID NULL");}
-        queue.add(new OBDMessage(
-                speedPID.getPidCode(),
-                speedPID.getFormula(),
-                speedPID.getId(),
-                speedPID.getTag(),
-                speedPID.getName()
-        ));
-
-        // rpm
-        ObdPidEntity rpmPID = ObdPidEntity.get(2);
-        if(rpmPID == null){AppLog.i(AppLog.LOG_TAG_OBD, "rpmPID NULL");}
-        queue.add(new OBDMessage(
-                rpmPID.getPidCode(),
-                rpmPID.getFormula(),
-                rpmPID.getId(),
-                rpmPID.getTag(),
-                rpmPID.getName()
-        ));*/
     }
 
     /**
@@ -584,6 +585,25 @@ public class OBDService extends Thread {
      */
     private void fireStatusEvent(int statusCode, String txt) {
         ServiceManager.getInstance().eventBus.post(new OBDStatusEvent(statusCode, txt)).asynchronously();
+    }
+
+    private void addDTC() {
+        OBDMessage dtc = new OBDMessage();
+        dtc.setCommand("03");
+        dtc.setTag("dtc");
+        dtc.setName("Diagnostic Trouble Code");
+
+        queue.add(dtc);
+    }
+
+    /**
+     * Adds DTC request event into queue.
+     *
+     * @param evt dtc request event
+     */
+    @Handler
+    public void handleDTCRequest(DTCRequestEvent evt) {
+        addedDTC = true;
     }
 
 }

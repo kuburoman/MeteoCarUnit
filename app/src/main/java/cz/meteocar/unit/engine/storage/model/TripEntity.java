@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
 /**
- * Created by Nell on 12.12.2015.
+ * Trip entity.
  */
 public class TripEntity extends AbstractEntity {
     private String json;

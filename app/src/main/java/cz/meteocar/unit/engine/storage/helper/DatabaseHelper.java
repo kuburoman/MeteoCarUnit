@@ -31,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(UserHelper.SQL_CREATE_ENTRIES);
         db.execSQL(FilterSettingHelper.SQL_CREATE_ENTRIES);
         db.execSQL(CarSettingHelper.SQL_CREATE_ENTRIES);
+        db.execSQL(DTCHelper.SQL_CREATE_ENTRIES);
 
         db.execSQL(ObdPidHelper.INSERT_INTO_ALL);
         db.execSQL(FilterSettingHelper.INSERT_INTO_ALL);
@@ -50,7 +51,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(UserHelper.SQL_DELETE_ENTRIES);
         db.execSQL(FilterSettingHelper.SQL_DELETE_ENTRIES);
         db.execSQL(CarSettingHelper.SQL_DELETE_ENTRIES);
-
+        db.execSQL(DTCHelper.SQL_DELETE_ENTRIES);
         onCreate(db);
     }
 
