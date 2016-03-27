@@ -22,6 +22,7 @@ import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.task.event.SyncWithServerChangedEvent;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.activity.helpers.BoardUnitSettingActivityHelper;
+import cz.meteocar.unit.ui.activity.helpers.CarSettingActivityHelper;
 import cz.meteocar.unit.ui.activity.helpers.FilterSettingActivityHelper;
 import cz.meteocar.unit.ui.activity.helpers.ObdPidSettingActivityHelper;
 
@@ -43,6 +44,8 @@ public class SettingsActivity extends PreferenceActivity
     public static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
     public static final String CHECKBOX_SYNC_WITH_SERVER = "checkbox_sync_with_server";
     public static final String BOARD_UNIT_SETTING_CAT = "board_unit_setting_category";
+    public static final String CAR_SETTINGS = "car_settings";
+
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
@@ -54,6 +57,7 @@ public class SettingsActivity extends PreferenceActivity
     private FilterSettingActivityHelper filterDialog;
     private ObdPidSettingActivityHelper obdPidDialog;
     private BoardUnitSettingActivityHelper boardUnitDialog;
+    private CarSettingActivityHelper carSettingDialog;
 
     @Override
     public void onContentChanged() {
@@ -134,6 +138,10 @@ public class SettingsActivity extends PreferenceActivity
                 getLayoutInflater().inflate(R.layout.board_unit_setting, null));
         boardUnitDialog.initDialog();
 
+        carSettingDialog = new CarSettingActivityHelper(this,
+                getLayoutInflater().inflate(R.layout.car_setting, null), (PreferenceScreen) findPreference(CAR_SETTINGS));
+        carSettingDialog.initDialog();
+        carSettingDialog.createScreen();
 
     }
 
@@ -176,6 +184,10 @@ public class SettingsActivity extends PreferenceActivity
         }
         if (preference.getKey().equals(BOARD_UNIT_SETTING_CAT)) {
             boardUnitDialog.showDialog();
+            return false;
+        }
+        if (preference.getKey().equals(CAR_SETTINGS)) {
+            carSettingDialog.treeClick((PreferenceScreen) preference);
             return false;
         }
 

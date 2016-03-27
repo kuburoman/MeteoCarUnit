@@ -32,6 +32,12 @@
 
     <PreferenceScreen
         android:icon="@null"
+        android:key="car_settings"
+        android:persistent="false"
+        android:title="@string/settings_car_title" />
+
+    <PreferenceScreen
+        android:icon="@null"
         android:key="button_network_category"
         android:persistent="false"
         android:title="@string/settings_network_settings">

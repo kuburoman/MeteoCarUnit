@@ -117,6 +117,11 @@
     <string name="settings_filter_active_on">Aktivní filter</string>
     <string name="settings_filter_active_off">Neaktivní filter</string>
 
+
+    <string name="settings_car_title">Nastavení procesů jednotky</string>
+    <string name="settings_car_code">Kód nastavení</string>
+    <string name="settings_car_value">Hodnota v sec</string>
+
     <!-- Setting - Board unit -->
     <string name="settings_board_unit_title">Nastavení palubní jednotky</string>
     <string name="settings_board_unit_name">Jméno palubní jednotky</string>
