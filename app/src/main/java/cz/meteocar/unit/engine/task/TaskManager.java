@@ -2,8 +2,6 @@ package cz.meteocar.unit.engine.task;
 
 import net.engio.mbassy.listener.Handler;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -42,21 +40,18 @@ public class TaskManager {
 
     private ScheduledExecutorService service;
 
-
     private CarSettingHelper dao;
-
-    List<AbstractTask> tasks;
 
     public TaskManager() {
         dao = ServiceManager.getInstance().db.getCarSettingHelper();
         service = Executors.newScheduledThreadPool(10);
+    }
 
-        tasks = new ArrayList<>();
-
+    public void initManager() {
         ServiceManager.getInstance().eventBus.subscribe(this);
-
         scheduleAllTasks();
     }
+
 
     protected void scheduleAllTasks() {
         if (getSyncSwitch()) {

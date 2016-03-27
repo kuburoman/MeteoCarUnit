@@ -31,18 +31,15 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.VideoView;
-
-import java.io.IOException;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.controller.UserController;
-import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.ui.UIManager;
 
 /**
  * TODO - Komentář ke třídě menu
@@ -62,6 +59,7 @@ public class MenuActivity extends Activity {
 
     /**
      * Handler nového "záměru" otevření aktivity, využito pro animaci
+     *
      * @param intent
      */
     @Override
@@ -75,6 +73,7 @@ public class MenuActivity extends Activity {
 
     /**
      * Vytvoření hlavní "menu" aktivity
+     *
      * @param savedInstanceState
      */
     @Override
@@ -149,9 +148,9 @@ public class MenuActivity extends Activity {
                 }
 
                 // první prvek nebudeme plnit
-                if(position == 0){
+                if (position == 0) {
                     convertView.setBackgroundResource(R.color.menu_background_first);
-                    return  convertView;
+                    return convertView;
                 }
 
                 // objekty položky
@@ -160,9 +159,9 @@ public class MenuActivity extends Activity {
 
                 // naplnění obsahu (text a ikona)
                 imgIcon.setImageResource(getResources().obtainTypedArray(
-                        R.array.array_menu_item_icon).getResourceId(position-1, 0));
+                        R.array.array_menu_item_icon).getResourceId(position - 1, 0));
                 txtTitle.setText(getResources().getStringArray(
-                        R.array.array_menu_item_names)[position-1]);
+                        R.array.array_menu_item_names)[position - 1]);
 
                 //
                 return convertView;
@@ -170,7 +169,7 @@ public class MenuActivity extends Activity {
         });
 
         // nastaví akci při označení položky menu
-        menuListView.setOnItemClickListener(new ListView.OnItemClickListener(){
+        menuListView.setOnItemClickListener(new ListView.OnItemClickListener() {
             /**
              * Handler kliknutí na položku
              * @param parent AdapterView
@@ -188,7 +187,7 @@ public class MenuActivity extends Activity {
 
                 // isOK použita, aby uzavření menu nemuselo čekat na zavedení nové
                 // obrazovky
-                if(isOK){
+                if (isOK) {
                     menuListView.setItemChecked(position, true);    // označení položky
                     menuLayout.closeDrawer(menuListView);           // uzavření menu
                 }
@@ -235,10 +234,10 @@ public class MenuActivity extends Activity {
              */
             @Override
             public void onDrawerStateChanged(int newState) {
-                AppLog.i("Drawer state: "+newState);
+                AppLog.i("Drawer state: " + newState);
 
                 // pokud se menu odemklo, překreslíme
-                if(newState == DrawerLayout.LOCK_MODE_LOCKED_OPEN){
+                if (newState == DrawerLayout.LOCK_MODE_LOCKED_OPEN) {
                     invalidateOptionsMenu();
                 }
                 super.onDrawerStateChanged(newState);
@@ -271,11 +270,11 @@ public class MenuActivity extends Activity {
                 invalidateOptionsMenu();
 
                 // načteme předchozí stav action baru
-                if(initBefore){
+                if (initBefore) {
 
                     // otevřeme jej, pokud je to potřeba
-                    if(actionBarStatusBefore){
-                        if(fragmentBefore == UIManager.getInstance().getActualFragment()){
+                    if (actionBarStatusBefore) {
+                        if (fragmentBefore == UIManager.getInstance().getActualFragment()) {
                             showActionBar();
                         }
                     }
@@ -286,21 +285,23 @@ public class MenuActivity extends Activity {
 
         // nastaví defaultní fragment / obrazovku
         //if (savedInstanceState == null) {
-            UIManager.getInstance().onMenuItemSelected(UIManager.DEFAULT_FRAGMENT, getFragmentManager(), getApplicationContext());
+        UIManager.getInstance().onMenuItemSelected(UIManager.DEFAULT_FRAGMENT, getFragmentManager(), getApplicationContext());
         //}
 
         // připravíme dialogy
         initGPSDialog();
-        initNoInternetDialog();
 
         //
-        if(instID == 0){return;}
+        if (instID == 0) {
+            return;
+        }
 
         // odložíme check hardware, aby stihli doběhnout animace (kt. by se jinak zasekli)
-        (new Handler()).postDelayed(new Runnable(){
-            public void run(){
+        (new Handler()).postDelayed(new Runnable() {
+            public void run() {
                 checkHardware();
-            }}, 150);
+            }
+        }, 150);
 
 
     }
@@ -310,8 +311,8 @@ public class MenuActivity extends Activity {
         super.onResume();
 
         //zrušíme GPS dialog
-        if(gpsDialog != null){
-            if(gpsDialog.isShowing()){
+        if (gpsDialog != null) {
+            if (gpsDialog.isShowing()) {
                 gpsDialog.dismiss();
             }
         }
@@ -333,10 +334,10 @@ public class MenuActivity extends Activity {
     /**
      * Otevře action bar
      */
-    public void showActionBar(){
+    public void showActionBar() {
         try {
             actionBarView.getBackground().setAlpha(128);
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e(AppLog.LOG_TAG_DEFAULT, "Unable to show action bar", e);
         }
     }
@@ -344,16 +345,17 @@ public class MenuActivity extends Activity {
     /**
      * Schová action bar
      */
-    private void hideActionBar(){
+    private void hideActionBar() {
         try {
             actionBarView.getBackground().setAlpha(128);
-        }catch(Exception e){
+        } catch (Exception e) {
             Log.e(AppLog.LOG_TAG_DEFAULT, "Unable to hide action bar", e);
         }
     }
 
     /**
      * Připraví hlavní menu
+     *
      * @param menu
      * @return
      */
@@ -365,6 +367,7 @@ public class MenuActivity extends Activity {
     /**
      * Handler událostí menu
      * - volá se při údálostech vysouvacího i normální menu (normální tu naštěstí nemáme)
+     *
      * @param item Označená položka
      * @return Vrací false pro volání dalších handlerů, true pokud se událost bude řešit pouze zde
      */
@@ -373,7 +376,7 @@ public class MenuActivity extends Activity {
 
         // jedná se o položku menu?
         // - pokus ano, nemusíme dále zpracovávat
-        if(menuToggle.onOptionsItemSelected(item)){
+        if (menuToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
@@ -389,12 +392,13 @@ public class MenuActivity extends Activity {
     /**
      * Handler vytvoření nebo (zejména) obnovení View
      * Synchoronizuje Toggle objekt a aktuálním stavem menu
+     *
      * @param savedInstanceState
      */
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
-        if(menuToggle!=null) {
+        if (menuToggle != null) {
             menuToggle.syncState();
         }
     }
@@ -408,10 +412,10 @@ public class MenuActivity extends Activity {
 
         // máme už jen poslední záznam v zásobníku?
         // - to znamená prázný fragment, tj. nic ke zobrazení
-        if(getFragmentManager().getBackStackEntryCount() <= 1){
+        if (getFragmentManager().getBackStackEntryCount() <= 1) {
 
             // zeptáme se trip controlleru, jestli můžeme zkončit
-            if(MasterController.getInstance().trip.isActive()){
+            if (MasterController.getInstance().trip.isActive()) {
                 requestTripExit(getWindow().getContext());
                 return;
             }
@@ -423,7 +427,7 @@ public class MenuActivity extends Activity {
     /**
      * Zkontrolujeme stav hardwaru, případně vyzveme uživatele k jejich aktivaci
      */
-    public void checkHardware(){
+    public void checkHardware() {
         askUserToActivateGPSifNeeded();
     }
 
@@ -432,17 +436,19 @@ public class MenuActivity extends Activity {
     /**
      * Ověříme stav GPS a pokud má být zaplá a máme hardware, zeptáme se uživatele
      */
-    public void askUserToActivateGPSifNeeded(){
+    public void askUserToActivateGPSifNeeded() {
 
         // není náhodou GPS zakázána?
-        if(!DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false)){
+        if (!DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false)) {
             AppLog.i("GPS Check - DISABLED");
-            return; }
+            return;
+        }
 
         // pokud nemáme hardware
-        if(ServiceManager.getInstance().gps.getStatus() == ServiceGPS.STATUS_NO_HARDWARE){
+        if (ServiceManager.getInstance().gps.getStatus() == ServiceGPS.STATUS_NO_HARDWARE) {
             AppLog.i("GPS Check - NO HARDWARE");
-            return; }
+            return;
+        }
 
         // GPS offline - tady se zeptáme uživatele
         /*if(ServiceManager.getInstance().gps.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE){
@@ -451,12 +457,12 @@ public class MenuActivity extends Activity {
         boolean gpsState = ServiceManager.getInstance().gps.isHardwareEnabled();
         //AppLog.i(AppLog.LOG_TAG_UI, "GPS State for dialog: "+gpsState);
 
-        if(!gpsState && !gpsDialogShowing){
-           //AppLog.i(AppLog.LOG_TAG_UI, "Will show GPS HW dialog");
-           if(!gpsDialog.isShowing()) {
-               gpsDialogShowing = true;
-               gpsDialog.show();
-           }
+        if (!gpsState && !gpsDialogShowing) {
+            //AppLog.i(AppLog.LOG_TAG_UI, "Will show GPS HW dialog");
+            if (!gpsDialog.isShowing()) {
+                gpsDialogShowing = true;
+                gpsDialog.show();
+            }
         }
     }
 
@@ -465,14 +471,14 @@ public class MenuActivity extends Activity {
     /**
      * Připravíme dialog žádající uživatele o zapnutí GPS
      */
-    private void initGPSDialog(){
+    private void initGPSDialog() {
         AppLog.i(null, "GPS Dialog Init");
 
         // připravíme si textview
         TextView txt = new TextView(this);
         txt.setText(Html.fromHtml(getResources().getString(R.string.dialog_gps_html)));
         int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
-        txt.setPadding(padding,padding,padding,0);
+        txt.setPadding(padding, padding, padding, 0);
         //txt.setTextSize(padding);
 
         // uděláme builder, nastavíme text a titulek
@@ -513,82 +519,16 @@ public class MenuActivity extends Activity {
                 }).setCancelable(false).create();
     }
 
-    public AlertDialog dialogNoInternet;
-
-    /**
-     * Připraví dialog a akce, pokud není internetové připojení
-     */
-    private void initNoInternetDialog(){
-
-        // připravíme si textview
-        TextView txt = new TextView(this);
-        txt.setText(Html.fromHtml(getResources().getString(R.string.menu_net_offline)));
-        int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
-        txt.setPadding(padding,padding,padding,0);
-        //txt.setTextSize(padding);
-
-        // uděláme builder, nastavíme text a titulek
-        AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
-        builder.setTitle(getResources().getString(R.string.login_net_offline_title));
-        builder.setView(txt);
-
-        // přidáme tlačítka, modalitu a sestavíme
-        dialogNoInternet = builder
-                .setPositiveButton( R.string.login_net_btn_wifi, null)
-                .setNeutralButton(R.string.login_net_btn_mob, null)
-                .setNegativeButton(R.string.login_net_btn_exit, null)
-                .setCancelable(false).create();
-
-        // přidáme akce tlačítek
-        // - jedná se o nestandartní způsob, umožnující dialogu zůstat otevřený i po klinutí
-        // - jinak by stačilo výše při přidávání před listenery místo null
-        dialogNoInternet.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface dialog){
-
-                // Wifi
-                dialogNoInternet.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        AppLog.i(null, "Zapni wifi!");
-                        ServiceManager.getInstance().network.enableWifi();
-                    }
-                });
-
-
-                // Mobilní internet
-                dialogNoInternet.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View v){
-                        ServiceManager.getInstance().network.enableMobileNet();
-                    }
-                });
-
-                // Ukončit
-                dialogNoInternet.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                        ServiceManager.getInstance().exitApp();
-                    }
-                });
-
-            }
-        });
-
-
-    }
-
     /**
      * Vyžádá a provede restart aplikace
      */
-    public void requestTripExit(final Context ctx){
+    public void requestTripExit(final Context ctx) {
 
         // vytvoříme a otevřeme dialog
         new AlertDialog.Builder(ctx)
                 .setTitle(R.string.dialog_trip_exit_title)
                 .setMessage(R.string.dialog_trip_exit_text)
-                .setPositiveButton(R.string.dialog_trip_exit_storno, new DialogInterface.OnClickListener(){
+                .setPositiveButton(R.string.dialog_trip_exit_storno, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -601,7 +541,7 @@ public class MenuActivity extends Activity {
                 try {
                     super.finalize();
                 } catch (Throwable e) {
-                    Log.e(AppLog.LOG_TAG_DEFAULT,"Error when exiting application", e);
+                    Log.e(AppLog.LOG_TAG_DEFAULT, "Error when exiting application", e);
                 }
             }
         }).setNegativeButton(R.string.dialog_trip_exit_exit, new DialogInterface.OnClickListener() {
@@ -616,35 +556,35 @@ public class MenuActivity extends Activity {
     /**
      * Vyžádá a provede restart aplikace
      */
-    public void requestAppRestart(final Context ctx){
+    public void requestAppRestart(final Context ctx) {
 
         // vytvoříme a otevřeme dialog
         new AlertDialog.Builder(ctx)
-            .setTitle(R.string.dialog_restart_title)
-            .setMessage(R.string.dialog_restart_text)
-            .setPositiveButton(R.string.dialog_restart_btn, new DialogInterface.OnClickListener(){
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //dialog.dismiss();
+                .setTitle(R.string.dialog_restart_title)
+                .setMessage(R.string.dialog_restart_text)
+                .setPositiveButton(R.string.dialog_restart_btn, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
 
-                    // kontext a intent ID
-                    Context context = ctx; //getApplicationContext();
-                    int intentID = 10123;
+                        // kontext a intent ID
+                        Context context = ctx; //getApplicationContext();
+                        int intentID = 10123;
 
-                    // vytvoříme intent na spuštění vstupní aktivity (splash screen)
-                    Intent splashActivity = new Intent(context, SplashActivity.class);
-                    PendingIntent mPendingIntent = PendingIntent.getActivity(
-                            context, intentID, splashActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                        // vytvoříme intent na spuštění vstupní aktivity (splash screen)
+                        Intent splashActivity = new Intent(context, SplashActivity.class);
+                        PendingIntent mPendingIntent = PendingIntent.getActivity(
+                                context, intentID, splashActivity, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                    // ukončíme všechny služby
-                    ServiceManager.getInstance().exitServices();
+                        // ukončíme všechny služby
+                        ServiceManager.getInstance().exitServices();
 
-                    // nastavíme opětovné spuštění a ukončíme
-                    AlarmManager mgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                    mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-                    System.exit(0);
+                        // nastavíme opětovné spuštění a ukončíme
+                        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+                        System.exit(0);
 
-                }
-            }).setCancelable(false).create().show();
+                    }
+                }).setCancelable(false).create().show();
     }
 }

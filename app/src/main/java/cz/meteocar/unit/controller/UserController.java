@@ -1,15 +1,9 @@
 package cz.meteocar.unit.controller;
 
 import android.content.Context;
-import android.util.Log;
-
-import net.engio.mbassy.listener.Handler;
-
-import org.json.JSONArray;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.event.NetworkRequestEvent;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 import cz.meteocar.unit.ui.UIManager;
@@ -165,44 +159,6 @@ public class UserController {
 
         return false;
     }
-
-    /**
-     * Zpracování příchozí odpovědi na JSON dotaz
-     *
-     * @param evt
-     */
-    @Handler
-    public void handleNetworkPidsResponse(final NetworkRequestEvent evt) {
-
-        // je to naše zpráva?
-        AppLog.i(AppLog.LOG_TAG_NETWORK, "Response commin: " + evt.getResponse().toString());
-        if (evt.getID() != NETWORK_PIDS_RESPONSE) {
-            return;
-        }
-        AppLog.i(AppLog.LOG_TAG_NETWORK, "Response is PIDs response");
-
-        // přečteme odpověď
-        boolean jsonError = false; // došlo k chybě při parsování?
-        JSONArray containingArray;
-        try {
-            AppLog.i(AppLog.LOG_TAG_NETWORK, "Response handler: A");
-            containingArray = evt.getResponse().getJSONArray("pids");
-
-            // ok
-            DB.set().putBoolean(SETTINGS_KEY_OBD_PIDS_SET, true).commit();
-
-            // pokračujeme
-            UIManager.getInstance().showMenuActivity();
-
-            // ok, nyní ověříme stav služby a zapneme, pokud je potřeba
-            //updateOBDstate();
-
-            Log.d(AppLog.LOG_TAG_NETWORK, "Pids received");
-        } catch (Exception e) {
-            Log.e(AppLog.LOG_TAG_NETWORK, "Error receiving PIDS.");
-        }
-    }
-
 
     // ---------- Status GPS ---------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------

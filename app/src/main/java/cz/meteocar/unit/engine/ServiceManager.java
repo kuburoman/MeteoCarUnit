@@ -69,6 +69,7 @@ public class ServiceManager {
         network = new NetworkService(context);
         accel = new AccelerationService(context);
         taskManager = new TaskManager();
+        taskManager.initManager();
     }
 
     /**
@@ -81,7 +82,6 @@ public class ServiceManager {
         gps.exit();
         obd.exit();
         db.exit();
-        network.exit();
 
         // teď jen voláme na jejich vláknech joiny
         try {
@@ -103,11 +103,6 @@ public class ServiceManager {
             db.join(500);
         } catch (InterruptedException e) {
             Log.e(AppLog.LOG_TAG_DEFAULT, "DB thread interrupted for calling join.", e);
-        }
-        try {
-            network.join(500);
-        } catch (InterruptedException e) {
-            Log.e(AppLog.LOG_TAG_DEFAULT, "Network thread interrupted for calling join.", e);
         }
 
         // nastavíme na null, pro jistotu

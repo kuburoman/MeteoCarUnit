@@ -1,6 +1,5 @@
 package cz.meteocar.unit.controller;
 
-import android.app.AlertDialog;
 import android.view.View;
 import android.widget.Button;
 
@@ -10,7 +9,6 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.network.event.NetworkStatusEvent;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.ui.UIManager;
 
@@ -169,74 +167,6 @@ public class TripController {
 
         // vymažeme zaznamenané statistiky
         ServiceManager.getInstance().db.resetTripRecording();
-    }
-
-    // ---------- Synchronizace ------------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    /**
-     * Odešle soubory na server
-     */
-    public void syncFilesToServer() {
-
-        // uživatel žádá sync
-        // TODO smazat tuhle blbost
-    }
-
-    public boolean userRequestedSync = false;
-
-    public void executeSync() {
-        //
-//        for (FileObject file : FileObject.getAllOfType(FileObject.TYPE_TRIP_DETAILS)) {
-//            ServiceManager.getInstance().network.sendFileToServer(file.getId());
-//        }
-        //
-//        userRequestedSync = false;
-//        UIManager.getInstance().getMenuActivity().updateSyncCountMenuItem();
-    }
-
-    /**
-     * Handler stavu sítě (přístup k internetu)
-     * - pokud je síť nedostupná, zobrazíme varování
-     *
-     * @param evt
-     */
-    @Handler
-    public void handleNetworkStatusUpdate(final NetworkStatusEvent evt) {
-
-        // vyžádána synchronizace?
-        // ne = budeme enevt ignorovat
-        if (!userRequestedSync) {
-            return;
-        }
-
-        UIManager.getInstance().getMenuActivity()
-                .runOnUiThread(new Runnable() {
-                    public void run() {
-                        AppLog.i(null, "Network conn type: " + evt.getConnectionType());
-                        AppLog.i(null, "Network isConn?: " + evt.isConnected());
-
-                        // dialog
-                        AlertDialog dialogNoInternet = UIManager.getInstance().getMenuActivity().dialogNoInternet;
-
-                        // jsme připojeni?
-                        if (!evt.isConnected()) {
-
-                            // ovetevřeme dialog
-                            //AppLog.i(null, "Network dialog show");
-                            dialogNoInternet.show();
-
-                        } else {
-
-                            // uzavřeme dialog, pokud je otevřený
-                            if (dialogNoInternet.isShowing()) {
-                                //AppLog.i(null, "Network dialog cancel");
-                                dialogNoInternet.cancel();
-                            }
-
-                        }
-                    }
-                });
     }
 
 }
