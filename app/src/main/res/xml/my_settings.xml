@@ -52,16 +52,12 @@
             android:defaultValue="true"
             android:icon="@null"
             android:key="checkbox_sync_with_server"
-            android:summary="@string/settings_sync_with_server"
+            android:summary="@string/settings_sync_with_server_summary"
             android:title="@string/settings_sync_with_server" />
-        <EditTextPreference
+        <PreferenceScreen
             android:icon="@null"
-            android:key="board_unit_name"
-            android:title="Board Unit Name" />
-        <EditTextPreference
-            android:icon="@null"
-            android:key="board_unit_secret_key"
-            android:title="Board Unit Secret Key" />
+            android:key="board_unit_setting_category"
+            android:title="@string/settings_board_unit_title" />
     </PreferenceScreen>
 
     <!-- GPS -->

@@ -21,6 +21,7 @@ import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.task.event.SyncWithServerChangedEvent;
 import cz.meteocar.unit.ui.UIManager;
+import cz.meteocar.unit.ui.activity.helpers.BoardUnitSettingActivityHelper;
 import cz.meteocar.unit.ui.activity.helpers.FilterSettingActivityHelper;
 import cz.meteocar.unit.ui.activity.helpers.ObdPidSettingActivityHelper;
 
@@ -41,19 +42,18 @@ public class SettingsActivity extends PreferenceActivity
     public static final String BOARD_UNIT_NAME = "board_unit_name";
     public static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
     public static final String CHECKBOX_SYNC_WITH_SERVER = "checkbox_sync_with_server";
+    public static final String BOARD_UNIT_SETTING_CAT = "board_unit_setting_category";
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
     private CheckBoxPreference gpsCheckBox;
     private EditTextPreference networkEditText;
 
-    private EditTextPreference boardUnitNameEditText;
-    private EditTextPreference boardUnitSecretKeyEditText;
-
     private CheckBoxPreference syncWithServer;
 
     private FilterSettingActivityHelper filterDialog;
     private ObdPidSettingActivityHelper obdPidDialog;
+    private BoardUnitSettingActivityHelper boardUnitDialog;
 
     @Override
     public void onContentChanged() {
@@ -98,12 +98,6 @@ public class SettingsActivity extends PreferenceActivity
         networkEditText = (EditTextPreference) findPreference(NETWORK_ADDRESS);
         networkEditText.setText(DB.get().getString(NETWORK_ADDRESS, "http://meteocar.herokuapp.com"));
 
-        boardUnitNameEditText = (EditTextPreference) findPreference(BOARD_UNIT_NAME);
-        boardUnitNameEditText.setText(DB.getBoardUnitName());
-
-        boardUnitSecretKeyEditText = (EditTextPreference) findPreference(BOARD_UNIT_SECRET_KEY);
-        boardUnitSecretKeyEditText.setText(DB.getBoardUnitSecretKey());
-
         syncWithServer = (CheckBoxPreference) findPreference(CHECKBOX_SYNC_WITH_SERVER);
         syncWithServer.setChecked(DB.getSyncWithServer());
 
@@ -135,6 +129,10 @@ public class SettingsActivity extends PreferenceActivity
                 getLayoutInflater().inflate(R.layout.filter_setting, null), (PreferenceScreen) findPreference(FILTER_SETTINGS));
         filterDialog.initDialog();
         filterDialog.createScreen();
+
+        boardUnitDialog = new BoardUnitSettingActivityHelper(this,
+                getLayoutInflater().inflate(R.layout.board_unit_setting, null));
+        boardUnitDialog.initDialog();
 
 
     }
@@ -176,6 +174,11 @@ public class SettingsActivity extends PreferenceActivity
             filterDialog.treeClick((PreferenceScreen) preference);
             return false;
         }
+        if (preference.getKey().equals(BOARD_UNIT_SETTING_CAT)) {
+            boardUnitDialog.showDialog();
+            return false;
+        }
+
 
         return false;
     }
@@ -288,16 +291,6 @@ public class SettingsActivity extends PreferenceActivity
         if (key.equals(NETWORK_ADDRESS)) {
             String value = sharedPreferences.getString(key, "http://meteocar.herokuapp.com");
             DB.setNetworkAddress(value);
-        }
-
-        if (key.equals(BOARD_UNIT_NAME)) {
-            String value = sharedPreferences.getString(key, "root");
-            DB.setBoardUnitName(value);
-        }
-
-        if (key.equals(BOARD_UNIT_SECRET_KEY)) {
-            String value = sharedPreferences.getString(key, "root");
-            DB.setBoardUnitSecretKey(value);
         }
     }
 }

@@ -146,6 +146,8 @@ public class ObdPidSettingActivityHelper {
      */
     public void initDialog() {
 
+        createScreen();
+
         // uděláme builder, nastavíme text a titulek
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getResources().getString(R.string.settings_obd_edit_window_title));

@@ -118,8 +118,12 @@
     <string name="settings_filter_active_off">Neaktivní filter</string>
 
     <!-- Setting - Board unit -->
+    <string name="settings_board_unit_title">Nastavení palubní jednotky</string>
     <string name="settings_board_unit_name">Jméno palubní jednotky</string>
     <string name="settings_board_unit_secret_key">Heslo</string>
+    <string name="settings_board_unit_change">Změna údajů jednotky</string>
+    <string name="settings_board_unit_change_message">Změna údajů jednotky vede ke smazání většiny uložených záznamů palubní jedntoky. A jejich nahrazení původnímy záznamy.</string>
+
 
     <!-- Setting - GPS -->
     <string name="settings_gps_settings">GPS Nastavení</string>

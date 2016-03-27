@@ -55,6 +55,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void insertDefaultValues() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL(RecordHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(ObdPidHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(TripHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(UserHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(FilterSettingHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(CarSettingHelper.SQL_DELETE_ENTRIES);
+        db.execSQL(DTCHelper.SQL_DELETE_ENTRIES);
+        onCreate(db);
+    }
+
     /**
      * Update database on lower version.
      * - is called automatically (if version of database is not same)

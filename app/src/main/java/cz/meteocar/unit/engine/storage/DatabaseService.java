@@ -358,5 +358,9 @@ public class DatabaseService extends Thread {
     public CarSettingHelper getCarSettingHelper() {
         return carSettingHelper;
     }
+
+    public DatabaseHelper getDatabaseHelper() {
+        return helper;
+    }
 }
 

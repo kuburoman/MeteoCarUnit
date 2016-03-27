@@ -114,10 +114,10 @@ public class FilterSettingActivityHelper {
         Spinner algorithm = (Spinner) dialogView.findViewById(R.id.dialog_filter_algorithm_edit);
         if (algorithm != null) {
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, getNames(FilterEnum.values()));
+            algorithm.setAdapter(adapter);
             if (!"".equals(filter.getAlgorithm())) {
                 algorithm.setSelection(adapter.getPosition(filter.getAlgorithm()));
             }
-            algorithm.setAdapter(adapter);
         }
 
 
@@ -126,10 +126,10 @@ public class FilterSettingActivityHelper {
             List<String> possibleTags = getPossibleTags();
             possibleTags.add(filter.getTag());
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, possibleTags);
+            tag.setAdapter(adapter);
             if (!"".equals(filter.getTag())) {
                 tag.setSelection(adapter.getPosition(filter.getTag()));
             }
-            tag.setAdapter(adapter);
         }
 
         EditText roundingDecimal = (EditText) dialogView.findViewById(R.id.dialog_filter_value_edit);
@@ -258,6 +258,9 @@ public class FilterSettingActivityHelper {
     }
 
     public void treeClick(PreferenceScreen myScreen) {
+
+        createScreen();
+
         // připravíme si layout
         RelativeLayout layout = new RelativeLayout(context);
         layout.setLayoutParams(new RelativeLayout.LayoutParams(
