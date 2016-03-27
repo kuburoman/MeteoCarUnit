@@ -48,6 +48,12 @@
         android:key="button_network_category"
         android:persistent="false"
         android:title="@string/settings_board_unit">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@null"
+            android:key="checkbox_sync_with_server"
+            android:summary="@string/settings_sync_with_server"
+            android:title="@string/settings_sync_with_server" />
         <EditTextPreference
             android:icon="@null"
             android:key="board_unit_name"

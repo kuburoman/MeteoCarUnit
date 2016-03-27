@@ -19,6 +19,7 @@ import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.task.event.SyncWithServerChangedEvent;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.activity.helpers.FilterSettingActivityHelper;
 import cz.meteocar.unit.ui.activity.helpers.ObdPidSettingActivityHelper;
@@ -39,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity
     public static final String FILTER_SETTINGS = "filter_settings";
     public static final String BOARD_UNIT_NAME = "board_unit_name";
     public static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
+    public static final String CHECKBOX_SYNC_WITH_SERVER = "checkbox_sync_with_server";
 
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
@@ -47,6 +49,8 @@ public class SettingsActivity extends PreferenceActivity
 
     private EditTextPreference boardUnitNameEditText;
     private EditTextPreference boardUnitSecretKeyEditText;
+
+    private CheckBoxPreference syncWithServer;
 
     private FilterSettingActivityHelper filterDialog;
     private ObdPidSettingActivityHelper obdPidDialog;
@@ -100,6 +104,8 @@ public class SettingsActivity extends PreferenceActivity
         boardUnitSecretKeyEditText = (EditTextPreference) findPreference(BOARD_UNIT_SECRET_KEY);
         boardUnitSecretKeyEditText.setText(DB.getBoardUnitSecretKey());
 
+        syncWithServer = (CheckBoxPreference) findPreference(CHECKBOX_SYNC_WITH_SERVER);
+        syncWithServer.setChecked(DB.getSyncWithServer());
 
         // načteme do listu obd zařízení data, pokud je OBD povoleno, jinak zakážeme
         if (obdEnabled) {
@@ -129,8 +135,6 @@ public class SettingsActivity extends PreferenceActivity
                 getLayoutInflater().inflate(R.layout.filter_setting, null), (PreferenceScreen) findPreference(FILTER_SETTINGS));
         filterDialog.initDialog();
         filterDialog.createScreen();
-
-
 
 
     }
@@ -264,6 +268,12 @@ public class SettingsActivity extends PreferenceActivity
                     .commit();
             MasterController.getInstance().user.updateOBDstateAndRestart(
                     getWindow().getContext());
+        }
+
+        if (key.equals(CHECKBOX_SYNC_WITH_SERVER)) {
+            boolean value = sharedPreferences.getBoolean(key, false);
+            DB.setSyncWithServer(value);
+            ServiceManager.getInstance().eventBus.post(new SyncWithServerChangedEvent()).asynchronously();
         }
 
         // povolení / zakázání GPS

@@ -1,18 +1,13 @@
 package cz.meteocar.unit.engine.network.task;
 
-import android.util.Log;
-
 import com.google.common.base.Converter;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.event.ErrorViewType;
-import cz.meteocar.unit.engine.event.NetworkErrorEvent;
-import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.network.ErrorCodes;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateFilterSettingRequest;
@@ -21,11 +16,12 @@ import cz.meteocar.unit.engine.network.dto.GetFilterSettingResponse;
 import cz.meteocar.unit.engine.network.task.converter.FilterSettingsEntity2DtoConverter;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
+import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
  * Created by Nell on 20.3.2016.
  */
-public class FilterSettingTask extends TimerTask {
+public class FilterSettingTask extends AbstractTask {
 
     private NetworkConnector<Void, GetFilterSettingResponse> getConnector = new NetworkConnector<>(Void.class, GetFilterSettingResponse.class, "filterSettings");
     private NetworkConnector<CreateFilterSettingRequest, Void> postConnector = new NetworkConnector<>(CreateFilterSettingRequest.class, Void.class, "filterSettings");
@@ -36,7 +32,7 @@ public class FilterSettingTask extends TimerTask {
     private static final Converter<FilterSettingDto, FilterSettingEntity> converterBackward = converterForward.reverse();
 
     @Override
-    public void run() {
+    public void runTask() {
         if (isNetworkReady()) {
             try {
                 List<FilterSettingEntity> all = dao.getAll();
@@ -55,15 +51,12 @@ public class FilterSettingTask extends TimerTask {
                     try {
                         postConnector.post(new CreateFilterSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
                     } catch (NetworkException e1) {
-                        ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+                        postNetworkException(e);
                     }
                 }
-                ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+                postNetworkException(e);
             }
-        } else {
-            Log.d(AppLog.LOG_TAG_NETWORK, "FilterSettingTask: network is offline");
         }
-
     }
 
     protected boolean isNetworkReady() {

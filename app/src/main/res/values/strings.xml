@@ -62,13 +62,13 @@
     <!-- Menu toast -->
     <string name="menu_no_such_fragment">Fragment pro tuto položku nebyl nenalezen :(</string>
 
-    <!-- Menu dialog zapnutí intrenetu -->
+    <!-- Menu dialog start internet -->
     <string name="menu_net_offline"><![CDATA[
         <p>Není k dispozici žádné internetové připojení, nelze synchronizovat.<br /><br />
         <small>Poznámka: Během zapínání Wifi nebo 3G vyčkejte.</small></p>
     ]]></string>
 
-    <!-- ========== Přístrojovka ============================================================== -->
+    <!-- ========== Dashboard ============================================================== -->
     <!-- ====================================================================================== -->
 
     <string name="dashoard_btn_trip_start">  Start jízdy  </string>
@@ -76,13 +76,13 @@
 
     <string name="dashoard_txt_empty"></string>
 
-    <!-- ========== Nastavení ================================================================= -->
+    <!-- ========== Setting ================================================================= -->
     <!-- ====================================================================================== -->
 
-    <!-- Nastavení -->
+    <!-- Setting -->
     <string name="settings_title">Nastavení aplikace</string>
 
-    <!-- Nastavení - OBD -->
+    <!-- Setting - OBD -->
     <string name="settings_obd_settings">OBD Nastavení</string>
     <string name="settings_obd_enabled">Používat OBD zařízení</string>
     <string name="settings_obd_enabled_summary">Povolte nebo zakažte použit bluetooth OBD adaptéru</string>
@@ -92,7 +92,7 @@
     <string name="settings_network_settings">Nastavení sítě</string>
     <string name="settings_board_unit">Nastavení palubní jednotky</string>
 
-    <!-- Nastavení - OBD PIDs -->
+    <!-- Setting - OBD PIDs -->
     <string name="settings_obd_pids_title">OBD PID příkazy</string>
     <string name="settings_obd_pids_add">Přidat</string>
     <string name="settings_obd_edit_title_name">Název veličiny</string>
@@ -107,7 +107,7 @@
     <string name="settings_obd_edit_btn_save">Uložit</string>
     <string name="settings_obd_edit_btn_cancel">Zrušit</string>
 
-    <!-- Nastavení - Filter -->
+    <!-- Setting - Filter -->
     <string name="settings_filter_algorithm">Nastavení filtru</string>
     <string name="settings_filter_tag">Kód OBD příkazu</string>
     <string name="settings_filter_value">Hodnota ořezávání</string>
@@ -121,14 +121,19 @@
     <string name="settings_board_unit_name">Jméno palubní jednotky</string>
     <string name="settings_board_unit_secret_key">Heslo</string>
 
-    <!-- Nastavení - GPS -->
+    <!-- Setting - GPS -->
     <string name="settings_gps_settings">GPS Nastavení</string>
     <string name="settings_gps_enabled">Používat GPS</string>
     <string name="settings_gps_enabled_summary">Používat satelity GPS a zaznamenávat trasu jízdy</string>
 
+    <!-- Nastavení synchronise se serverem -->
+    <string name="settings_sync_with_server">Syncnhronizovat nastavení</string>
+    <string name="settings_sync_with_server_summary">Chcete synchornizovat nasvení OBD, filtrů a další se serverem?</string>
+
     <!-- Bluetooth nastavení (ADMIN) -->
     <string name="bt_no_device_1">Žádné spárované zařízení</string>
     <string name="bt_no_device_2">Adresa není k dispozici</string>
+
 
     <!-- ========== Dialogy =================================================================== -->
     <!-- ====================================================================================== -->
@@ -160,7 +165,7 @@
     <string name="menu_close">Uzavřít menu</string>
 
 
-    <string name="filter_settings_title">OBD Nastavení filtru</string>
+    <string name="filter_settings_title">Nastavení filtru</string>
 
 
 </resources>

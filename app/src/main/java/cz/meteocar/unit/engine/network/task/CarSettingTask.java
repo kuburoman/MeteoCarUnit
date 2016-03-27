@@ -1,18 +1,13 @@
 package cz.meteocar.unit.engine.network.task;
 
-import android.util.Log;
-
 import com.google.common.base.Converter;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.event.ErrorViewType;
-import cz.meteocar.unit.engine.event.NetworkErrorEvent;
-import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.network.ErrorCodes;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CarSettingDto;
@@ -21,11 +16,13 @@ import cz.meteocar.unit.engine.network.dto.GetCarSettingResponse;
 import cz.meteocar.unit.engine.network.task.converter.CarSettingsEntity2DtoConverter;
 import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
 import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
+import cz.meteocar.unit.engine.task.AbstractTask;
+import cz.meteocar.unit.engine.task.event.SyncWithServerChangedEvent;
 
 /**
  * Created by Nell on 20.3.2016.
  */
-public class CarSettingTask extends TimerTask {
+public class CarSettingTask extends AbstractTask {
 
     private NetworkConnector<Void, GetCarSettingResponse> getConnector = new NetworkConnector<>(Void.class, GetCarSettingResponse.class, "carSettings");
     private NetworkConnector<CreateCarSettingRequest, Void> postConnector = new NetworkConnector<>(CreateCarSettingRequest.class, Void.class, "carSettings");
@@ -36,7 +33,7 @@ public class CarSettingTask extends TimerTask {
     private static final Converter<CarSettingDto, CarSettingEntity> converterBackward = converterForward.reverse();
 
     @Override
-    public void run() {
+    public void runTask() {
         if (isNetworkReady()) {
             try {
                 List<CarSettingEntity> all = dao.getAll();
@@ -50,20 +47,19 @@ public class CarSettingTask extends TimerTask {
                 }
                 dao.deleteAll();
                 dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
+                postEvent(new SyncWithServerChangedEvent());
+
             } catch (NetworkException e) {
                 if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
                     try {
                         postConnector.post(new CreateCarSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
-                    } catch (NetworkException e1) {
-                        ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+                    } catch (NetworkException exception) {
+                        postNetworkException(exception);
                     }
                 }
-                ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+                postNetworkException(e);
             }
-        } else {
-            Log.d(AppLog.LOG_TAG_NETWORK, "CarSettingTask: network is offline");
         }
-
     }
 
     protected boolean isNetworkReady() {

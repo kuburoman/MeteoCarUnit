@@ -13,8 +13,8 @@ import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkService;
 import cz.meteocar.unit.engine.obd.OBDService;
-import cz.meteocar.unit.engine.storage.ConvertService;
 import cz.meteocar.unit.engine.storage.DatabaseService;
+import cz.meteocar.unit.engine.task.TaskManager;
 
 /**
  * Created by Toms, 2014.
@@ -26,13 +26,17 @@ public class ServiceManager {
 
     // singleton pattern
     private static final ServiceManager MY_SERVICE_MANAGER = new ServiceManager();
+
     public static ServiceManager getInstance() {
         return MY_SERVICE_MANAGER;
     }
 
     // kontext aplikace
     private Context context;
-    public Context getContext(){return context;}
+
+    public Context getContext() {
+        return context;
+    }
 
     // služby
     public ClockService clock;
@@ -41,7 +45,7 @@ public class ServiceManager {
     public DatabaseService db;
     public NetworkService network;
     public AccelerationService accel;
-    public ConvertService convert;
+    private TaskManager taskManager;
 
     // bus
     public MBassador<AppEvent> eventBus;
@@ -49,7 +53,7 @@ public class ServiceManager {
     /**
      * Inicializace manageru, start služeb
      */
-    public void init(Context baseContext){
+    public void init(Context baseContext) {
 
         // context
         context = baseContext;
@@ -64,13 +68,13 @@ public class ServiceManager {
         db = new DatabaseService(context);
         network = new NetworkService(context);
         accel = new AccelerationService(context);
-        convert = new ConvertService();
+        taskManager = new TaskManager();
     }
 
     /**
      * Bezpečně ukončí služby
      */
-    public void exitServices(){
+    public void exitServices() {
 
         // nastavíme všem službám ukončovací flag
         clock.exit();
@@ -80,30 +84,30 @@ public class ServiceManager {
         network.exit();
 
         // teď jen voláme na jejich vláknech joiny
-        try{
+        try {
             clock.join(500);
-        }catch(InterruptedException e){
-            Log.e(AppLog.LOG_TAG_DEFAULT, "Clock thread interrupted for calling join.",e);
+        } catch (InterruptedException e) {
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Clock thread interrupted for calling join.", e);
         }
-        try{
+        try {
             gps.join(500);
-        }catch(InterruptedException e){
-            Log.e(AppLog.LOG_TAG_DEFAULT, "GPS thread interrupted for calling join.",e);
+        } catch (InterruptedException e) {
+            Log.e(AppLog.LOG_TAG_DEFAULT, "GPS thread interrupted for calling join.", e);
         }
-        try{
+        try {
             obd.join(500);
-        }catch(InterruptedException e){
-            Log.e(AppLog.LOG_TAG_DEFAULT, "OBD thread interrupted for calling join.",e);
+        } catch (InterruptedException e) {
+            Log.e(AppLog.LOG_TAG_DEFAULT, "OBD thread interrupted for calling join.", e);
         }
-        try{
+        try {
             db.join(500);
-        }catch(InterruptedException e){
-            Log.e(AppLog.LOG_TAG_DEFAULT, "DB thread interrupted for calling join.",e);
+        } catch (InterruptedException e) {
+            Log.e(AppLog.LOG_TAG_DEFAULT, "DB thread interrupted for calling join.", e);
         }
-        try{
+        try {
             network.join(500);
-        }catch(InterruptedException e){
-            Log.e(AppLog.LOG_TAG_DEFAULT, "Network thread interrupted for calling join.",e);
+        } catch (InterruptedException e) {
+            Log.e(AppLog.LOG_TAG_DEFAULT, "Network thread interrupted for calling join.", e);
         }
 
         // nastavíme na null, pro jistotu
@@ -111,14 +115,13 @@ public class ServiceManager {
         obd = null;
         db = null;
         network = null;
-        convert = null;
 
     }
 
     /**
      * Ukončí služby i aplikaci
      */
-    public void exitApp(){
+    public void exitApp() {
         exitServices();
         System.exit(0);
     }

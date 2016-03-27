@@ -16,6 +16,7 @@ public class DB {
     private static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
     private static final String NETWORK_ADDRESS = "network_address";
     private static final String TRIP_ID = "trip_id";
+    private static final String SYNC_SWITCH = "sync_switch";
 
 
     // persistence key-value
@@ -75,4 +76,11 @@ public class DB {
         return get().getString(TRIP_ID, "s");
     }
 
+    public static void setSyncWithServer(boolean value) {
+        set().putBoolean(SYNC_SWITCH, value).commit();
+    }
+
+    public static boolean getSyncWithServer() {
+        return get().getBoolean(SYNC_SWITCH, false);
+    }
 }

@@ -8,34 +8,35 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TimerTask;
 
 import cz.meteocar.unit.engine.ServiceManager;
+import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
+import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
  * Created by Nell on 13.12.2015.
  */
-public class ConvertService extends TimerTask {
+public class RecordConvertTask extends AbstractTask {
 
     private RecordHelper recordHelper;
     private TripHelper tripHelper;
 
-    public ConvertService() {
+    public RecordConvertTask() {
         this(ServiceManager.getInstance().db.getRecordHelper(), ServiceManager.getInstance().db.getTripHelper());
     }
 
-    public ConvertService(RecordHelper recordHelper, TripHelper tripHelper) {
+    public RecordConvertTask(RecordHelper recordHelper, TripHelper tripHelper) {
         this.recordHelper = recordHelper;
         this.tripHelper = tripHelper;
     }
 
     @Override
-    public void run() {
+    public void runTask() {
         if (recordHelper.getNumberOfRecord(false) > 0) {
             createJsonRecords();
         }

@@ -33,7 +33,7 @@ import cz.meteocar.unit.engine.network.task.OBDPidsTask;
 import cz.meteocar.unit.engine.network.task.PostLoginTask;
 import cz.meteocar.unit.engine.network.task.PostTripTask;
 import cz.meteocar.unit.engine.obd.taks.DTCRequestTask;
-import cz.meteocar.unit.engine.storage.ConvertService;
+import cz.meteocar.unit.engine.storage.RecordConvertTask;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
@@ -84,22 +84,6 @@ public class NetworkService extends Thread {
         secretKey = "Ninjahash";
         start();
 
-        FilterSettingTask filterSettingTask = new FilterSettingTask();
-        ConvertService convertService = new ConvertService();
-        PostTripTask postTripTask = new PostTripTask();
-        OBDPidsTask obdPidsTask = new OBDPidsTask();
-        CarSettingTask carSettingTask = new CarSettingTask();
-        DTCRequestTask dtcRequestTask = new DTCRequestTask();
-        DTCTask dtcTask = new DTCTask();
-
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(10);
-        ScheduledFuture<?> scheduledFuture = service.scheduleAtFixedRate(postTripTask, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture2 = service.scheduleAtFixedRate(convertService, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture3 = service.scheduleAtFixedRate(filterSettingTask, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture4 = service.scheduleAtFixedRate(obdPidsTask, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture5 = service.scheduleAtFixedRate(carSettingTask, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture6 = service.scheduleAtFixedRate(dtcRequestTask, 0, 10, TimeUnit.SECONDS);
-        ScheduledFuture<?> scheduledFuture7 = service.scheduleAtFixedRate(dtcTask, 0, 10, TimeUnit.SECONDS);
     }
 
     public void loginUser(String username, String password) {
