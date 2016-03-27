@@ -109,7 +109,7 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onStart() {
         AppLog.i("TestFragment onStart");
-        UIManager.getInstance().showActionBarFor(UIManager.FRAGMENT_DASHBOARD);
+        UIManager.getInstance().showActionBarFor(UIManager.MENU_DASHBOARD);
 
         // nastavíme je do tachometrů
         speedGauge.setMinMax(0, 255);

@@ -217,6 +217,9 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     }
 
     protected List<String> getUserTrips(String userId) {
+        if (userId == null) {
+            return new ArrayList<>();
+        }
         SQLiteDatabase db = helper.getReadableDatabase();
         List<String> tripIds = new ArrayList<>();
         Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, null, null, null, null);

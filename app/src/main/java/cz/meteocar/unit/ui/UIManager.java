@@ -7,22 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.activity.LoginActivity;
 import cz.meteocar.unit.ui.activity.MenuActivity;
@@ -31,11 +24,10 @@ import cz.meteocar.unit.ui.activity.TripDetailActivity;
 import cz.meteocar.unit.ui.fragments.DashboardFragment;
 
 /**
- * Created by Toms, 2014.
+ * Manager for UI.
  */
 public class UIManager {
 
-    // verze
     public final String version = "1.9";
 
     // singleton pattern
@@ -51,62 +43,35 @@ public class UIManager {
     public static final int SPLASH_TIMEOUT = 1500;
 
     // kontext
-    Context appContext;
+    private Context appContext;
 
-    // aktivity
+    // activities
     private Activity splashScreen;
     private MenuActivity menuActivity;
-    private SettingsActivity settingsActivity;
+    private Fragment dashboardFragment;
 
-    // fragmenty - konstanty
-    public static final int FRAGMENT_DASHBOARD = 0;
-    public static final int FRAGMENT_TRIPS = 1;
-    public static final int FRAGMENT_EXIT = 2;
+    // Menu items
+    public static final int MENU_DASHBOARD = 1;
+    public static final int MENU_TRIPS = 2;
+    public static final int MENU_EXIT = 3;
 
-    //
-    public static final int DEFAULT_FRAGMENT = FRAGMENT_DASHBOARD;
+    public static final int DEFAULT_FRAGMENT = MENU_DASHBOARD;
 
-    // fragmenty - proměnné
-    private HashMap<Integer, Fragment> fragments = new HashMap();
     private int actualFragment = DEFAULT_FRAGMENT;
 
-    /**
-     * Byl UI manager již inicializován?
-     * - pokud ano splashScreen již nebude null
-     *
-     * @return True - pokud ano, False - pokud ne
-     */
-    public boolean isInitialized() {
-        return !(splashScreen == null);
-    }
 
     /**
-     * Nastaví úvodní obrazovku a kontext aplikace
+     * Sets default page and context.
      *
-     * @param splashAct Úvodní obrazovka, vstupní bod aplikace
+     * @param splashAct Entry view of application
      */
     public void setSplashScreenAndInit(Activity splashAct) {
 
-        // log
-        AppLog.i("\\-----------------------------------------------/");
-        AppLog.i(" AndroidCarTracker");
-        AppLog.i(" Time: " + ((DateFormat) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")).format(Calendar.getInstance().getTime()) + " (" + System.currentTimeMillis() + ")");
-        AppLog.i(" UI version: " + UIManager.getInstance().version);
-        AppLog.i(" Engine version: " + ServiceManager.getInstance().version);
-        AppLog.i("/-----------------------------------------------\\");
-
-        // nastavení úvodní aktivity a kontextu
         splashScreen = splashAct;
         appContext = splashScreen.getApplicationContext();
 
-        // vytvoří aktivity
-        //menuActivity = new MenuActivity();
-        //settingsActivity = new SettingsActivity();
-
-        // vytvoří fragmenty
         initFragments();
 
-        // nastaví timeout pro úvodní obrazovku
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -115,135 +80,92 @@ public class UIManager {
             }
         }, SPLASH_TIMEOUT);
 
-        // inicializuje manager služeb
         ServiceManager.getInstance().init(splashScreen.getBaseContext());
     }
 
     /**
-     * Akce po zkončení úvodní animace
-     * - provede inicializaci šlueb a kontrollerů
+     * Action after welcome animation ended.
+     * - initialise controllers
      */
     private void onSplashFinished() {
 
-        // inicializuje manager služeb
-        //ServiceManager.getInstance().init(splashScreen.getBaseContext());
-
-        // inic. kontrolery (musí být inic. až po službách)
         MasterController.getInstance().init();
 
-        // zkontrolujeme stav přihlášení uživatele
-        if (MasterController.getInstance().user.isLogged()) {
-
-            // je přihlášený, pokračujeme na dashboard
+        if (DB.getLoggedUser() != null) {
             showMenuActivity();
         } else {
-
-            // nepřihlášen, přihlásíme
             showLoginActivity();
         }
     }
 
     /**
-     * Naství instanci aktivity Menu
+     * Sets instance of menu activity
      *
-     * @param menuActivity
+     * @param menuActivity currecnt menu activity
      */
     public void setMenuActivity(MenuActivity menuActivity) {
         this.menuActivity = menuActivity;
     }
 
     /**
-     * Instanciuje fragmenty do hashmapy
+     * Initialize fragments.
      */
     private void initFragments() {
-        fragments.put(UIManager.FRAGMENT_DASHBOARD, new DashboardFragment());
+        dashboardFragment = new DashboardFragment();
     }
 
     /**
-     * Přepne zobrazení mezi úvodní obrazovkou a menu aktivitou
+     * Switch between login and menu activity.
      */
     public void showMenuActivity() {
-
-        //
-        AppLog.i(null, "AAAAAAAAAAAAAAAAAAA");
-
-        // vyvoláme aktivitu skrz intent
-        // - new task a clear top tagy from smazání navigačního backstacku
         Intent intent = new Intent(appContext, MenuActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP );
 
-        // animace
+        // animation
         Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.fadein, R.anim.fadeout).toBundle();
 
         appContext.startActivity(intent, options);
-
-        // animace
-        //((Activity)appContext).overridePendingTransition(R.anim.in, R.anim.out);
-        //splashScreen.finish();splashScreen.overridePendingTransition(R.anim.in, R.anim.out);
-
+        actualFragment = DEFAULT_FRAGMENT;
     }
 
     public void showTripsActivity() {
 
-        // vyvoláme aktivitu skrz intent
-        // - new task a clear top tagy from smazání navigačního backstacku
         Intent intent = new Intent(appContext, TripDetailActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        // animace
+        // animation
         Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.in, R.anim.out).toBundle();
 
         appContext.startActivity(intent, options);
-
-        // animace
-        //((Activity)appContext).overridePendingTransition(R.anim.in, R.anim.out);
-        //splashScreen.finish();splashScreen.overridePendingTransition(R.anim.in, R.anim.out);
-
     }
 
     /**
-     * Přepne zobrazení mezi úvodní obrazovkou a menu aktivitou
+     * Shows settings activity.
      */
     public void showSettingsActivity() {
-
-        // vyvoláme aktivitu skrz intent
-        // - new task a clear top tagy from smazání navigačního backstacku
         Intent intent = new Intent(appContext, SettingsActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        // animace
         Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.in, R.anim.out).toBundle();
-
         appContext.startActivity(intent, options);
-
-        // animace
-        //((Activity)appContext).overridePendingTransition(R.anim.in, R.anim.out);
-        //splashScreen.finish();splashScreen.overridePendingTransition(R.anim.in, R.anim.out);
-
     }
 
     /**
-     * Přepne zobrazení na přihlašovací obrazovku
+     * Shows login activity.
      */
     public void showLoginActivity() {
 
-        // nový intent (záměr) na spuštění aktivity
         Intent intent = new Intent(appContext, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        // animace
         Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.fadein, R.anim.fadeout).toBundle();
-
-        // nastartujeme
         appContext.startActivity(intent, options);
     }
 
     /**
-     * Informuje uživatele o restartu a provede jej
+     * Inform user about restart of application and does it.
      *
-     * @param ctx Kontext, který vyvolal restart (pro zobrazení dialogu)
+     * @param ctx that initialize application restart.
      */
     public void restartApp(Context ctx) {
         menuActivity.requestAppRestart(ctx);
@@ -251,15 +173,15 @@ public class UIManager {
 
 
     /**
-     * Nastaví režim plné obrazovky (FS)
+     * Sets full screen view.
      *
-     * @param act Aktivita, pro přepnutí do režimu FS
+     * @param act Activity to switch intu full mode.
      */
     public void setupFullscreen(Activity act) {
-        act.getWindow().setFlags(                               // flagy - nastaví typ okna FS
+        act.getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        act.getWindow().getDecorView().setSystemUiVisibility(   // nastavení UI dekorací
+        act.getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -267,70 +189,46 @@ public class UIManager {
     }
 
     /**
-     * Handler ozačení položky v menu
+     * Handler for menu item clicked.
      *
-     * @param position Pozice položky
-     * @return True pokud se má zavřít menu, false pokud ne
+     * @param position of item.
+     * @return true if menu shloud be closed.
      */
     public boolean onMenuItemSelected(int position, FragmentManager fragmentManager, Context ctx) {
-        AppLog.log(AppLog.LOG_MSG_INFO, "Položka vybrána: " + position);
-
-        if (position == FRAGMENT_TRIPS) {
+        if (position == MENU_TRIPS) {
             showTripsActivity();
             return true;
         }
 
-        // exit - není potřeba již nic měnit
-        if (position == FRAGMENT_EXIT) {
+        if (position == MENU_DASHBOARD) {
 
-            // máme aktivní trip?
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content_frame, dashboardFragment)
+                    .addToBackStack("fragment" + position)
+                    .commit();
+
+            actualFragment = position;
+            return true;
+        }
+
+        if (position == MENU_EXIT) {
             if (MasterController.getInstance().trip.isActive()) {
 
-                // nelze ukončit, zobrazíme hlášku
                 UIManager.getInstance().menuActivity.requestTripExit(ctx);
                 return true;
             }
 
             DB.setLoggedUser(null);
-
-            // ukončíme aplikaci
             this.showLoginActivity();
             return true;
         }
 
-        // ověříme, zda vůbec máme předpřipravený vybraný fragment v hashmapě
-        if (!fragments.containsKey(position)) {
-            AppLog.log(AppLog.LOG_MSG_PROBLEM, "selected fragment not found in hashmap");
-            try {
-                displayToast(appContext.getResources().getString(R.string.menu_no_such_fragment));
-            } catch (Exception e) {
-                Log.e(AppLog.LOG_TAG_DEFAULT, "Error when displaying toast", e);
-            }
-            return false;   // nebudeme zavírat menu
-        } else {
-            AppLog.log(AppLog.LOG_MSG_PROBLEM, "fragment OK");
-            //displayToast("Menu item selected: " + position);
-        }
-
-        // nový fragment
-        Fragment newFragment = fragments.get(position);
-
-        // transkace výměny fragmentů v menu aktivitě
-        fragmentManager
-                .beginTransaction()
-                .replace(R.id.content_frame, newFragment)
-                .addToBackStack("fragment" + position)
-                .commit();
-
-        // označíme nový fragment jako aktuální
-        actualFragment = position;
-
-        // true - označit položku v menu a zavřít jej
         return true;
     }
 
     /**
-     * Vrací ID aktuálního frgament / obrazovky
+     * Return id of active fragment.
      *
      * @return ID fragmentu
      */
@@ -339,48 +237,25 @@ public class UIManager {
     }
 
     /**
-     * Zobrazí v hlavní aktivitě action bar (s tlačítkem "menu")
-     * - tuto metodu volá fragment po zobrazení
-     * - předává své id pro aktualizaci aktuálního fragmentu při použití tlačítka zpět
-     * protože tím pádem nemá o přechodu UIManager žádnou jinou informaci
+     * Shows action bar in main activity with button menu.
      *
-     * @param whichFragment Fragment, který žádá o zobrazení (nastaví se jako aktuální)
+     * @param whichFragment request showing.
      */
     public void showActionBarFor(int whichFragment) {
-
-        // aktuální fragment
         if (whichFragment > -1) {
             actualFragment = whichFragment;
         }
 
-        // otevřeme
         menuActivity.showActionBar();
     }
 
     /**
-     * Zobrazení action baru
-     */
-    public void showActionBar() {
-        showActionBarFor(-1);
-    }
-
-
-    /**
-     * Vrátí hlavní "Menu" aktivitu
-     * - zapouzdření
+     * Return Menu activity.
      *
-     * @return menu aktivita
+     * @return {@link MenuActivity}.
      */
     public MenuActivity getMenuActivity() {
         return menuActivity;
     }
 
-    /**
-     * Zobrazí na despleji krátkou zprávu
-     *
-     * @param txt Text zprávy
-     */
-    public void displayToast(String txt) {
-        Toast.makeText(appContext, txt, Toast.LENGTH_LONG).show();
-    }
 }
