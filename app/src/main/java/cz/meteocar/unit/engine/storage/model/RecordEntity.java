@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.storage.model;
 
+import cz.meteocar.unit.engine.storage.simplify.DataPoint;
+
 /**
  * Record entity.
  */

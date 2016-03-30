@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.model.AbstractEntity;
 
 /**
@@ -26,14 +27,19 @@ public abstract class AbstractHelper<E extends AbstractEntity> {
      * @param entity to be saved.
      * @return id of entity.
      */
-    public abstract int save(E entity);
+    public abstract int save(E entity) throws DatabaseException;
 
-    public void saveAll(List<E> entities) {
+    public void saveAll(List<E> entities) throws DatabaseException {
         for (E entity : entities) {
             save(entity);
         }
     }
 
+    public void deleteAll(List<E> entities) {
+        for (E entity : entities) {
+            delete(entity.getId());
+        }
+    }
 
     /**
      * Inner save for new entity into database.
@@ -42,15 +48,26 @@ public abstract class AbstractHelper<E extends AbstractEntity> {
      * @param values ContentValues to be saved.
      * @return id of entity
      */
-    protected int innerSave(int id, ContentValues values) {
+    protected int innerSave(int id, ContentValues values) throws DatabaseException {
         SQLiteDatabase db = helper.getWritableDatabase();
 
         if (id > 0) {
             values.put(getColumnNameIdSQL(), id);
-            db.update(getTableNameSQL(), values, getColumnNameIdSQL() + " = ?", new String[]{String.valueOf(id)});
+            int result = db.update(getTableNameSQL(), values, getColumnNameIdSQL() + " = ?", new String[]{String.valueOf(id)});
+
+            // Update returns number of records affected. We are updating one row so result should be 1.
+            if (result != 1) {
+                throw new DatabaseException();
+            }
             return id;
         } else {
-            return (int) db.insert(getTableNameSQL(), null, values);
+            int result = (int) db.insert(getTableNameSQL(), null, values);
+
+            // If save fails insert will return -1
+            if (result == -1) {
+                throw new DatabaseException();
+            }
+            return result;
         }
     }
 

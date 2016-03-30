@@ -1,10 +1,12 @@
 package cz.meteocar.unit.controller;
 
 import android.content.Context;
+import android.util.Log;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 import cz.meteocar.unit.ui.UIManager;
 
@@ -219,7 +221,6 @@ public class UserController {
 
     /**
      * @param password Password of user
-     * @return True - if user exist and we set him as active. Otherwise false.
      */
     public void updateUser(String username, String password, boolean isAdmin) {
         UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username);
@@ -230,7 +231,11 @@ public class UserController {
         user.setPassword(password);
         user.setAdmin(isAdmin);
 
-        ServiceManager.getInstance().db.getUserHelper().save(user);
+        try {
+            ServiceManager.getInstance().db.getUserHelper().save(user);
+        } catch (DatabaseException e) {
+            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+        }
     }
 
     public boolean isUserAdmin(String username) {

@@ -24,6 +24,7 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
 import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
 import cz.meteocar.unit.engine.task.event.RescheduleTasksEvent;
@@ -164,12 +165,13 @@ public class CarSettingActivityHelper {
                         obj.setUpdateTime(System.currentTimeMillis());
 
                         // uložíme
-                        if (helper.save(obj) == 1) {
-                            dialog.dismiss();
-                        } else {
-                            AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
+                        try {
+                            helper.save(obj);
+                        } catch (DatabaseException e) {
+                            e.printStackTrace();
                         }
                         ServiceManager.getInstance().eventBus.post(new RescheduleTasksEvent()).asynchronously();
+                        dialog.dismiss();
                         createScreen();
 
                     }

@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
@@ -76,7 +77,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
     }
 
     @Override
-    public int save(ObdPidEntity entity) {
+    public int save(ObdPidEntity entity) throws DatabaseException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_NAME, entity.getName());
         values.put(COLUMN_NAME_TAG, entity.getTag());
@@ -109,26 +110,6 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
 
         cursor.close();
         return arr;
-    }
-
-    /**
-     * Adds copy of entity based on id with new name.
-     *
-     * @param id      ID of copied entity
-     * @param newName name of new entity
-     * @return ID of new entity
-     */
-    public int addOneByCopying(int id, String newName) {
-        ObdPidEntity obj = get(id);
-
-        if (obj == null) {
-            return -1;
-        }
-
-        obj.setId(-1);
-        obj.setActive(0);
-
-        return save(obj);
     }
 
     protected ObdPidEntity convert(Cursor cursor) {

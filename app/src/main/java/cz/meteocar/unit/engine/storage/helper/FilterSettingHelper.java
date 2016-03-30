@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 
@@ -57,7 +58,7 @@ public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
     }
 
     @Override
-    public int save(FilterSettingEntity obj) {
+    public int save(FilterSettingEntity obj) throws DatabaseException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_ALGORITHM, obj.getAlgorithm());
         values.put(COLUMN_NAME_TAG, obj.getTag());

@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,6 +21,7 @@ import java.util.List;
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
@@ -207,7 +209,11 @@ public class ObdPidSettingActivityHelper {
                             obj.setActive(active.isChecked() ? 1 : 0);
                         }
 
-                        obdPidHelper.save(obj);
+                        try {
+                            obdPidHelper.save(obj);
+                        } catch (DatabaseException e) {
+                            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                        }
                         dialog.dismiss();
                         createScreen();
                     }

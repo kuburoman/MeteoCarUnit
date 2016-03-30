@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.network.task;
 
+import android.util.Log;
+
 import com.google.common.base.Converter;
 import com.google.common.collect.Lists;
 
@@ -8,12 +10,14 @@ import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.CarSettingEnum;
+import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.ErrorCodes;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateFilterSettingRequest;
 import cz.meteocar.unit.engine.network.dto.FilterSettingDto;
 import cz.meteocar.unit.engine.network.dto.GetFilterSettingResponse;
 import cz.meteocar.unit.engine.network.task.converter.FilterSettingsEntity2DtoConverter;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.task.AbstractTask;
@@ -45,7 +49,11 @@ public class FilterSettingTask extends AbstractTask {
                     return;
                 }
                 dao.deleteAll();
-                dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
+                try {
+                    dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
+                } catch (DatabaseException e) {
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                }
             } catch (NetworkException e) {
                 if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
                     try {

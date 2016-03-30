@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.UserEntity;
 
@@ -53,7 +54,7 @@ public class UserHelper extends AbstractHelper<UserEntity> {
      * @return Number of affected rows
      */
     @Override
-    public int save(UserEntity obj) {
+    public int save(UserEntity obj) throws DatabaseException {
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_NAME_USERNAME, obj.getUsername());

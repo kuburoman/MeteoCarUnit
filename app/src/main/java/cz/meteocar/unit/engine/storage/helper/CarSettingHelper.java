@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
@@ -47,7 +48,7 @@ public class CarSettingHelper extends AbstractHelper<CarSettingEntity> {
     }
 
     @Override
-    public int save(CarSettingEntity obj) {
+    public int save(CarSettingEntity obj) throws DatabaseException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_CODE, obj.getCode());
         values.put(COLUMN_NAME_VALUE, obj.getValue());

@@ -27,6 +27,7 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.FilterEnum;
 import cz.meteocar.unit.engine.enums.NonObdFilterTagEnum;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
@@ -199,12 +200,12 @@ public class FilterSettingActivityHelper {
 
                         obj.setUpdateTime(System.currentTimeMillis());
 
-                        // uložíme
-                        if (filterSettingHelper.save(obj) == 1) {
-                            dialog.dismiss();
-                        } else {
-                            AppLog.p(AppLog.LOG_TAG_DB, "Problem while saving OBD PID form data, incorrect save result");
+                        try {
+                            filterSettingHelper.save(obj);
+                        } catch (DatabaseException e) {
+                            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
                         }
+                        dialog.dismiss();
                         createScreen();
 
                     }
@@ -214,7 +215,6 @@ public class FilterSettingActivityHelper {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
-                        // vymažeme
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         filterSettingHelper.delete(dialogDataID);
                         createScreen();

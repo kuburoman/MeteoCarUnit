@@ -68,7 +68,7 @@ public class DatabaseService extends Thread {
         obdPidHelper = new ObdPidHelper(helper);
         filterSettingHelper = new FilterSettingHelper(helper);
         carSettingHelper = new CarSettingHelper(helper);
-        recordHelper = new RecordHelper(helper, filterSettingHelper);
+        recordHelper = new RecordHelper(helper);
         dtcHelper = new DTCHelper(helper);
         // přihlášení k odběru dat ze service busu
         ServiceManager.getInstance().eventBus.subscribe(this);

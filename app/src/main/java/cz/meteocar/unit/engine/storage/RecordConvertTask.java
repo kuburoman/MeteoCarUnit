@@ -2,6 +2,8 @@ package cz.meteocar.unit.engine.storage;
 
 import android.util.Log;
 
+import com.google.common.collect.Lists;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -10,12 +12,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.CarSettingEnum;
+import cz.meteocar.unit.engine.convertor.DataPoint2RecordEntityConverter;
+import cz.meteocar.unit.engine.convertor.RecordEntity2DataPointConverter;
+import cz.meteocar.unit.engine.enums.FilterEnum;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
+import cz.meteocar.unit.engine.storage.helper.JsonTags;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
+import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
+import cz.meteocar.unit.engine.storage.simplify.DataPoint;
+import cz.meteocar.unit.engine.storage.simplify.PercentageSimplify;
+import cz.meteocar.unit.engine.storage.simplify.RDPSimplify;
 import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
@@ -23,16 +33,40 @@ import cz.meteocar.unit.engine.task.AbstractTask;
  */
 public class RecordConvertTask extends AbstractTask {
 
+    protected static final int NUMBER_OF_RECORDS_TO_SEND_TOGETHER = 100;
+
     private RecordHelper recordHelper;
     private TripHelper tripHelper;
+    private FilterSettingHelper filterSettingHelper;
+
+    private RecordEntity2DataPointConverter converterIntoPoint;
+    private DataPoint2RecordEntityConverter converterFromPoint;
+
+    private PercentageSimplify percentageSimplify;
+    private RDPSimplify rdpSimplify;
+
 
     public RecordConvertTask() {
-        this(ServiceManager.getInstance().db.getRecordHelper(), ServiceManager.getInstance().db.getTripHelper());
+        this(ServiceManager.getInstance().db.getRecordHelper(),
+                ServiceManager.getInstance().db.getTripHelper(),
+                ServiceManager.getInstance().db.getFilterSettingHelper(),
+                new RecordEntity2DataPointConverter(),
+                new DataPoint2RecordEntityConverter(),
+                new PercentageSimplify(),
+                new RDPSimplify()
+        );
     }
 
-    public RecordConvertTask(RecordHelper recordHelper, TripHelper tripHelper) {
+    public RecordConvertTask(RecordHelper recordHelper, TripHelper tripHelper, FilterSettingHelper filterSettingHelper,
+                             RecordEntity2DataPointConverter converterIntoPoint, DataPoint2RecordEntityConverter converterFromPoint,
+                             PercentageSimplify percentageSimplify, RDPSimplify rdpSimplify) {
         this.recordHelper = recordHelper;
         this.tripHelper = tripHelper;
+        this.filterSettingHelper = filterSettingHelper;
+        this.converterIntoPoint = converterIntoPoint;
+        this.converterFromPoint = converterFromPoint;
+        this.percentageSimplify = percentageSimplify;
+        this.rdpSimplify = rdpSimplify;
     }
 
     @Override
@@ -53,18 +87,18 @@ public class RecordConvertTask extends AbstractTask {
             JSONObject object = new JSONObject();
 
             JSONObject value = new JSONObject(recordEntity.getJson());
-            object.put("json", value);
-            object.put("code", recordEntity.getType());
-            object.put("time", recordEntity.getTime());
+            object.put(JsonTags.JSON, value);
+            object.put(JsonTags.CODE, recordEntity.getType());
+            object.put(JsonTags.TIME, recordEntity.getTime());
 
             jsonArray.put(object);
         }
 
 
         JSONObject main = new JSONObject();
-        main.put("trip", tripId);
-        main.put("user", userName);
-        main.put("records", jsonArray);
+        main.put(JsonTags.TRIP, tripId);
+        main.put(JsonTags.USER, userName);
+        main.put(JsonTags.RECORDS, jsonArray);
 
         return main;
     }
@@ -76,28 +110,68 @@ public class RecordConvertTask extends AbstractTask {
                 recordHelper.deleteUserNullRecords();
                 continue;
             }
-            List<RecordEntity> entityList = recordHelper.getByUserId(userId, 100, false);
-            if (entityList.size() < 1) {
-                break;
+            List<String> types = recordHelper.getRecordsDistinctTypesForUser(userId);
+
+            for (String type : types) {
+                List<RecordEntity> records = recordHelper.getByUserIdAndType(userId, type, false);
+                List<RecordEntity> simplifiedRecords = simplifyRecords(type, records);
+                deleteRemovedRecords(records, simplifiedRecords);
+                try {
+                    convertRecordsIntoTrip(simplifiedRecords, NUMBER_OF_RECORDS_TO_SEND_TOGETHER);
+                } catch (DatabaseException | JSONException e) {
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                    return;
+                }
             }
-
-            JSONObject jsonTrip = new JSONObject();
-            try {
-                jsonTrip = createJsonTrip(entityList);
-            } catch (JSONException e) {
-                Log.e(AppLog.LOG_TAG_DEFAULT, "Cannot convert trip", e);
-                e.printStackTrace();
-            }
-
-            tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
-
-            List<Integer> integers = new ArrayList<>();
-            for (RecordEntity recordEntity : entityList) {
-                integers.add(recordEntity.getId());
-            }
-
-            recordHelper.updateProcessed(integers, true);
-            Log.d(AppLog.LOG_TAG_DB, "Successful creation of trip");
         }
+    }
+
+    protected void convertRecordsIntoTrip(List<RecordEntity> inputList, int partitionSize) throws DatabaseException, JSONException {
+        List<List<RecordEntity>> partitions = Lists.partition(inputList, partitionSize);
+        for (List<RecordEntity> partition : partitions) {
+            processPartition(partition);
+        }
+    }
+
+    protected void processPartition(List<RecordEntity> partition) throws JSONException, DatabaseException {
+
+        JSONObject jsonTrip = createJsonTrip(partition);
+        tripHelper.save(new TripEntity(-1, jsonTrip.toString()));
+
+        List<Integer> integers = new ArrayList<>();
+        for (RecordEntity recordEntity : partition) {
+            integers.add(recordEntity.getId());
+        }
+
+        recordHelper.updateProcessed(integers, true);
+    }
+
+    protected void deleteRemovedRecords(List<RecordEntity> fullList, List<RecordEntity> simplifiedList) {
+        fullList.removeAll(simplifiedList);
+        recordHelper.deleteAll(fullList);
+    }
+
+    protected List<RecordEntity> simplifyRecords(String type, List<RecordEntity> input) {
+        FilterSettingEntity filter = filterSettingHelper.getByCode(type);
+        if (filter == null) {
+            return input;
+        }
+        if (!filter.isActive()) {
+            return input;
+        }
+
+        List<DataPoint> dataPoints = converterIntoPoint.convertList(input);
+
+        if (FilterEnum.PERCENTAGE.toString().equals(filter.getAlgorithm())) {
+            List<DataPoint> simplified = percentageSimplify.simplify(dataPoints, filter.getValue());
+            return converterFromPoint.convertList(simplified);
+        }
+
+        if (FilterEnum.RDP.toString().equals(filter.getAlgorithm())) {
+            return converterFromPoint.convertList(rdpSimplify.simplify(dataPoints, filter.getValue()));
+        }
+
+
+        return input;
     }
 }

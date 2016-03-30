@@ -20,10 +20,10 @@ import cz.meteocar.unit.engine.event.EventType;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.TripDetailVO;
 import cz.meteocar.unit.engine.storage.helper.filter.AccelerationVO;
-import cz.meteocar.unit.engine.storage.helper.filter.Filter;
 import cz.meteocar.unit.engine.storage.model.RecordEntity;
 
 /**
@@ -55,25 +55,27 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
 
     public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
 
-    private Filter filter;
-
-    public RecordHelper(DatabaseHelper helper, FilterSettingHelper filterSettingHelper) {
+    public RecordHelper(DatabaseHelper helper) {
         super(helper);
-        this.filter = new Filter(filterSettingHelper, this);
     }
 
     @Override
     public int save(RecordEntity obj) {
-        ContentValues values = new ContentValues();
+        try {
+            ContentValues values = new ContentValues();
 
-        values.put(COLUMN_NAME_TIME, obj.getTime());
-        values.put(COLUMN_NAME_TYPE, obj.getType());
-        values.put(COLUMN_NAME_USER_ID, obj.getUserName());
-        values.put(COLUMN_NAME_TRIP_ID, obj.getTripId());
-        values.put(COLUMN_NAME_JSON, obj.getJson());
-        values.put(COLUMN_NAME_PROCESSED, obj.isProcessed());
+            values.put(COLUMN_NAME_TIME, obj.getTime());
+            values.put(COLUMN_NAME_TYPE, obj.getType());
+            values.put(COLUMN_NAME_USER_ID, obj.getUserName());
+            values.put(COLUMN_NAME_TRIP_ID, obj.getTripId());
+            values.put(COLUMN_NAME_JSON, obj.getJson());
+            values.put(COLUMN_NAME_PROCESSED, obj.isProcessed());
 
-        return this.innerSave(obj.getId(), values);
+            return this.innerSave(obj.getId(), values);
+        } catch (DatabaseException exception) {
+            Log.e(AppLog.LOG_TAG_DB, exception.getMessage(), exception.getCause());
+            return -1;
+        }
     }
 
     /**
@@ -90,6 +92,32 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         SQLiteDatabase db = helper.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USER_ID + " = ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{userId, processed ? "1" : "0"}, null, null, null, String.valueOf(maxNumberOfRecords));
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                arr.add(convert(cursor));
+                cursor.moveToNext();
+            }
+        }
+
+        cursor.close();
+        return arr;
+    }
+
+    /**
+     * Return List of entities based on user Id and type of record.
+     *
+     * @param userId    id of user
+     * @param type      type of record that we want.
+     * @param processed if record was prepared for sending on server.
+     * @return List of {@link RecordEntity}
+     */
+    public List<RecordEntity> getByUserIdAndType(String userId, String type, boolean processed) {
+        List<RecordEntity> arr = new ArrayList<>();
+
+        SQLiteDatabase db = helper.getReadableDatabase();
+
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USER_ID + " = ? and " + COLUMN_NAME_TYPE + " =  ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{userId, type, processed ? "1" : "0"}, null, null, null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -275,6 +303,21 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         return userIds;
     }
 
+    public List<String> getRecordsDistinctTypesForUser(String userId) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        List<String> userIds = new ArrayList<>();
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TYPE}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, COLUMN_NAME_TYPE, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                userIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return userIds;
+    }
+
     public void deleteUserNullRecords() {
         SQLiteDatabase db = helper.getReadableDatabase();
         db.delete(getTableNameSQL(), COLUMN_NAME_USER_ID + " is NULL OR trim(" + COLUMN_NAME_USER_ID + ") = ''", null);
@@ -343,9 +386,9 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         obj.setType(RecordTypeEnum.TYPE_ACCEL.getValue());
 
         try {
-            jsonObj.put("x", accelEvent.getX());
-            jsonObj.put("y", accelEvent.getY());
-            jsonObj.put("z", accelEvent.getZ());
+            jsonObj.put(JsonTags.ACCELERATION_X, accelEvent.getX());
+            jsonObj.put(JsonTags.ACCELERATION_Y, accelEvent.getY());
+            jsonObj.put(JsonTags.ACCELERATION_Z, accelEvent.getZ());
         } catch (Exception e) {
             Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
         }
@@ -367,10 +410,10 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         double m = 1000000.0;
         double k = 1000.0;
         try {
-            jsonObj.put("lat", m * loc.getLatitude());
-            jsonObj.put("lng", m * loc.getLongitude());
-            jsonObj.put("alt", loc.getAltitude());
-            jsonObj.put("acc", loc.getAccuracy());
+            jsonObj.put(JsonTags.GPS_LAT, m * loc.getLatitude());
+            jsonObj.put(JsonTags.GPS_LNG, m * loc.getLongitude());
+            jsonObj.put(JsonTags.GPS_ALT, loc.getAltitude());
+            jsonObj.put(JsonTags.GPS_ACC, loc.getAccuracy());
             // TODO - Až bude přidaná rychlost odkomentovat
             //  jsonObj.put("speed", 3.6 * loc.getSpeed());
         } catch (Exception e) {
@@ -392,7 +435,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         JSONObject jsonObj = new JSONObject();
 
         try {
-            jsonObj.put("value", ((OBDPidEvent) evt).getValue());
+            jsonObj.put(JsonTags.OTHER_VALUE, ((OBDPidEvent) evt).getValue());
         } catch (Exception e) {
             Log.e(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
         }

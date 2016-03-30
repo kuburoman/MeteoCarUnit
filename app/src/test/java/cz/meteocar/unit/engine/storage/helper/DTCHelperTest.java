@@ -12,6 +12,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.model.DTCEntity;
 
 import static junit.framework.Assert.assertNotNull;
@@ -43,7 +44,7 @@ public class DTCHelperTest {
     private DTCHelper helper = new DTCHelper(null);
 
     @Test
-    public void testSave() {
+    public void testSave() throws DatabaseException {
         ContentValues contentValues = mock(ContentValues.class);
         doReturn(contentValues).when(helper).newContentValues();
         doReturn(0).when(helper).innerSave(any(Integer.class), any(ContentValues.class));

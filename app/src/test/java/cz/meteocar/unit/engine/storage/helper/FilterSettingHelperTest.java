@@ -11,6 +11,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
+
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -41,7 +43,7 @@ public class FilterSettingHelperTest {
     }
 
     @Test
-    public void testInnerSave() {
+    public void testInnerSave() throws DatabaseException {
         long saveId = 7L;
         when(helper.getWritableDatabase()).thenReturn(database);
         int id = filterSettingHelper.innerSave((int) saveId, values);
@@ -51,7 +53,7 @@ public class FilterSettingHelperTest {
     }
 
     @Test
-    public void testInnerUpdate() {
+    public void testInnerUpdate() throws DatabaseException {
         long saveId = -1L;
         when(helper.getWritableDatabase()).thenReturn(database);
         when(database.insert(TABLE_NAME, null, values)).thenReturn(saveId);

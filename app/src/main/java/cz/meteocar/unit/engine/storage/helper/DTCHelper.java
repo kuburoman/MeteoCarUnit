@@ -10,6 +10,7 @@ import java.util.List;
 
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.DTCEntity;
 
@@ -49,7 +50,11 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         values.put(COLUMN_NAME_DTC_CODE, obj.getDtcCode());
         values.put(COLUMN_NAME_TRIP_ID, obj.getTripId());
         values.put(COLUMN_NAME_POSTED, obj.isPosted());
-        return this.innerSave(obj.getId(), values);
+        try {
+            return this.innerSave(obj.getId(), values);
+        } catch (DatabaseException e) {
+            return -1;
+        }
     }
 
 

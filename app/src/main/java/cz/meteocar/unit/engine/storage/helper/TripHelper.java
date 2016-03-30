@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
 
@@ -37,7 +38,7 @@ public class TripHelper extends AbstractHelper<TripEntity> {
      * @return id of entity
      */
     @Override
-    public int save(TripEntity obj) {
+    public int save(TripEntity obj) throws DatabaseException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_JSON, obj.getJson());
 
