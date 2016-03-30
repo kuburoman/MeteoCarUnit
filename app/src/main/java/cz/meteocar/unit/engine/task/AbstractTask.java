@@ -24,7 +24,7 @@ public abstract class AbstractTask extends TimerTask {
         try {
             runTask();
         } catch (Exception e) {
-            Log.e(AppLog.LOG_TAG_DEFAULT, e.getMessage(), e.getCause());
+            Log.e(AppLog.LOG_TAG_DEFAULT, e.getMessage(), e);
         }
     }
 

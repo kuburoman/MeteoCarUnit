@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.ErrorCodes;
 import cz.meteocar.unit.engine.network.NetworkException;
@@ -23,7 +22,7 @@ import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
- * Created by Nell on 20.3.2016.
+ * Task for synchronization with server.
  */
 public class FilterSettingTask extends AbstractTask {
 
@@ -52,9 +51,10 @@ public class FilterSettingTask extends AbstractTask {
                 try {
                     dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
                 } catch (DatabaseException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                 }
             } catch (NetworkException e) {
+                Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                 if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
                     try {
                         postConnector.post(new CreateFilterSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));

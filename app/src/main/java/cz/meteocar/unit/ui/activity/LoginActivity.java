@@ -30,9 +30,9 @@ public class LoginActivity extends Activity {
 
     private AlertDialog dialogWarning;
 
-    private static String username;
-    private static String password;
-    private static Boolean goToSettings;
+    private String username;
+    private String password;
+    private Boolean goToSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

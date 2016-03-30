@@ -134,6 +134,7 @@ public class OBDMessageResolver {
         try {
             outStream.write(byteMsg);
         } catch (IOException e) {
+            Log.e(AppLog.LOG_TAG_OBD, e.getMessage(), e);
             return false;
         }
         return true;

@@ -53,10 +53,6 @@ public class MenuActivity extends Activity {
     private View actionBarView;
     private BitmapDrawable actionBarBg;
 
-    //
-    private TextView syncTextView;
-    private String syncTextViewBaseText;
-
     /**
      * Handler nového "záměru" otevření aktivity, využito pro animaci
      *
@@ -354,10 +350,11 @@ public class MenuActivity extends Activity {
     }
 
     /**
-     * Připraví hlavní menu
+     * Prepares main menu
      *
-     * @param menu
-     * @return
+     * @param menu to be prepared
+     * @return You must return true for the menu to be displayed;
+     *         if you return false it will not be shown.
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -365,17 +362,13 @@ public class MenuActivity extends Activity {
     }
 
     /**
-     * Handler událostí menu
-     * - volá se při údálostech vysouvacího i normální menu (normální tu naštěstí nemáme)
+     * Handler of menu event
      *
-     * @param item Označená položka
-     * @return Vrací false pro volání dalších handlerů, true pokud se událost bude řešit pouze zde
+     * @param item selected item in menu
+     * @return True if it is item from menu.
      */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
-        // jedná se o položku menu?
-        // - pokus ano, nemusíme dále zpracovávat
         if (menuToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -393,7 +386,7 @@ public class MenuActivity extends Activity {
      * Handler vytvoření nebo (zejména) obnovení View
      * Synchoronizuje Toggle objekt a aktuálním stavem menu
      *
-     * @param savedInstanceState
+     * @param savedInstanceState instance
      */
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -450,15 +443,9 @@ public class MenuActivity extends Activity {
             return;
         }
 
-        // GPS offline - tady se zeptáme uživatele
-        /*if(ServiceManager.getInstance().gps.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE){
-            gpsDialog.show();
-        }*/
         boolean gpsState = ServiceManager.getInstance().gps.isHardwareEnabled();
-        //AppLog.i(AppLog.LOG_TAG_UI, "GPS State for dialog: "+gpsState);
 
         if (!gpsState && !gpsDialogShowing) {
-            //AppLog.i(AppLog.LOG_TAG_UI, "Will show GPS HW dialog");
             if (!gpsDialog.isShowing()) {
                 gpsDialogShowing = true;
                 gpsDialog.show();
@@ -479,7 +466,6 @@ public class MenuActivity extends Activity {
         txt.setText(Html.fromHtml(getResources().getString(R.string.dialog_gps_html)));
         int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
         txt.setPadding(padding, padding, padding, 0);
-        //txt.setTextSize(padding);
 
         // uděláme builder, nastavíme text a titulek
         AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
@@ -508,10 +494,6 @@ public class MenuActivity extends Activity {
                         DB.set().putBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false).commit();
                         MasterController.getInstance().user.updateGPSstate();
 
-                        // vyžádáme si odeslání GPS stavu
-                        //ServiceManager.getInstance().gps.updateStatus();
-                        //AppLog.i("GPS status after OFF: "+ServiceManager.getInstance().gps.getStatus());
-
                         // vyžádáme si restart
                         UIManager.getInstance().restartApp(MenuActivity.this);
 
@@ -533,18 +515,7 @@ public class MenuActivity extends Activity {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                }).setNeutralButton(R.string.dialog_trip_exit_off, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                MasterController.getInstance().trip.stopTrip();
-                ServiceManager.getInstance().exitApp();
-                try {
-                    super.finalize();
-                } catch (Throwable e) {
-                    Log.e(AppLog.LOG_TAG_DEFAULT, "Error when exiting application", e);
-                }
-            }
-        }).setNegativeButton(R.string.dialog_trip_exit_exit, new DialogInterface.OnClickListener() {
+                }).setNegativeButton(R.string.dialog_trip_exit_exit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 MasterController.getInstance().trip.stopTrip();
@@ -565,22 +536,19 @@ public class MenuActivity extends Activity {
                 .setPositiveButton(R.string.dialog_restart_btn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //dialog.dismiss();
 
-                        // kontext a intent ID
-                        Context context = ctx; //getApplicationContext();
                         int intentID = 10123;
 
                         // vytvoříme intent na spuštění vstupní aktivity (splash screen)
-                        Intent splashActivity = new Intent(context, SplashActivity.class);
+                        Intent splashActivity = new Intent(ctx, SplashActivity.class);
                         PendingIntent mPendingIntent = PendingIntent.getActivity(
-                                context, intentID, splashActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+                                ctx, intentID, splashActivity, PendingIntent.FLAG_CANCEL_CURRENT);
 
                         // ukončíme všechny služby
                         ServiceManager.getInstance().exitServices();
 
                         // nastavíme opětovné spuštění a ukončíme
-                        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        AlarmManager mgr = (AlarmManager) ctx.getSystemService(Context.ALARM_SERVICE);
                         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
                         System.exit(0);
 

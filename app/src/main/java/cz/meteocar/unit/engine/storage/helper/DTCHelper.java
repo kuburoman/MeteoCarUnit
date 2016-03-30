@@ -53,6 +53,7 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         try {
             return this.innerSave(obj.getId(), values);
         } catch (DatabaseException e) {
+            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
             return -1;
         }
     }

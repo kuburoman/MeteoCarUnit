@@ -51,9 +51,10 @@ public class OBDPidsTask extends AbstractTask {
                 try {
                     dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
                 } catch (DatabaseException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                 }
             } catch (NetworkException e) {
+                Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
                 if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
                     try {
                         postConnector.post(new CreateOBDPidRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));

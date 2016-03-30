@@ -154,7 +154,7 @@ public class DashboardFragment extends Fragment {
 
     @Handler
     public void handleGPSStatus(GPSStatusEvent msg) {
-        if ((msg.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE) |
+        if ((msg.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE) ||
                 (msg.getStatus() == ServiceGPS.STATUS_NO_HARDWARE)) {
             gpsText.setText("GPS OFF");
         }
@@ -184,12 +184,12 @@ public class DashboardFragment extends Fragment {
      */
     @Handler
     public void handleOBDStatus(OBDStatusEvent msg) {
-        if ((msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED) |
+        if ((msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED) ||
                 (msg.getStatusCode() == OBDService.OBD_STATE_NOT_CONNECTED)) {
             obdText.setText("OBD SEARCH");
             isOBD = false;
         }
-        if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTING) |
+        if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTING) ||
                 (msg.getStatusCode() == OBDService.OBD_STATE_RECONNECTING)) {
             obdText.setText("OBD CONN");
             isOBD = false;

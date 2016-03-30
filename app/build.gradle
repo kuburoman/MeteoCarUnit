@@ -34,6 +34,7 @@ apply plugin: 'sonar-runner'
 sonarRunner {
     sonarProperties {
         property "sonar.host.url", "http://localhost:9000" // Address of Sonar server
+        property "sonar.java.source", "7"
         property "sonar.sources", "src/main/java" // Sources
         property "sonar.projectName", "Meteocar" // Name of your project
         property "sonar.projectVersion", "1.0.2" // Version of your project

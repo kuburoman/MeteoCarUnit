@@ -234,7 +234,7 @@ public class UserController {
         try {
             ServiceManager.getInstance().db.getUserHelper().save(user);
         } catch (DatabaseException e) {
-            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
         }
     }
 

@@ -207,7 +207,8 @@ public class SettingsActivity extends PreferenceActivity
         // získáme spárovaná BT zařízení
         Set<BluetoothDevice> devicesBT = ServiceManager.getInstance().obd.getBluetoothDevices();
         if (devicesBT == null) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices NULL");
+            Log.d(AppLog.LOG_TAG_OBD, "No bluetooth devices were found.");
+            return;
         }
         CharSequence[] entries = new CharSequence[devicesBT.size()];
         CharSequence[] entryValues = new CharSequence[devicesBT.size()];

@@ -43,7 +43,7 @@ public class PercentageSimplify {
             it.remove();
             next = it.next();
 
-            if (curr.getValueY() != prev.getValueY()) {
+            if (Math.abs(curr.getValueY() - prev.getValueY()) < 0.000001) {
                 double currTime = next.getValueX() - curr.getValueX();
                 double prevTime = curr.getValueX() - prev.getValueX();
                 prev.setValueY((((prev.getValueY() * prevTime) + (curr.getValueY() * currTime)) / (currTime + prevTime)));

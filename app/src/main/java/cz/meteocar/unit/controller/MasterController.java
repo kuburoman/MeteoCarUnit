@@ -30,10 +30,6 @@ public class MasterController {
      */
     public void init(){
 
-        // zde nemůžeme inicializovat trip kontroller, potřebuje tlačítko
-        //trip.init();
-
-        // init user ctrlr
         user.init();
     }
 }

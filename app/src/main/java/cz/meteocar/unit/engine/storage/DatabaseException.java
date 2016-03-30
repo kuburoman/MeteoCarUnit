@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.storage;
 
 /**
- * Created by Nell on 30.3.2016.
+ * Database exception
  */
 public class DatabaseException extends Exception {
 }

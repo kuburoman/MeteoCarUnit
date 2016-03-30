@@ -53,7 +53,7 @@ public class CarSettingTask extends AbstractTask {
                 try {
                     dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
                 } catch (DatabaseException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                 }
                 postEvent(new SyncWithServerChangedEvent());
 

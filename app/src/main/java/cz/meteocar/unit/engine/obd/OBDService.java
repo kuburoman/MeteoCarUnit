@@ -40,7 +40,7 @@ public class OBDService extends Thread {
     public static final int OBD_STATE_RECONNECTING = 3;
     public static final int OBD_STATE_CONNECTED = 4;
     public static final int OBD_STATE_ERROR = 5;
-    public static final String[] OBD_STATE_TEXTS = new String[]{
+    protected static final String[] OBD_STATE_TEXTS = new String[]{
             "OBD_STATE_NOT_INITIALIZED",
             "OBD_STATE_NOT_CONNECTED",
             "OBD_STATE_CONNECTING",
@@ -54,7 +54,7 @@ public class OBDService extends Thread {
     public static final int OBD_ERROR_ADAPTER_ENABLE_FAILED = 2;
     public static final int OBD_ERROR_NO_DEVICE = 3;
     public static final int OBD_ERROR_DEV_INIT_FAILED = 4;
-    public static final String[] OBD_ERROR_TEXTS = new String[]{
+    protected static final String[] OBD_ERROR_TEXTS = new String[]{
             "OBD_ERROR_ALL_OK",
             "OBD_ERROR_NO_ADAPTER",
             "OBD_ERROR_ADAPTER_ENABLE_FAILED",

@@ -64,7 +64,7 @@ public class NetworkConnector<IN, OUT> {
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage());
+            Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
         }
         return getData(post);
     }
@@ -117,6 +117,7 @@ public class NetworkConnector<IN, OUT> {
             }
 
         } catch (IOException | IllegalArgumentException e) {
+            Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
             throw new NetworkException(new ErrorResponse("ERROR", e.getMessage()));
         }
     }

@@ -119,7 +119,7 @@ public class RecordConvertTask extends AbstractTask {
                 try {
                     convertRecordsIntoTrip(simplifiedRecords, NUMBER_OF_RECORDS_TO_SEND_TOGETHER);
                 } catch (DatabaseException | JSONException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                     return;
                 }
             }

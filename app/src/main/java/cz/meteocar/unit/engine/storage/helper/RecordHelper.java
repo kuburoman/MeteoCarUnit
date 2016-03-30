@@ -73,7 +73,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
 
             return this.innerSave(obj.getId(), values);
         } catch (DatabaseException exception) {
-            Log.e(AppLog.LOG_TAG_DB, exception.getMessage(), exception.getCause());
+            Log.e(AppLog.LOG_TAG_DB, exception.getMessage(), exception);
             return -1;
         }
     }
@@ -390,7 +390,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
             jsonObj.put(JsonTags.ACCELERATION_Y, accelEvent.getY());
             jsonObj.put(JsonTags.ACCELERATION_Z, accelEvent.getZ());
         } catch (Exception e) {
-            Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object");
+            Log.d(AppLog.LOG_TAG_DB, "Exception while adding OBD event data to JSON object", e);
         }
 
         obj.setJson(jsonObj.toString());

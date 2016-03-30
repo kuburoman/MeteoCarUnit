@@ -203,7 +203,7 @@ public class FilterSettingActivityHelper {
                         try {
                             filterSettingHelper.save(obj);
                         } catch (DatabaseException e) {
-                            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e.getCause());
+                            Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                         }
                         dialog.dismiss();
                         createScreen();

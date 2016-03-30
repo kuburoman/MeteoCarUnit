@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.graphics.Color;
 import android.preference.Preference;
 import android.preference.PreferenceScreen;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -168,7 +169,7 @@ public class CarSettingActivityHelper {
                         try {
                             helper.save(obj);
                         } catch (DatabaseException e) {
-                            e.printStackTrace();
+                            Log.e(AppLog.LOG_TAG_UI, e.getMessage(), e);
                         }
                         ServiceManager.getInstance().eventBus.post(new RescheduleTasksEvent()).asynchronously();
                         dialog.dismiss();
@@ -181,8 +182,6 @@ public class CarSettingActivityHelper {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
-                        // vymažeme
-                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         helper.delete(dialogDataID);
                         ServiceManager.getInstance().eventBus.post(new RescheduleTasksEvent()).asynchronously();
                         createScreen();

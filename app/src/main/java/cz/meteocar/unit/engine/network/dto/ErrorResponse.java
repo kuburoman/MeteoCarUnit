@@ -1,9 +1,13 @@
 package cz.meteocar.unit.engine.network.dto;
 
+import java.io.Serializable;
+
 /**
- * Created by Nell on 28.2.2016.
+ * Error response from server.
  */
-public class ErrorResponse {
+public class ErrorResponse implements Serializable {
+
+    private static final long serialVersionUID = 12145315135431L;
 
     private String code;
     private String message;

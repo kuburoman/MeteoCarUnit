@@ -1,10 +1,12 @@
 package cz.meteocar.unit.engine.network.task;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.event.ErrorViewType;
 import cz.meteocar.unit.engine.event.NetworkErrorEvent;
+import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.LoginRequest;
 import cz.meteocar.unit.engine.network.dto.LoginResponse;
@@ -27,6 +29,7 @@ public class PostLoginTask extends AsyncTask<LoginRequest, Void, Void> {
             LoginResponse response = networkConnector.post(params[0]);
             ServiceManager.getInstance().eventBus.post(new LoginEvent(response)).asynchronously();
         } catch (NetworkException e) {
+            Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
             ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.LOGIN)).asynchronously();
         }
         return null;
