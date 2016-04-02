@@ -459,23 +459,7 @@ public class OBDService extends Thread {
         // status - nepřipojeno
         setStatusAndFireEvent(OBD_STATE_NOT_CONNECTED);
 
-        // otevře spojení
-        threadRun = connect();
-        if (threadRun) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "AppConnected OK");
-        } else {
-            AppLog.p(AppLog.LOG_TAG_OBD, "Connection FAILED");
-            threadFinalized = true;
-            return;
-        }
-
-        //zahajovací sekvence
-        if (sendInitialOBDSequence()) {
-            setStatusAndFireEvent(OBD_STATE_CONNECTED);
-        }
-
-        // připravíme OBD PID dotazy
-        initPIDQueue();
+        reconnectNeeded = true;
 
         // hlavní cyklus
         while (threadRun) {
@@ -487,15 +471,16 @@ public class OBDService extends Thread {
                     // nastavíme status
                     setStatusAndFireEvent(OBD_STATE_RECONNECTING);
 
-                    //zahajovací sekvence
-                    if (sendInitialOBDSequence()) {
-
-                        // připojení v pořádku
+                    reconnectNeeded = !connect();
+                    if (!reconnectNeeded && sendInitialOBDSequence()) {
+                        AppLog.i(AppLog.LOG_TAG_OBD, "AppConnected OK");
                         setStatusAndFireEvent(OBD_STATE_CONNECTED);
-                        reconnectNeeded = false;
 
+                        // připravíme OBD PID dotazy
+                        initPIDQueue();
                     } else {
                         this.sleep(1000);
+                        reconnectNeeded = true;
                         continue;
                     }
                 }
@@ -510,6 +495,11 @@ public class OBDService extends Thread {
                     if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
+                        if (!"03".equals(msg.getCommand())) {
+                            disconnectAndCleanup();
+                            reconnectNeeded = true;
+                            break;
+                        }
                         // NO DATA response can be caused by request on DTC (03)
                         AppLog.i(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");
                         firePIDEvent(msg, -5.0, msgResolver.getLastResponse());
