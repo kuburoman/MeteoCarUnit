@@ -27,10 +27,7 @@ android {
         unitTests.returnDefaultValues = true
     }
 }
-
-
 apply plugin: 'sonar-runner'
-
 sonarRunner {
     sonarProperties {
         property "sonar.host.url", "http://localhost:9000" // Address of Sonar server
@@ -46,9 +43,6 @@ sonarRunner {
 
     }
 }
-
-
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile files('libs/mbassador-1.2.0.jar')
@@ -70,13 +64,10 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
 }
-
 apply plugin: 'jacoco'
-
 jacoco {
     version "0.7.1.201405082137"
 }
-
 task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
     group = "Reporting"
     description = "Generate Jacoco coverage reports after running tests."
