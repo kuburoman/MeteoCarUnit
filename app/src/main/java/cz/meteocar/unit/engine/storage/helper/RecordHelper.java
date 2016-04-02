@@ -306,7 +306,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     public List<String> getRecordsDistinctTypesForUser(String userId) {
         SQLiteDatabase db = helper.getReadableDatabase();
         List<String> userIds = new ArrayList<>();
-        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TYPE}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, COLUMN_NAME_TYPE, null, null, null);
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_USER_ID}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, COLUMN_NAME_TYPE, null, null, null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
