@@ -13,6 +13,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import cz.meteocar.unit.engine.storage.DatabaseException;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -46,6 +48,7 @@ public class FilterSettingHelperTest {
     public void testInnerSave() throws DatabaseException {
         long saveId = 7L;
         when(helper.getWritableDatabase()).thenReturn(database);
+        when(database.update(any(String.class), any(ContentValues.class), any(String.class), any(String[].class))).thenReturn(1);
         int id = filterSettingHelper.innerSave((int) saveId, values);
         Assert.assertEquals((int) saveId, id);
 
@@ -56,9 +59,9 @@ public class FilterSettingHelperTest {
     public void testInnerUpdate() throws DatabaseException {
         long saveId = -1L;
         when(helper.getWritableDatabase()).thenReturn(database);
-        when(database.insert(TABLE_NAME, null, values)).thenReturn(saveId);
+        when(database.insert(TABLE_NAME, null, values)).thenReturn(1L);
         int id = filterSettingHelper.innerSave(-1, values);
-        Assert.assertEquals((int) saveId, id);
+        Assert.assertEquals(1L, id);
 
         verify(database).insert(TABLE_NAME, null, values);
     }

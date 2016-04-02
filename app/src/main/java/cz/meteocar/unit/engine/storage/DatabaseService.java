@@ -70,7 +70,8 @@ public class DatabaseService extends Thread {
         carSettingHelper = new CarSettingHelper(helper);
         recordHelper = new RecordHelper(helper);
         dtcHelper = new DTCHelper(helper);
-        // přihlášení k odběru dat ze service busu
+
+
         ServiceManager.getInstance().eventBus.subscribe(this);
 
         // inicializujeme stav zaznamenávání jízdy

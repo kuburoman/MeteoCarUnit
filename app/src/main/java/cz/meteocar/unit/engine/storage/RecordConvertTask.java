@@ -154,10 +154,10 @@ public class RecordConvertTask extends AbstractTask {
     protected List<RecordEntity> simplifyRecords(String type, List<RecordEntity> input) {
         FilterSettingEntity filter = filterSettingHelper.getByCode(type);
         if (filter == null) {
-            return input;
+            return new ArrayList<>(input);
         }
         if (!filter.isActive()) {
-            return input;
+            return new ArrayList<>(input);
         }
 
         List<DataPoint> dataPoints = converterIntoPoint.convertList(input);
@@ -170,8 +170,6 @@ public class RecordConvertTask extends AbstractTask {
         if (FilterEnum.RDP.toString().equals(filter.getAlgorithm())) {
             return converterFromPoint.convertList(rdpSimplify.simplify(dataPoints, filter.getValue()));
         }
-
-
-        return input;
+        return new ArrayList<>(input);
     }
 }
