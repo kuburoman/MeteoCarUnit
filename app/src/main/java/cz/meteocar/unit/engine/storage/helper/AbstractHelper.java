@@ -9,6 +9,7 @@ import java.util.List;
 
 import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.model.AbstractEntity;
+import cz.meteocar.unit.engine.storage.model.DTCEntity;
 
 /**
  * Abstract helper for working with database.
@@ -156,6 +157,23 @@ public abstract class AbstractHelper<E extends AbstractEntity> {
         cursor.close();
 
         return cnt;
+    }
+
+    public List<E> convertArray(Cursor cursor) {
+        List<E> arr = new ArrayList<>();
+        try {
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    arr.add(convert(cursor));
+                    cursor.moveToNext();
+                }
+            }
+            return arr;
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 
     protected abstract E convert(Cursor cursor);

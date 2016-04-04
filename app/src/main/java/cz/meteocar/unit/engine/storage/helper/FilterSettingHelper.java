@@ -77,7 +77,7 @@ public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
     public FilterSettingEntity getByCode(String code) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_ALGORITHM + " = ?", new String[]{code}, null, null, null);
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TAG + " = ?", new String[]{code}, null, null, null);
 
         try {
             if (cursor.getCount() > 0) {

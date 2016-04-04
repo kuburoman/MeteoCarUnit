@@ -19,12 +19,12 @@ import cz.meteocar.unit.engine.storage.model.DTCEntity;
  */
 public class DTCHelper extends AbstractHelper<DTCEntity> {
 
-    private static final String TABLE_NAME = "dtc_messages";
-    private static final String COLUMN_NAME_ID = "id";
-    private static final String COLUMN_NAME_TIME = "time";
-    private static final String COLUMN_NAME_TRIP_ID = "trip_id";
-    private static final String COLUMN_NAME_DTC_CODE = "dtc_code";
-    private static final String COLUMN_NAME_POSTED = "posted";
+    protected static final String TABLE_NAME = "dtc_messages";
+    protected static final String COLUMN_NAME_ID = "id";
+    protected static final String COLUMN_NAME_TIME = "time";
+    protected static final String COLUMN_NAME_TRIP_ID = "trip_id";
+    protected static final String COLUMN_NAME_DTC_CODE = "dtc_code";
+    protected static final String COLUMN_NAME_POSTED = "posted";
 
     public static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_NAME + " (" +
@@ -77,7 +77,7 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
             array[i] = String.valueOf(id.get(i));
         }
 
-        ContentValues values = new ContentValues();
+        ContentValues values = newContentValues();
         values.put(COLUMN_NAME_POSTED, posted);
 
         SQLiteDatabase db = helper.getReadableDatabase();
@@ -211,20 +211,7 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_POSTED + " = ?", new String[]{!posted ? "0" : "1"}, null, null, null, String.valueOf(maxRecords));
 
-        List<DTCEntity> arr = new ArrayList<>();
-        try {
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
-                    arr.add(convert(cursor));
-                    cursor.moveToNext();
-                }
-            }
-            return arr;
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return convertArray(cursor);
     }
 
     /**

@@ -57,7 +57,7 @@ public class RDPSimplify {
 
         double sqTolerance = tolerance * tolerance;
 
-        points = simplifyDouglasPeucker((DataPoint[]) points.toArray(), sqTolerance);
+        points = simplifyDouglasPeucker(points.toArray(new DataPoint[points.size()]), sqTolerance);
 
         return points;
     }

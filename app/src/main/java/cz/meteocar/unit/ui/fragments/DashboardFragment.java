@@ -15,6 +15,7 @@ import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.clock.event.TimeEvent;
+import cz.meteocar.unit.engine.event.DebugMessageEvent;
 import cz.meteocar.unit.engine.event.ErrorViewType;
 import cz.meteocar.unit.engine.event.NetworkErrorEvent;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
@@ -101,6 +102,16 @@ public class DashboardFragment extends Fragment {
                 }
             });
         }
+    }
+
+    @Handler
+    public void handleDebugEvent(final DebugMessageEvent evt) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getActivity(), evt.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     /**

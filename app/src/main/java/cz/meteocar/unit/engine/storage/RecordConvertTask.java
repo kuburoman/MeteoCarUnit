@@ -15,6 +15,7 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.convertor.DataPoint2RecordEntityConverter;
 import cz.meteocar.unit.engine.convertor.RecordEntity2DataPointConverter;
 import cz.meteocar.unit.engine.enums.FilterEnum;
+import cz.meteocar.unit.engine.event.DebugMessageEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.JsonTags;
@@ -38,6 +39,7 @@ public class RecordConvertTask extends AbstractTask {
     private RecordHelper recordHelper;
     private TripHelper tripHelper;
     private FilterSettingHelper filterSettingHelper;
+    private String debugMessage;
 
     private RecordEntity2DataPointConverter converterIntoPoint;
     private DataPoint2RecordEntityConverter converterFromPoint;
@@ -112,9 +114,12 @@ public class RecordConvertTask extends AbstractTask {
             }
             List<String> types = recordHelper.getRecordsDistinctTypesForUser(userId);
 
+            debugMessage = "user: " + userId + "\n";
+
             for (String type : types) {
                 List<RecordEntity> records = recordHelper.getByUserIdAndType(userId, type, false);
                 List<RecordEntity> simplifiedRecords = simplifyRecords(type, records);
+                debugMessage += type + ": " + simplifiedRecords.size() + "/" + records.size() + "\n";
                 deleteRemovedRecords(records, simplifiedRecords);
                 try {
                     convertRecordsIntoTrip(simplifiedRecords, NUMBER_OF_RECORDS_TO_SEND_TOGETHER);
@@ -123,6 +128,10 @@ public class RecordConvertTask extends AbstractTask {
                     return;
                 }
             }
+
+            ServiceManager.getInstance().eventBus.post(
+                    new DebugMessageEvent(debugMessage)
+            ).asynchronously();
         }
     }
 

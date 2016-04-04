@@ -16,17 +16,23 @@ public class PostTripTask extends AbstractTask {
 
     @Override
     public void runTask() {
-        while (tripHelper.getNumberOfRecord() > 0) {
-            TripEntity oneTrip = tripHelper.getOneTrip();
-            try {
-                networkConnector.post(oneTrip.getJson());
-                tripHelper.delete(oneTrip.getId());
-            } catch (NetworkException e) {
-                postNetworkException(e);
-                break;
-            }
+        if (isNetworkReady()) {
+            while (tripHelper.getNumberOfRecord() > 0) {
+                TripEntity oneTrip = tripHelper.getOneTrip();
+                try {
+                    networkConnector.post(oneTrip.getJson());
+                    tripHelper.delete(oneTrip.getId());
+                } catch (NetworkException e) {
+                    postNetworkException(e);
+                    break;
+                }
 
+            }
         }
+    }
+
+    protected boolean isNetworkReady() {
+        return ServiceManager.getInstance().network.isOnline();
     }
 
 }
