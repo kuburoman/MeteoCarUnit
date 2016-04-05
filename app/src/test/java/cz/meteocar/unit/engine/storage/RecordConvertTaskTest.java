@@ -93,47 +93,31 @@ public class RecordConvertTaskTest {
     }
 
     @Test
-    public void testCreateJsonRecordsNullUserId() {
-        List<String> list = new ArrayList<>();
-        list.add(null);
-        when(recordHelper.getUserIdStored()).thenReturn(list);
-
-        convertService.createJsonRecords();
-
-        verify(convertService).createJsonRecords();
-        verify(recordHelper).getUserIdStored();
-        verify(recordHelper).deleteUserNullRecords();
-        verifyNoMoreInteractions(convertService);
-        verifyNoMoreInteractions(recordHelper);
-
-    }
-
-    @Test
     public void testCreateJsonRecordsSuccessful() throws DatabaseException, JSONException {
-        List<String> users = new ArrayList<>();
-        users.add("user");
-        when(recordHelper.getUserIdStored()).thenReturn(users);
+        List<String> trips = new ArrayList<>();
+        trips.add("user154455");
+        when(recordHelper.getDistinctTrips(false)).thenReturn(trips);
 
         List<String> types = new ArrayList<>();
         types.add("types");
-        when(recordHelper.getRecordsDistinctTypesForUser("user")).thenReturn(types);
+        when(recordHelper.getRecordsDistinctTypesForTrip("user154455")).thenReturn(types);
 
 
         List<RecordEntity> records = new ArrayList<>();
         records.add(new RecordEntity());
-        when(recordHelper.getByUserIdAndType("user", "types", false)).thenReturn(records);
+        when(recordHelper.getByTripIdAndType("user", "types", false)).thenReturn(records);
 
         doReturn(records).when(convertService).simplifyRecords("types", records);
         doNothing().when(convertService).convertRecordsIntoTrip(records, RecordConvertTask.NUMBER_OF_RECORDS_TO_SEND_TOGETHER);
         doNothing().when(convertService).deleteRemovedRecords(records, records);
-
+        doNothing().when(convertService).postDebugMessage(any(String.class));
 
         convertService.createJsonRecords();
 
 
-        verify(recordHelper).getUserIdStored();
-        verify(recordHelper).getRecordsDistinctTypesForUser("user");
-        verify(recordHelper).getByUserIdAndType("user", "types", false);
+        verify(recordHelper).getDistinctTrips(false);
+        verify(recordHelper).getRecordsDistinctTypesForTrip("user154455");
+        verify(recordHelper).getByTripIdAndType("user154455", "types", false);
         verifyNoMoreInteractions(recordHelper);
         verify(convertService).createJsonRecords();
         verify(convertService).simplifyRecords("types", records);
@@ -145,18 +129,18 @@ public class RecordConvertTaskTest {
     @Test
     public void testCreateJsonRecordsException() throws DatabaseException, JSONException {
         List<String> users = new ArrayList<>();
-        users.add("user");
-        users.add("user2");
-        when(recordHelper.getUserIdStored()).thenReturn(users);
+        users.add("user154455");
+        users.add("user154477");
+        when(recordHelper.getDistinctTrips(false)).thenReturn(users);
 
         List<String> types = new ArrayList<>();
         types.add("types");
-        when(recordHelper.getRecordsDistinctTypesForUser("user")).thenReturn(types);
+        when(recordHelper.getRecordsDistinctTypesForTrip("user154455")).thenReturn(types);
 
 
         List<RecordEntity> records = new ArrayList<>();
         records.add(new RecordEntity());
-        when(recordHelper.getByUserIdAndType("user", "types", false)).thenReturn(records);
+        when(recordHelper.getByTripIdAndType("user154455", "types", false)).thenReturn(records);
         doNothing().when(convertService).deleteRemovedRecords(records, records);
 
         doReturn(records).when(convertService).simplifyRecords("types", records);
@@ -166,9 +150,9 @@ public class RecordConvertTaskTest {
         convertService.createJsonRecords();
 
 
-        verify(recordHelper, times(1)).getUserIdStored();
-        verify(recordHelper, times(1)).getRecordsDistinctTypesForUser("user");
-        verify(recordHelper, times(1)).getByUserIdAndType("user", "types", false);
+        verify(recordHelper, times(1)).getDistinctTrips(false);
+        verify(recordHelper, times(1)).getRecordsDistinctTypesForTrip("user154455");
+        verify(recordHelper, times(1)).getByTripIdAndType("user154455", "types", false);
         verifyNoMoreInteractions(recordHelper);
         verify(convertService, times(1)).createJsonRecords();
         verify(convertService, times(1)).simplifyRecords("types", records);

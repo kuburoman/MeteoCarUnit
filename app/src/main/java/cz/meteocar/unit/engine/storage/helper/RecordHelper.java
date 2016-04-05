@@ -79,55 +79,19 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     }
 
     /**
-     * Return List of entities based on userid.
+     * Return List of entities based on trip Id and type of record.
      *
-     * @param userId             id of user
-     * @param maxNumberOfRecords number of maximum records
-     * @param processed
-     * @return List of {@link RecordEntity}
-     */
-    public List<RecordEntity> getByUserId(String userId, int maxNumberOfRecords, boolean processed) {
-        List<RecordEntity> arr = new ArrayList<>();
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USER_ID + " = ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{userId, processed ? "1" : "0"}, null, null, null, String.valueOf(maxNumberOfRecords));
-
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                arr.add(convert(cursor));
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        return arr;
-    }
-
-    /**
-     * Return List of entities based on user Id and type of record.
-     *
-     * @param userId    id of user
+     * @param tripId    id of trip
      * @param type      type of record that we want.
      * @param processed if record was prepared for sending on server.
      * @return List of {@link RecordEntity}
      */
-    public List<RecordEntity> getByUserIdAndType(String userId, String type, boolean processed) {
-        List<RecordEntity> arr = new ArrayList<>();
-
+    public List<RecordEntity> getByTripIdAndType(String tripId, String type, boolean processed) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USER_ID + " = ? and " + COLUMN_NAME_TYPE + " =  ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{userId, type, processed ? "1" : "0"}, null, null, null);
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ? and " + COLUMN_NAME_TYPE + " =  ? and " + COLUMN_NAME_PROCESSED + " = ?", new String[]{tripId, type, processed ? "1" : "0"}, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                arr.add(convert(cursor));
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        return arr;
+        return convertArray(cursor);
     }
 
     /**
@@ -303,10 +267,30 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         return userIds;
     }
 
-    public List<String> getRecordsDistinctTypesForUser(String userId) {
+    /**
+     * Return list of Users that have records stored in database/
+     *
+     * @return id of users.
+     */
+    public List<String> getDistinctTrips(boolean processed) {
         SQLiteDatabase db = helper.getReadableDatabase();
         List<String> userIds = new ArrayList<>();
-        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TYPE}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, COLUMN_NAME_TYPE, null, null, null);
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_PROCESSED + " = ?", new String[]{processed ? "1" : "0"}, COLUMN_NAME_TRIP_ID, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                userIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
+                cursor.moveToNext();
+            }
+        }
+        cursor.close();
+        return userIds;
+    }
+
+    public List<String> getRecordsDistinctTypesForTrip(String tripId) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        List<String> userIds = new ArrayList<>();
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TYPE}, COLUMN_NAME_TRIP_ID + " = ?", new String[]{tripId}, COLUMN_NAME_TYPE, null, null, null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -408,14 +392,11 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         }
 
         double m = 1000000.0;
-        double k = 1000.0;
         try {
             jsonObj.put(JsonTags.GPS_LAT, m * loc.getLatitude());
             jsonObj.put(JsonTags.GPS_LNG, m * loc.getLongitude());
             jsonObj.put(JsonTags.GPS_ALT, loc.getAltitude());
             jsonObj.put(JsonTags.GPS_ACC, loc.getAccuracy());
-            // TODO - Až bude přidaná rychlost odkomentovat
-            //  jsonObj.put("speed", 3.6 * loc.getSpeed());
         } catch (Exception e) {
             Log.e(AppLog.LOG_TAG_DB, "Exception while adding GPS event data to JSON object", e);
         }

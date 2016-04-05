@@ -106,18 +106,14 @@ public class RecordConvertTask extends AbstractTask {
     }
 
     protected void createJsonRecords() {
-        List<String> userIds = recordHelper.getUserIdStored();
-        for (String userId : userIds) {
-            if (userId == null) {
-                recordHelper.deleteUserNullRecords();
-                continue;
-            }
-            List<String> types = recordHelper.getRecordsDistinctTypesForUser(userId);
+        List<String> trips = recordHelper.getDistinctTrips(false);
+        for (String trip : trips) {
+            List<String> types = recordHelper.getRecordsDistinctTypesForTrip(trip);
 
-            debugMessage = "user: " + userId + "\n";
+            debugMessage = "trip: " + trip + "\n";
 
             for (String type : types) {
-                List<RecordEntity> records = recordHelper.getByUserIdAndType(userId, type, false);
+                List<RecordEntity> records = recordHelper.getByTripIdAndType(trip, type, false);
                 List<RecordEntity> simplifiedRecords = simplifyRecords(type, records);
                 debugMessage += type + ": " + simplifiedRecords.size() + "/" + records.size() + "\n";
                 deleteRemovedRecords(records, simplifiedRecords);
@@ -128,11 +124,15 @@ public class RecordConvertTask extends AbstractTask {
                     return;
                 }
             }
-
-            ServiceManager.getInstance().eventBus.post(
-                    new DebugMessageEvent(debugMessage)
-            ).asynchronously();
+            postDebugMessage(debugMessage);
         }
+    }
+
+    protected void postDebugMessage(String debugMessage) {
+
+        ServiceManager.getInstance().eventBus.post(
+                new DebugMessageEvent(debugMessage)
+        ).asynchronously();
     }
 
     protected void convertRecordsIntoTrip(List<RecordEntity> inputList, int partitionSize) throws DatabaseException, JSONException {
