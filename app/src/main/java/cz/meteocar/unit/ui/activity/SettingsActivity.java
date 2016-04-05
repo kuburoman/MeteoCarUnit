@@ -45,6 +45,7 @@ public class SettingsActivity extends PreferenceActivity
     public static final String CHECKBOX_SYNC_WITH_SERVER = "checkbox_sync_with_server";
     public static final String BOARD_UNIT_SETTING_CAT = "board_unit_setting_category";
     public static final String CAR_SETTINGS = "car_settings";
+    public static final String CHECKBOX_SHOW_FILTER_RESULT = "checkbox_show_filter_result";
 
 
     private ListPreference obdList;
@@ -53,6 +54,7 @@ public class SettingsActivity extends PreferenceActivity
     private EditTextPreference networkEditText;
 
     private CheckBoxPreference syncWithServer;
+    private CheckBoxPreference showFilterResult;
 
     private FilterSettingActivityHelper filterDialog;
     private ObdPidSettingActivityHelper obdPidDialog;
@@ -104,6 +106,9 @@ public class SettingsActivity extends PreferenceActivity
 
         syncWithServer = (CheckBoxPreference) findPreference(CHECKBOX_SYNC_WITH_SERVER);
         syncWithServer.setChecked(DB.getSyncWithServer());
+
+        showFilterResult = (CheckBoxPreference) findPreference(CHECKBOX_SHOW_FILTER_RESULT);
+        showFilterResult.setChecked(DB.getShowFilterResults());
 
         // načteme do listu obd zařízení data, pokud je OBD povoleno, jinak zakážeme
         if (obdEnabled) {
@@ -304,6 +309,11 @@ public class SettingsActivity extends PreferenceActivity
         if (key.equals(NETWORK_ADDRESS)) {
             String value = sharedPreferences.getString(key, "http://meteocar.herokuapp.com");
             DB.setNetworkAddress(value);
+        }
+
+        if (key.equals(CHECKBOX_SHOW_FILTER_RESULT)) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, false);
+            DB.setShowFilterResults(isEnabled);
         }
     }
 }

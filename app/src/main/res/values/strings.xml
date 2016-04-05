@@ -140,6 +140,9 @@
     <string name="settings_sync_with_server">Synchronizovat nastavení</string>
     <string name="settings_sync_with_server_summary">Chcete synchornizovat nasvení OBD, filtrů a další se serverem?</string>
 
+    <string name="settings_show_filter_result">Zobrazovat výsledky filtrování</string>
+    <string name="settings_show_filter_result_summary">Chcete zobrazovat výsledky filtrování?</string>
+
     <!-- Bluetooth nastavení (ADMIN) -->
     <string name="bt_no_device_1">Žádné spárované zařízení</string>
     <string name="bt_no_device_2">Adresa není k dispozici</string>

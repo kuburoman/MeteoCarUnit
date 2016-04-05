@@ -129,10 +129,11 @@ public class RecordConvertTask extends AbstractTask {
     }
 
     protected void postDebugMessage(String debugMessage) {
-
-        ServiceManager.getInstance().eventBus.post(
-                new DebugMessageEvent(debugMessage)
-        ).asynchronously();
+        if (DB.getShowFilterResults()) {
+            ServiceManager.getInstance().eventBus.post(
+                    new DebugMessageEvent(debugMessage)
+            ).asynchronously();
+        }
     }
 
     protected void convertRecordsIntoTrip(List<RecordEntity> inputList, int partitionSize) throws DatabaseException, JSONException {

@@ -17,6 +17,7 @@ public class DB {
     private static final String NETWORK_ADDRESS = "network_address";
     private static final String TRIP_ID = "trip_id";
     private static final String SYNC_SWITCH = "sync_switch";
+    private static final String SHOW_FILTER_RESULT = "show_filter_result";
 
 
     // persistence key-value
@@ -82,5 +83,13 @@ public class DB {
 
     public static boolean getSyncWithServer() {
         return get().getBoolean(SYNC_SWITCH, false);
+    }
+
+    public static void setShowFilterResults(boolean value) {
+        set().putBoolean(SHOW_FILTER_RESULT, value).commit();
+    }
+
+    public static boolean getShowFilterResults() {
+        return get().getBoolean(SHOW_FILTER_RESULT, false);
     }
 }

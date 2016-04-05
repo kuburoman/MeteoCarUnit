@@ -44,7 +44,7 @@ public class FilterSettingActivityHelper {
 
     private View dialogView;
     private Context context;
-    private AlertDialog dialog;
+    private AlertDialog alertDialog;
     private PreferenceScreen cat;
     private int dialogDataID = 0;
 
@@ -145,7 +145,7 @@ public class FilterSettingActivityHelper {
         }
 
 
-        dialog.show();
+        alertDialog.show();
     }
 
     /**
@@ -157,21 +157,32 @@ public class FilterSettingActivityHelper {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getResources().getString(R.string.settings_obd_edit_window_title));
         builder.setView(dialogView);
+        builder.setPositiveButton(R.string.settings_obd_edit_btn_cancel, null);
+        builder.setNeutralButton(R.string.settings_obd_edit_btn_save, null);
+        builder.setNegativeButton(R.string.settings_obd_edit_btn_delete, null);
+        builder.setCancelable(true);
+        alertDialog = builder.create();
 
-        dialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+
+                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
                     }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                });
+
+
+                Button neutralButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                neutralButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
+                    public void onClick(View view) {
                         // připravíme si objekt
                         FilterSettingEntity obj = new FilterSettingEntity();
 
@@ -210,23 +221,25 @@ public class FilterSettingActivityHelper {
                         } catch (DatabaseException e) {
                             Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                         }
-                        dialog.dismiss();
+                        alertDialog.dismiss();
                         createScreen();
-
                     }
-                }).setNegativeButton(R.string.settings_obd_edit_btn_delete, new DialogInterface.OnClickListener() {
+                });
+
+                Button negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                negativeButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
 
                         AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         filterSettingHelper.delete(dialogDataID);
                         createScreen();
-
-
                     }
-                }).setCancelable(true).create();
+                });
+            }
+        });
     }
 
 

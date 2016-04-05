@@ -49,6 +49,13 @@
             android:title="Adresa serveru" />
     </PreferenceScreen>
 
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:icon="@null"
+        android:key="checkbox_show_filter_result"
+        android:summary="@string/settings_show_filter_result_summary"
+        android:title="@string/settings_show_filter_result" />
+
     <PreferenceScreen
         android:icon="@null"
         android:key="button_network_category"
