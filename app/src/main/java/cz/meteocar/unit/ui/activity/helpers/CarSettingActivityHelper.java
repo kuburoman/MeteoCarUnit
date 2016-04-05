@@ -240,7 +240,7 @@ public class CarSettingActivityHelper {
 
         layout.addView(btn);
         TextView txt = new TextView(context);
-        txt.setText(context.getResources().getString(R.string.settings_obd_pids_title));
+        txt.setText(context.getResources().getString(R.string.settings_car_title));
         txt.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         txt.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));

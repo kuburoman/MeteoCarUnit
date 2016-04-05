@@ -108,6 +108,7 @@
     <string name="settings_obd_edit_btn_cancel">Zrušit</string>
 
     <!-- Setting - Filter -->
+    <string name="settings_filter_title">Nastavení filtrů</string>
     <string name="settings_filter_algorithm">Nastavení filtru</string>
     <string name="settings_filter_tag">Kód OBD příkazu</string>
     <string name="settings_filter_value">Hodnota ořezávání</string>
@@ -136,7 +137,7 @@
     <string name="settings_gps_enabled_summary">Používat satelity GPS a zaznamenávat trasu jízdy</string>
 
     <!-- Nastavení synchronise se serverem -->
-    <string name="settings_sync_with_server">Syncnhronizovat nastavení</string>
+    <string name="settings_sync_with_server">Synchronizovat nastavení</string>
     <string name="settings_sync_with_server_summary">Chcete synchornizovat nasvení OBD, filtrů a další se serverem?</string>
 
     <!-- Bluetooth nastavení (ADMIN) -->

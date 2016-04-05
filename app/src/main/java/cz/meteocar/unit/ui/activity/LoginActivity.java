@@ -121,8 +121,14 @@ public class LoginActivity extends Activity {
         if (goToSettings) {
             if (evt.getResponse().getIsAdmin() || validateBoardUnit(username, password)) {
                 UIManager.getInstance().showSettingsActivity();
-                return;
+            } else {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        showWarningDialog("Only user with admin role can go into settings.");
+                    }
+                });
             }
+            return;
         }
 
 
@@ -140,7 +146,6 @@ public class LoginActivity extends Activity {
         if (ErrorViewType.LOGIN.equals(evt.getView())) {
             runOnUiThread(new Runnable() {
                 public void run() {
-//                    Toast.makeText(LoginActivity.this, evt.getErrorResponse().getMessage(), Toast.LENGTH_SHORT).show();
                     showWarningDialog(evt.getErrorResponse().getMessage());
                 }
             });

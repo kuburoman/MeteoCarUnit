@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.util.ArrayList;
@@ -170,7 +171,6 @@ public class FilterSettingActivityHelper {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
 
                         // připravíme si objekt
                         FilterSettingEntity obj = new FilterSettingEntity();
@@ -184,9 +184,14 @@ public class FilterSettingActivityHelper {
                         }
 
                         Spinner tag = (Spinner) dialogView.findViewById(R.id.dialog_filter_tag_edit);
+                        if ("".equals(tag.getSelectedItem().toString())) {
+                            Toast.makeText(context, "Tag value cannot be empty.", Toast.LENGTH_LONG).show();
+                            return;
+                        }
                         if (tag != null) {
                             obj.setTag(tag.getSelectedItem().toString());
                         }
+
 
                         EditText roundingDecimal = (EditText) dialogView.findViewById(R.id.dialog_filter_value_edit);
                         if (roundingDecimal != null) {
@@ -279,7 +284,7 @@ public class FilterSettingActivityHelper {
 
         layout.addView(btn);
         TextView txt = new TextView(context);
-        txt.setText(context.getResources().getString(R.string.settings_obd_pids_title));
+        txt.setText(context.getResources().getString(R.string.settings_filter_title));
         txt.setTextAppearance(context, android.R.style.TextAppearance_Medium);
         txt.setLayoutParams(new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));

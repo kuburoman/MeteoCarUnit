@@ -47,7 +47,9 @@ public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
                     "(2, 'RDP', 'obd_rpm'        , '1.0', '1', '1451602800000')," +
                     "(3, 'RDP', 'obd_throttle'   , '1.0', '1', '1451602800000')," +
                     "(4, 'RDP', 'obd_engine_temp', '1.0', '1', '1451602800000')," +
-                    "(5, 'RDP', 'obf_airflow'    , '1.0', '1', '1451602800000');";
+                    "(5, 'RDP', 'obf_airflow'    , '1.0', '1', '1451602800000')," +
+                    "(5, 'RDP', 'gps123'         , '1.0', '1', '1451602800000')," +
+                    "(5, 'RDP', 'acc123'         , '1.5', '1', '1451602800000');";
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

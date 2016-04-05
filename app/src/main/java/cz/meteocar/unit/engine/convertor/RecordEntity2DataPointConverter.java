@@ -35,8 +35,15 @@ public class RecordEntity2DataPointConverter extends AbstractConverter<RecordEnt
         }
     }
 
-    protected DataPoint createAccelerationDataPoint(RecordEntity input) {
-        return null;
+    protected DataPoint createAccelerationDataPoint(RecordEntity input) throws JSONException {
+        JSONObject json = new JSONObject(input.getJson());
+        double x = json.getDouble(JsonTags.ACCELERATION_X);
+        double y = json.getDouble(JsonTags.ACCELERATION_Y);
+        double z = json.getDouble(JsonTags.ACCELERATION_Z);
+
+        double vector = (x * x + y * y + z * z) * 100;
+
+        return new DataPoint(input.getId(), input.getTime(), vector, input);
     }
 
     protected DataPoint createGpsDataPoint(RecordEntity input) throws JSONException {
