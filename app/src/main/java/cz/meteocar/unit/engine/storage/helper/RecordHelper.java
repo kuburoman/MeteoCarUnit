@@ -403,7 +403,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
 
         obj.setJson(jsonObj.toString());
 
-        ServiceManager.getInstance().db.incrementGpsDistance(loc);
+        ServiceManager.getInstance().getDB().incrementGpsDistance(loc);
 
         save(obj);
     }
@@ -424,7 +424,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         obj.setJson(jsonObj.toString());
 
         if (obdEvent.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
-            ServiceManager.getInstance().db.incrementObdDistance(obdEvent);
+            ServiceManager.getInstance().getDB().incrementObdDistance(obdEvent);
         }
 
         save(obj);

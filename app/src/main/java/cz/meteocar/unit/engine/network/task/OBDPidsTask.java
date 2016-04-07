@@ -29,7 +29,7 @@ public class OBDPidsTask extends AbstractTask {
     private NetworkConnector<Void, GetOBDPidResponse> getConnector = new NetworkConnector<>(Void.class, GetOBDPidResponse.class, "obdPids");
     private NetworkConnector<CreateOBDPidRequest, Void> postConnector = new NetworkConnector<>(CreateOBDPidRequest.class, Void.class, "obdPids");
 
-    private ObdPidHelper dao = ServiceManager.getInstance().db.getObdPidHelper();
+    private ObdPidHelper dao = ServiceManager.getInstance().getDB().getObdPidHelper();
 
     private static final Converter<ObdPidEntity, OBDPidDto> converterForward = new OBDPidEntity2DtoConverter();
     private static final Converter<OBDPidDto, ObdPidEntity> converterBackward = converterForward.reverse();
@@ -44,7 +44,7 @@ public class OBDPidsTask extends AbstractTask {
                 List<QueryParameter> params = new ArrayList<>();
                 params.add(new QueryParameter("lastUpdateTime", String.valueOf(updateTime)));
                 GetOBDPidResponse response = getConnector.get(null, params);
-                if (response.getRecords().size() == 0) {
+                if (response.getRecords().isEmpty()) {
                     return;
                 }
                 dao.deleteAll();
@@ -59,6 +59,7 @@ public class OBDPidsTask extends AbstractTask {
                     try {
                         postConnector.post(new CreateOBDPidRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
                     } catch (NetworkException e1) {
+                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
                         postNetworkException(e);
                     }
                 }
@@ -68,7 +69,7 @@ public class OBDPidsTask extends AbstractTask {
     }
 
     protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().network.isOnline();
+        return ServiceManager.getInstance().getNetwork().isOnline();
     }
 
     protected Long getLatestUpdateTime(List<ObdPidEntity> OBDPidEntities) {

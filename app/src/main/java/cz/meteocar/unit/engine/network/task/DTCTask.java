@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateDiagnosticTroubleCodeRequest;
 import cz.meteocar.unit.engine.network.task.converter.DTCEntity2DiagnosticTroubleCodeDtoConverter;
@@ -21,7 +20,7 @@ public class DTCTask extends AbstractTask {
 
     private DTCEntity2DiagnosticTroubleCodeDtoConverter converter = new DTCEntity2DiagnosticTroubleCodeDtoConverter();
     private NetworkConnector<CreateDiagnosticTroubleCodeRequest, Void> postConnector = new NetworkConnector<>(CreateDiagnosticTroubleCodeRequest.class, Void.class, "dtcs");
-    private DTCHelper dao = ServiceManager.getInstance().db.getDTCHelper();
+    private DTCHelper dao = ServiceManager.getInstance().getDB().getDTCHelper();
 
     @Override
     public void runTask() {

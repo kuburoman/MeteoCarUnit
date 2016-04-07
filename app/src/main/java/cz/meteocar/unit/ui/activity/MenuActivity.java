@@ -230,8 +230,6 @@ public class MenuActivity extends Activity {
              */
             @Override
             public void onDrawerStateChanged(int newState) {
-                AppLog.i("Drawer state: " + newState);
-
                 // pokud se menu odemklo, překreslíme
                 if (newState == DrawerLayout.LOCK_MODE_LOCKED_OPEN) {
                     invalidateOptionsMenu();
@@ -313,17 +311,11 @@ public class MenuActivity extends Activity {
             }
         }
         gpsDialogShowing = false;
-
-        //
-        //ServiceManager.getInstance().video.pause();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-
-        //
-        //erviceManager.getInstance().video.continue();
     }
 
 
@@ -354,7 +346,7 @@ public class MenuActivity extends Activity {
      *
      * @param menu to be prepared
      * @return You must return true for the menu to be displayed;
-     *         if you return false it will not be shown.
+     * if you return false it will not be shown.
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
@@ -401,7 +393,6 @@ public class MenuActivity extends Activity {
      * as appropriate.
      */
     public void onBackPressed() {
-        AppLog.i("BACK PRESSED");
 
         // máme už jen poslední záznam v zásobníku?
         // - to znamená prázný fragment, tj. nic ke zobrazení
@@ -433,17 +424,17 @@ public class MenuActivity extends Activity {
 
         // není náhodou GPS zakázána?
         if (!DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false)) {
-            AppLog.i("GPS Check - DISABLED");
+            Log.d(AppLog.LOG_TAG_UI, "GPS Check - DISABLED");
             return;
         }
 
         // pokud nemáme hardware
-        if (ServiceManager.getInstance().gps.getStatus() == ServiceGPS.STATUS_NO_HARDWARE) {
-            AppLog.i("GPS Check - NO HARDWARE");
+        if (ServiceManager.getInstance().getGPS().getStatus() == ServiceGPS.STATUS_NO_HARDWARE) {
+            Log.d(AppLog.LOG_TAG_UI, "GPS Check - NO HARDWARE");
             return;
         }
 
-        boolean gpsState = ServiceManager.getInstance().gps.isHardwareEnabled();
+        boolean gpsState = ServiceManager.getInstance().getGPS().isHardwareEnabled();
 
         if (!gpsState && !gpsDialogShowing) {
             if (!gpsDialog.isShowing()) {
@@ -459,7 +450,6 @@ public class MenuActivity extends Activity {
      * Připravíme dialog žádající uživatele o zapnutí GPS
      */
     private void initGPSDialog() {
-        AppLog.i(null, "GPS Dialog Init");
 
         // připravíme si textview
         TextView txt = new TextView(this);

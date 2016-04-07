@@ -35,7 +35,7 @@ import cz.meteocar.unit.engine.task.event.RescheduleTasksEvent;
  */
 public class CarSettingActivityHelper {
 
-    private CarSettingHelper helper = ServiceManager.getInstance().db.getCarSettingHelper();
+    private CarSettingHelper helper = ServiceManager.getInstance().getDB().getCarSettingHelper();
 
     private View dialogView;
     private Context context;

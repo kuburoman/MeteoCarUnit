@@ -1,7 +1,6 @@
 package cz.meteocar.unit.engine.obd.taks;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.enums.CarSettingEnum;
 import cz.meteocar.unit.engine.obd.event.DTCRequestEvent;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.DTCHelper;
@@ -12,7 +11,7 @@ import cz.meteocar.unit.engine.task.AbstractTask;
  */
 public class DTCRequestTask extends AbstractTask {
 
-    private DTCHelper helper = ServiceManager.getInstance().db.getDTCHelper();
+    private DTCHelper helper = ServiceManager.getInstance().getDB().getDTCHelper();
 
     @Override
     public void runTask() {

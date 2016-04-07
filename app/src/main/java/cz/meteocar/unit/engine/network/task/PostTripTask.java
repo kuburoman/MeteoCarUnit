@@ -11,7 +11,7 @@ import cz.meteocar.unit.engine.task.AbstractTask;
  */
 public class PostTripTask extends AbstractTask {
 
-    private TripHelper tripHelper = ServiceManager.getInstance().db.getTripHelper();
+    private TripHelper tripHelper = ServiceManager.getInstance().getDB().getTripHelper();
     private NetworkConnector<String, Void> networkConnector = new NetworkConnector<>(String.class, Void.class, "trip");
 
     @Override
@@ -32,7 +32,7 @@ public class PostTripTask extends AbstractTask {
     }
 
     protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().network.isOnline();
+        return ServiceManager.getInstance().getNetwork().isOnline();
     }
 
 }

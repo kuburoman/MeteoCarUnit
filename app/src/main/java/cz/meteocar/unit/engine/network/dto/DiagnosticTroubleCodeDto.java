@@ -11,15 +11,6 @@ public class DiagnosticTroubleCodeDto {
 
     private String code;
 
-    public DiagnosticTroubleCodeDto() {
-    }
-
-    public DiagnosticTroubleCodeDto(String tripHashcode, Long time, String code) {
-        this.tripHashcode = tripHashcode;
-        this.time = time;
-        this.code = code;
-    }
-
     public String getTripHashcode() {
         return tripHashcode;
     }

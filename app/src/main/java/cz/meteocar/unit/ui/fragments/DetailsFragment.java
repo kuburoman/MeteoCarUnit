@@ -76,7 +76,7 @@ public class DetailsFragment extends Fragment {
         TextView viewById = (TextView) rootView.findViewById(R.id.trip_graph_name);
         viewById.setText(tripId + " " + type);
 
-        List<AccelerationVO> tripList = ServiceManager.getInstance().db.getRecordHelper().getTripByType(tripId, type);
+        List<AccelerationVO> tripList = ServiceManager.getInstance().getDB().getRecordHelper().getTripByType(tripId, type);
 
         DataPoint[] pointsX = new DataPoint[tripList.size()];
         DataPoint[] pointsY = new DataPoint[tripList.size()];

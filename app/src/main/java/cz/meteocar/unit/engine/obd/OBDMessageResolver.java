@@ -115,11 +115,11 @@ public class OBDMessageResolver {
                 }
                 return true;
             } else {
-                AppLog.p("Failed read msg response to: " + msg.getCommand());
+                Log.d(AppLog.LOG_TAG_OBD, "Failed read msg response to: " + msg.getCommand());
                 return false;
             }
         } else {
-            AppLog.p("Failed to send msg: " + msg.getCommand());
+            Log.d(AppLog.LOG_TAG_OBD, "Failed read msg response to: " + msg.getCommand());
             return false;
         }
     }

@@ -52,10 +52,10 @@ public class UserController {
     public void init() {
 
         // první spuštění?
-        if (!ServiceManager.getInstance().db.getSettings().getBoolean("appInit", false)) {
+        if (!ServiceManager.getInstance().getDB().getSettings().getBoolean("appInit", false)) {
 
             // inicializujeme
-            ServiceManager.getInstance().db.editSettings()
+            ServiceManager.getInstance().getDB().editSettings()
 
                     // uživatel
                     .putBoolean("userLogged", false)
@@ -88,12 +88,8 @@ public class UserController {
      * @param ctx Kontext odkud vyšel požadavek
      */
     public void updateOBDstateAndRestart(Context ctx) {
-        if (updateOBDstate()) {
-
-            // pokud máme kontext vyžádáme restart
-            if (ctx != null) {
-                UIManager.getInstance().restartApp(ctx);
-            }
+        if (updateOBDstate() && ctx != null) {
+            UIManager.getInstance().restartApp(ctx);
         }
     }
 
@@ -107,55 +103,53 @@ public class UserController {
         // potřebujeme restart aplikace?
         // - služba se totiž může jen zapnout a pak vypnout
         // - nelze ji ale zapnout po druhé poté co byla vypnuta, proto restart
-        //boolean restartRequired = false;
 
         //obd - thread
-        AppLog.i(AppLog.LOG_TAG_OBD,
+        Log.d(AppLog.LOG_TAG_OBD,
                 "UserController.SETTINGS_KEY_OBD_IS_ENABLED: "
                         + DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false));
-        AppLog.i(AppLog.LOG_TAG_OBD,
-                "obd.isRunning(): " + ServiceManager.getInstance().obd.isRunning());
+        Log.d(AppLog.LOG_TAG_OBD,
+                "obd.isRunning(): " + ServiceManager.getInstance().getOBD().isRunning());
         if (DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_ENABLED, false) !=
-                ServiceManager.getInstance().obd.isRunning()) {
+                ServiceManager.getInstance().getOBD().isRunning()) {
 
             // stojí?
-            if (!ServiceManager.getInstance().obd.isRunning()) {
-                AppLog.i(AppLog.LOG_TAG_OBD, "OBD not running");
+            if (!ServiceManager.getInstance().getOBD().isRunning()) {
+                Log.d(AppLog.LOG_TAG_OBD, "OBD not running");
 
                 // stojí, neběžela už jednou?
-                if (!ServiceManager.getInstance().obd.isFinalized()) {
-                    AppLog.i(AppLog.LOG_TAG_OBD, "OBD not finalized");
+                if (!ServiceManager.getInstance().getOBD().isFinalized()) {
+                    Log.d(AppLog.LOG_TAG_OBD, "OBD not finalized");
 
                     // ještě neběžela, máme vybrané zařízení?
                     // - pokud ne, nemůžeme nic dělat
                     if (DB.get().getBoolean(UserController.SETTINGS_KEY_OBD_IS_SET, false)) {
-                        AppLog.i(AppLog.LOG_TAG_OBD, "OBD device is SET");
+                        Log.d(AppLog.LOG_TAG_OBD, "OBD device is SET");
 
                         // vše OK, spustíme s vybranným zařízením (default OBDII v př. chyby)
-                        ServiceManager.getInstance().obd.setDeviceAndStart(
+                        ServiceManager.getInstance().getOBD().setDeviceAndStart(
                                 DB.get().getString(UserController.SETTINGS_KEY_OBD_DEVICE_NAME, "OBDII")
                         );
                     } else {
 
                         // vše ok, jen není vybrané žádné zařízení
-                        AppLog.i(AppLog.LOG_TAG_OBD, "No OBD device set");
+                        Log.d(AppLog.LOG_TAG_OBD, "No OBD device set");
 
                         // tím pádem musíme zkontrolovat stav hardware a příp. povolit
                         // - jinak uživatel nebude moci v menu vybrat zařízení, ptž. nebude
                         //   fungovat vrácení seznamu spárovaných zařízení
-                        ServiceManager.getInstance().obd.checkAndEnableBluetoothAsynchronously();
+                        ServiceManager.getInstance().getOBD().checkAndEnableBluetoothAsynchronously();
                     }
                 } else {
 
                     // už běžela, na tuhle prácičku bude potřeba restart
-                    //restartRequired = true;
-                    AppLog.i(AppLog.LOG_TAG_OBD, "Restart required by OBD");
+                    Log.d(AppLog.LOG_TAG_OBD, "Restart required by OBD");
                     return true;
                 }
             } else {
 
                 // nestojí, zastavíme
-                ServiceManager.getInstance().obd.exit();
+                ServiceManager.getInstance().getOBD().exit();
             }
         }
 
@@ -171,12 +165,8 @@ public class UserController {
      * @param ctx Kontext odkud vyšel požadavek
      */
     public void updateGPSstateAndRestart(Context ctx) {
-        if (updateGPSstate()) {
-
-            // pokud máme kontext vyžádáme restart
-            if (ctx != null) {
-                UIManager.getInstance().restartApp(ctx);
-            }
+        if (updateGPSstate() && ctx != null) {
+            UIManager.getInstance().restartApp(ctx);
         }
     }
 
@@ -189,27 +179,26 @@ public class UserController {
 
         // je rozdíl mezi požadovaným a aktuálním stavem služby?
         if (DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false) !=
-                ServiceManager.getInstance().gps.isRunning()) {
+                ServiceManager.getInstance().getGPS().isRunning()) {
 
             // stojí?
-            if (!ServiceManager.getInstance().gps.isRunning()) {
+            if (!ServiceManager.getInstance().getGPS().isRunning()) {
 
                 // stojí, neběžela už jednou?
-                if (!ServiceManager.getInstance().gps.isFinalized()) {
+                if (!ServiceManager.getInstance().getGPS().isFinalized()) {
 
                     // ještě neběžela, nastartujeme
-                    ServiceManager.getInstance().gps.start();
+                    ServiceManager.getInstance().getGPS().start();
                 } else {
 
                     // už běžela, na tuhle prácičku bude potřeba restart
-                    // restartRequired = true;
-                    AppLog.i("Restart required by GPS");
+                    Log.d(AppLog.LOG_TAG_GPS, "Restart required by GPS");
                     return true;
                 }
             } else {
 
                 // nestojí, zastavíme
-                ServiceManager.getInstance().gps.exit();
+                ServiceManager.getInstance().getGPS().exit();
             }
         }
 
@@ -223,7 +212,7 @@ public class UserController {
      * @param password Password of user
      */
     public void updateUser(String username, String password, boolean isAdmin) {
-        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username);
+        UserEntity user = ServiceManager.getInstance().getDB().getUserHelper().getUser(username);
         if (user == null) {
             user = new UserEntity();
         }
@@ -232,14 +221,14 @@ public class UserController {
         user.setAdmin(isAdmin);
 
         try {
-            ServiceManager.getInstance().db.getUserHelper().save(user);
+            ServiceManager.getInstance().getDB().getUserHelper().save(user);
         } catch (DatabaseException e) {
             Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
         }
     }
 
     public boolean isUserAdmin(String username) {
-        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username);
+        UserEntity user = ServiceManager.getInstance().getDB().getUserHelper().getUser(username);
         if (user == null) {
             return false;
         }
@@ -248,7 +237,7 @@ public class UserController {
 
 
     public boolean verifyUser(String username, String password) {
-        UserEntity user = ServiceManager.getInstance().db.getUserHelper().getUser(username, password);
+        UserEntity user = ServiceManager.getInstance().getDB().getUserHelper().getUser(username, password);
         return user != null;
     }
 
@@ -274,7 +263,7 @@ public class UserController {
     public boolean isLogged() {
 
         // zjistíme z pers. DB
-        AppLog.i(AppLog.LOG_TAG_UI, "User isLogged: " + DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false));
+        Log.d(AppLog.LOG_TAG_UI, "User isLogged: " + DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false));
         return DB.get().getBoolean(SETTINGS_KEY_USER_LOGGED, false);
     }
 

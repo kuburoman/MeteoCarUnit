@@ -66,7 +66,11 @@ public class SplashView extends View {
         boxFore = new Box();
 
         // červená čára
-        red = new Paint(); red.setColor(Color.RED); /*red.setAntiAlias(true);*/ red.setStrokeWidth(1f); red.setStyle(Paint.Style.STROKE); red.setStrokeJoin(Paint.Join.ROUND);
+        red = new Paint();
+        red.setColor(Color.RED);
+        red.setStrokeWidth(1f);
+        red.setStyle(Paint.Style.STROKE);
+        red.setStrokeJoin(Paint.Join.ROUND);
 
         // načtení bitmap
         bmpBack = BitmapFactory.decodeResource(getResources(), R.drawable.metrocar_logo_fullscreen_bg);
@@ -99,9 +103,7 @@ public class SplashView extends View {
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 alphaOfBack = (Integer)valueAnimator.getAnimatedValue();
                 invalidate();
-                /*if(!animatorOfFore.isRunning() && (alphaOfBack > 200)){
-                   // animatorOfFore.start();
-                }*/
+
             }
         });
         animatorOfBack.start();
@@ -117,15 +119,15 @@ public class SplashView extends View {
 
         // rámeček
         Path p = new Path();
-        p.moveTo(boxBack.left,  boxBack.bottom);
+        p.moveTo(boxBack.left, boxBack.bottom);
         p.lineTo(boxBack.left,  boxBack.top);
         p.lineTo(boxBack.right, boxBack.top);
         p.lineTo(boxBack.right, boxBack.bottom);
-        p.lineTo(boxBack.left,  boxBack.bottom);
+        p.lineTo(boxBack.left, boxBack.bottom);
 
         // pozadí
         canvas.drawColor(getResources().getColor(R.color.splash_back));
-        //AppLog.i(null,"Drawing with alpha: "+alphaOfBack);
+
         pBack.setAlpha(alphaOfBack);
         canvas.drawBitmap(bmpBack, null, new Rect(0,0, canvas.getWidth(), canvas.getHeight()), pBack);
 
@@ -133,8 +135,6 @@ public class SplashView extends View {
         pFore.setAlpha(alphaOfFore);
         canvas.drawBitmap(bmpFore, (float)boxFore.left, (float)boxFore.top, pFore);
 
-        //red.setStrokeWidth(1 / getResources().getDisplayMetrics().density);
-        //canvas.drawPath(p, red);
     }
 
     @Override
@@ -157,8 +157,8 @@ public class SplashView extends View {
         boxBack.bottom = border + height;
 
         // box pro popředí (logo + text)
-        int realWidth = _right - _left; AppLog.i(null, "Real width: "+realWidth);
-        int realHeight = _bottom - _top; AppLog.i(null, "Real height: " + realHeight);
+        int realWidth = _right - _left;
+        int realHeight = _bottom - _top;
         boxFore.left = _left + (realWidth - bmpFore.getWidth())/2;
         boxFore.top = _top + (realHeight - bmpFore.getHeight())/2;
 

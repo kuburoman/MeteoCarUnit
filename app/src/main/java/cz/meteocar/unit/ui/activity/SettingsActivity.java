@@ -210,14 +210,14 @@ public class SettingsActivity extends PreferenceActivity
         invalidateOptionsMenu();
 
         // získáme spárovaná BT zařízení
-        Set<BluetoothDevice> devicesBT = ServiceManager.getInstance().obd.getBluetoothDevices();
+        Set<BluetoothDevice> devicesBT = ServiceManager.getInstance().getOBD().getBluetoothDevices();
         if (devicesBT == null) {
             Log.d(AppLog.LOG_TAG_OBD, "No bluetooth devices were found.");
             return;
         }
         CharSequence[] entries = new CharSequence[devicesBT.size()];
         CharSequence[] entryValues = new CharSequence[devicesBT.size()];
-        AppLog.i(AppLog.LOG_TAG_OBD, "OBD devices to list: " + devicesBT.size());
+        Log.d(AppLog.LOG_TAG_OBD, "OBD devices to list: " + devicesBT.size());
 
         // přečteme defaultní OBD zařízení, pokud jej máme
         boolean defaultEntryPresent = false;
@@ -229,8 +229,8 @@ public class SettingsActivity extends PreferenceActivity
         // projdeme všechna zařízení, přidáme do polí a ověříme defaultní volbu
         int index = 0;
         for (BluetoothDevice device : devicesBT) {
-            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getName());
-            AppLog.i(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getAddress());
+            Log.d(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getName());
+            Log.d(AppLog.LOG_TAG_OBD, "device[" + index + "]: " + device.getAddress());
 
             // připravíme položku
             entries[index] = device.getName();
@@ -266,7 +266,7 @@ public class SettingsActivity extends PreferenceActivity
      * @param key               Klíč pro právě změněné hodnoty
      */
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        AppLog.i(null, "Key changed: " + key);
+        Log.d(null, "Key changed: " + key);
 
         // povolení / zakázání OBD
         if (key.equals(SETTINGS_ID_OBD_ENABLED)) {

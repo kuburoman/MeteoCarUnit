@@ -7,7 +7,7 @@ import cz.meteocar.unit.engine.network.dto.ErrorResponse;
  */
 public class NetworkException extends Exception {
 
-    private ErrorResponse errorResponse;
+    private final ErrorResponse errorResponse;
 
     public NetworkException(ErrorResponse errorResponse) {
         this.errorResponse = errorResponse;

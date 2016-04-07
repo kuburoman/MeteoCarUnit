@@ -43,7 +43,7 @@ public class TaskManager {
     private CarSettingHelper dao;
 
     public TaskManager() {
-        dao = ServiceManager.getInstance().db.getCarSettingHelper();
+        dao = ServiceManager.getInstance().getDB().getCarSettingHelper();
         service = Executors.newScheduledThreadPool(10);
     }
 
@@ -97,6 +97,11 @@ public class TaskManager {
         } else {
             return DEFAULT_TIME;
         }
+    }
+
+    public void stopAll() {
+        stopSyncTasks();
+        stopOtherTasks();
     }
 
     protected void stopSyncTasks() {

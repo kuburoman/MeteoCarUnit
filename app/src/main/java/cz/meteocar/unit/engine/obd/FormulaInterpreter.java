@@ -45,13 +45,13 @@ public class FormulaInterpreter {
         if (expression == null) {
 
             // nemáme, označíme vzorec jako neplatný a zkončíme
-            AppLog.i(AppLog.LOG_TAG_OBD, "Expression NULL!");
+            Log.d(AppLog.LOG_TAG_OBD, "Expression NULL!");
             isOK = false;
             return;
         } else {
 
             //
-            AppLog.i(AppLog.LOG_TAG_OBD, "Parsing expression: " + expression);
+            Log.d(AppLog.LOG_TAG_OBD, "Parsing expression: " + expression);
         }
 
         // předzpracování
@@ -430,14 +430,6 @@ public class FormulaInterpreter {
      */
     public boolean isSyntaxOK() {
         return isSyntaxAllRight;
-    }
-
-    public void traceTree() {
-        AppLog.log("RootTrace: " + traceTree(rootNode, true));
-    }
-
-    private String traceTree(Node n) {
-        return traceTree(n, false);
     }
 
     private String traceTree(Node n, boolean getVal) {

@@ -30,7 +30,7 @@ public class CarSettingTask extends AbstractTask {
     private NetworkConnector<Void, GetCarSettingResponse> getConnector = new NetworkConnector<>(Void.class, GetCarSettingResponse.class, "carSettings");
     private NetworkConnector<CreateCarSettingRequest, Void> postConnector = new NetworkConnector<>(CreateCarSettingRequest.class, Void.class, "carSettings");
 
-    private CarSettingHelper dao = ServiceManager.getInstance().db.getCarSettingHelper();
+    private CarSettingHelper dao = ServiceManager.getInstance().getDB().getCarSettingHelper();
 
     private static final Converter<CarSettingEntity, CarSettingDto> converterForward = new CarSettingsEntity2DtoConverter();
     private static final Converter<CarSettingDto, CarSettingEntity> converterBackward = converterForward.reverse();
@@ -45,7 +45,7 @@ public class CarSettingTask extends AbstractTask {
                 List<QueryParameter> params = new ArrayList<>();
                 params.add(new QueryParameter("lastUpdateTime", String.valueOf(updateTime)));
                 GetCarSettingResponse response = getConnector.get(null, params);
-                if (response.getRecords().size() == 0) {
+                if (response.getRecords().isEmpty()) {
                     return;
                 }
                 dao.deleteAll();
@@ -71,7 +71,7 @@ public class CarSettingTask extends AbstractTask {
     }
 
     protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().network.isOnline();
+        return ServiceManager.getInstance().getNetwork().isOnline();
     }
 
     protected Long getLatestUpdateTime(List<CarSettingEntity> CarSettingEntities) {

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 
 /**
@@ -14,7 +13,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, MySQLiteConfig.DATABASE_NAME, null, MySQLiteConfig.DATABASE_VERSION);
-        AppLog.i(AppLog.LOG_TAG_DB, "TripDetails Constructor");
     }
 
     /**
@@ -24,7 +22,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @param db Writable database.
      */
     public void onCreate(SQLiteDatabase db) {
-        AppLog.i(AppLog.LOG_TAG_DB, "DB onCreate");
         db.execSQL(RecordHelper.SQL_CREATE_ENTRIES);
         db.execSQL(ObdPidHelper.SQL_CREATE_ENTRIES);
         db.execSQL(TripHelper.SQL_CREATE_ENTRIES);

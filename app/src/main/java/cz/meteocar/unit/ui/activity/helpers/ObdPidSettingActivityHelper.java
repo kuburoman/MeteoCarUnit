@@ -30,7 +30,7 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
  */
 public class ObdPidSettingActivityHelper {
 
-    private ObdPidHelper obdPidHelper = ServiceManager.getInstance().db.getObdPidHelper();
+    private ObdPidHelper obdPidHelper = ServiceManager.getInstance().getDB().getObdPidHelper();
 
     private View dialogView;
     private Context context;
@@ -223,7 +223,6 @@ public class ObdPidSettingActivityHelper {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
 
-                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         obdPidHelper.delete(dialogDataID);
                         createScreen();
                     }

@@ -22,11 +22,11 @@ public class DB {
 
     // persistence key-value
     public static SharedPreferences get() {
-        return ServiceManager.getInstance().db.getSettings();
+        return ServiceManager.getInstance().getDB().getSettings();
     }
 
     public static SharedPreferences.Editor set() {
-        return ServiceManager.getInstance().db.editSettings();
+        return ServiceManager.getInstance().getDB().editSettings();
     }
 
     public static void setLoggedUser(String value) {

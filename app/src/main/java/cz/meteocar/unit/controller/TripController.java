@@ -1,5 +1,6 @@
 package cz.meteocar.unit.controller;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -53,9 +54,6 @@ public class TripController {
      */
     public void init(Button btn) {
 
-        //
-        AppLog.i(AppLog.LOG_TAG_UI, "Trip Controller init()");
-
         // button
         button = btn;
 
@@ -89,7 +87,7 @@ public class TripController {
 
         // máme tlačítko?
         if (button == null) {
-            AppLog.i(AppLog.LOG_TAG_UI, "Trip Controller - BUTTON NULL");
+            Log.d(AppLog.LOG_TAG_UI, "Trip Controller - BUTTON NULL");
             return;
         }
 
@@ -108,25 +106,6 @@ public class TripController {
         button.postInvalidate();
     }
 
-    // ---------- Události -----------------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    @Handler
-    public void handleLocationUpdate(GPSPositionEvent msg) {
-        //AppLog.i(null, "Location delivered: ");
-        /*line1gps = "LAT: "+msg.getLocation().getLatitude();
-        line2gps = "LON: "+msg.getLocation().getLongitude();
-        line3gps = "ACC: "+msg.getLocation().getAccuracy();
-        postInvalidate();*/
-    }
-
-    @Handler
-    public void handleOBDpid(OBDPidEvent evt) {
-        /*line6obd_pid = "OBD status: "+evt.getValue();
-        //AppLog.i(null, "Time delivered: " + line4time);
-        postInvalidate();*/
-    }
-
     // ---------- Start / Stop  ------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
@@ -141,14 +120,10 @@ public class TripController {
         tripActive = true;
 
         // spustíme záznam do db
-        ServiceManager.getInstance().db.enableTripRecording();
+        ServiceManager.getInstance().getDB().enableTripRecording();
 
         // změníme text na tlačítku
         refreshButtonText();
-
-        // TODO tohle určitě nechceme
-        // smažeme předchozí záznamy
-//        TripDetailObject.deleteAllRecords();
     }
 
     /**
@@ -160,13 +135,13 @@ public class TripController {
         tripActive = false;
 
         // stopneme záznam do db
-        ServiceManager.getInstance().db.disableTripRecording();
+        ServiceManager.getInstance().getDB().disableTripRecording();
 
         // změníme text na tlačítku
         refreshButtonText();
 
         // vymažeme zaznamenané statistiky
-        ServiceManager.getInstance().db.resetTripRecording();
+        ServiceManager.getInstance().getDB().resetTripRecording();
     }
 
 }

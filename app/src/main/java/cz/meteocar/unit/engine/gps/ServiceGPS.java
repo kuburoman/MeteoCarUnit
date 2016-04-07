@@ -67,7 +67,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
      */
     @Override
     public synchronized void start() {
-        AppLog.i(AppLog.LOG_TAG_GPS, "GPS start()");
+        Log.d(AppLog.LOG_TAG_GPS, "GPS start()");
         threadRun = true;
         super.start();
     }
@@ -90,7 +90,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
      * Ukončí thread bezpečně
      */
     public void exit() {
-        AppLog.i(AppLog.LOG_TAG_GPS, "GPS Exit reuqired");
+        Log.d(AppLog.LOG_TAG_GPS, "GPS Exit reuqired");
         threadRun = false;
     }
 
@@ -111,7 +111,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         }
 
         //
-        AppLog.i(AppLog.LOG_TAG_GPS, "GPS E");
+        Log.d(AppLog.LOG_TAG_GPS, "GPS E");
         threadFinalized = true;
     }
 
@@ -163,18 +163,15 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
 
     @Override
     public void onLocationChanged(Location location) {
-        //AppLog.i(AppLog.LOG_TAG_GPS, "GPS updating: " + location.toString());
         setLocation(location);
     }
 
     @Override
     public void onStatusChanged(String s, int state, Bundle bundle) {
-        AppLog.i(AppLog.LOG_TAG_GPS, "GPS Provider status: " + state);
-        //eventBus.post(new GPSStatusEvent(i,true)).asynchronously();
+        Log.d(AppLog.LOG_TAG_GPS, "GPS Provider status: " + state);
         if (state == LocationProvider.OUT_OF_SERVICE) {
             status = STATUS_GPS_OFFLINE;
         }
-        //if(state == LocationProvider.AVAILABLE){status = STATUS_GPS_OFFLINE;} ???????
         if (state == LocationProvider.OUT_OF_SERVICE) {
             status = STATUS_GPS_OFFLINE;
         }
@@ -185,7 +182,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public void onProviderEnabled(String s) {
 
         // provider je povolený, GPS se právě zaplo
-        AppLog.i(null, "GPS provider enabled");
+        Log.d(null, "GPS provider enabled");
 
         status = STATUS_NO_FIX;
         updateStatus();
@@ -195,7 +192,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public void onProviderDisabled(String s) {
 
         // provider je vypnutý
-        AppLog.i(null, "GPS provider disabled");
+        Log.d(null, "GPS provider disabled");
         status = STATUS_GPS_OFFLINE;
         updateStatus();
     }
@@ -218,11 +215,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
             status = STATUS_FIXED;
         }
 
-        // stav satelitu - ???
-        //if(state == GpsStatus.GPS_EVENT_SATELLITE_STATUS){status = STATUS_FIXED;}
-
-
-        //AppLog.i(null, "GPS Status Changed To: " + state);
         updateStatus();
     }
 
@@ -230,7 +222,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
      * Odešle aktuální stav služby na bus
      */
     public void updateStatus() {
-        //AppLog.i(null, "Reporting gps status: "+status);
         eventBus.post(new GPSStatusEvent(status)).asynchronously();
     }
 
@@ -242,7 +233,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     }
 
     public boolean isHardwareEnabled() {
-        //AppLog.i(AppLog.LOG_TAG_GPS, "GPS Hardware enabled: "+locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER));
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 

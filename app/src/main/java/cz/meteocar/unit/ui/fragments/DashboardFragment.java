@@ -14,14 +14,12 @@ import net.engio.mbassy.listener.Handler;
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.event.DebugMessageEvent;
 import cz.meteocar.unit.engine.event.ErrorViewType;
 import cz.meteocar.unit.engine.event.NetworkErrorEvent;
 import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.gps.event.GPSPositionEvent;
 import cz.meteocar.unit.engine.gps.event.GPSStatusEvent;
-import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
@@ -51,7 +49,6 @@ public class DashboardFragment extends Fragment {
         if (instCount == 1) {
             throw new NullPointerException("return value is null at method AAA");
         }
-        AppLog.i(AppLog.LOG_TAG_UI, "DashboardFragment()");
         instCount++;
     }
 
@@ -119,7 +116,6 @@ public class DashboardFragment extends Fragment {
      */
     @Override
     public void onStart() {
-        AppLog.i("TestFragment onStart");
         UIManager.getInstance().showActionBarFor(UIManager.MENU_DASHBOARD);
 
         // nastavíme je do tachometrů
@@ -177,16 +173,6 @@ public class DashboardFragment extends Fragment {
         }
     }
 
-
-    @Handler
-    public void handleTimeUpdate(TimeEvent msg) {
-        //line4time = msg.getTime();
-        //AppLog.i(null, "Time delivered: " + line4time);
-        //postInvalidate();
-    }
-
-    private boolean isOBD = false;
-
     /**
      * Handler stavu OBD
      * - používá enum typy OBDService
@@ -198,16 +184,13 @@ public class DashboardFragment extends Fragment {
         if ((msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED) ||
                 (msg.getStatusCode() == OBDService.OBD_STATE_NOT_CONNECTED)) {
             obdText.setText("OBD SEARCH");
-            isOBD = false;
         }
         if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTING) ||
                 (msg.getStatusCode() == OBDService.OBD_STATE_RECONNECTING)) {
             obdText.setText("OBD CONN");
-            isOBD = false;
         }
         if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTED)) {
             obdText.setText("OBD OK");
-            isOBD = true;
         }
     }
 

@@ -29,7 +29,7 @@ public class FilterSettingTask extends AbstractTask {
     private NetworkConnector<Void, GetFilterSettingResponse> getConnector = new NetworkConnector<>(Void.class, GetFilterSettingResponse.class, "filterSettings");
     private NetworkConnector<CreateFilterSettingRequest, Void> postConnector = new NetworkConnector<>(CreateFilterSettingRequest.class, Void.class, "filterSettings");
 
-    private FilterSettingHelper dao = ServiceManager.getInstance().db.getFilterSettingHelper();
+    private FilterSettingHelper dao = ServiceManager.getInstance().getDB().getFilterSettingHelper();
 
     private static final Converter<FilterSettingEntity, FilterSettingDto> converterForward = new FilterSettingsEntity2DtoConverter();
     private static final Converter<FilterSettingDto, FilterSettingEntity> converterBackward = converterForward.reverse();
@@ -44,7 +44,7 @@ public class FilterSettingTask extends AbstractTask {
                 List<QueryParameter> params = new ArrayList<>();
                 params.add(new QueryParameter("lastUpdateTime", String.valueOf(updateTime)));
                 GetFilterSettingResponse response = getConnector.get(null, params);
-                if (response.getRecords().size() == 0) {
+                if (response.getRecords().isEmpty()) {
                     return;
                 }
                 dao.deleteAll();
@@ -59,6 +59,7 @@ public class FilterSettingTask extends AbstractTask {
                     try {
                         postConnector.post(new CreateFilterSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
                     } catch (NetworkException e1) {
+                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
                         postNetworkException(e);
                     }
                 }
@@ -68,7 +69,7 @@ public class FilterSettingTask extends AbstractTask {
     }
 
     protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().network.isOnline();
+        return ServiceManager.getInstance().getNetwork().isOnline();
     }
 
     protected Long getLatestUpdateTime(List<FilterSettingEntity> filterSettingEntities) {

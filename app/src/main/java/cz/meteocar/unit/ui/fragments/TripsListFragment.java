@@ -26,7 +26,7 @@ public class TripsListFragment extends ListFragment {
 
         String id = DB.getLoggedUser();
 
-        ArrayList<TripDetailVO> userTripDetailList = ServiceManager.getInstance().db.getRecordHelper().getUserTripDetailList(id);
+        ArrayList<TripDetailVO> userTripDetailList = ServiceManager.getInstance().getDB().getRecordHelper().getUserTripDetailList(id);
 
         setListAdapter(new TripAdapter(getActivity(), R.layout.trip_list_item, userTripDetailList));
 

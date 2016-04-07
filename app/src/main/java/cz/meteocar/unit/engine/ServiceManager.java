@@ -17,38 +17,58 @@ import cz.meteocar.unit.engine.storage.DatabaseService;
 import cz.meteocar.unit.engine.task.TaskManager;
 
 /**
- * Created by Toms, 2014.
+ * Service manager that manages all services in application.
  */
 public class ServiceManager {
 
-    // verze
     public final String version = "1.15";
 
-    // singleton pattern
+    private ClockService clock;
+    private ServiceGPS gps;
+    private OBDService obd;
+    private DatabaseService db;
+    private NetworkService network;
+    private AccelerationService accel;
+    private TaskManager taskManager;
+
+    private Context context;
+
+    // bus
+    public MBassador<AppEvent> eventBus;
+
     private static final ServiceManager MY_SERVICE_MANAGER = new ServiceManager();
 
     public static ServiceManager getInstance() {
         return MY_SERVICE_MANAGER;
     }
 
-    // kontext aplikace
-    private Context context;
-
     public Context getContext() {
         return context;
     }
 
-    // služby
-    public ClockService clock;
-    public ServiceGPS gps;
-    public OBDService obd;
-    public DatabaseService db;
-    public NetworkService network;
-    public AccelerationService accel;
-    private TaskManager taskManager;
+    public ClockService getClock() {
+        return clock;
+    }
 
-    // bus
-    public MBassador<AppEvent> eventBus;
+    public ServiceGPS getGPS() {
+        return gps;
+    }
+
+    public OBDService getOBD() {
+        return obd;
+    }
+
+    public DatabaseService getDB() {
+        return db;
+    }
+
+    public NetworkService getNetwork() {
+        return network;
+    }
+
+    public AccelerationService getAccel() {
+        return accel;
+    }
 
     /**
      * Inicializace manageru, start služeb
@@ -111,13 +131,7 @@ public class ServiceManager {
         db = null;
         network = null;
 
-    }
+        taskManager.stopAll();
 
-    /**
-     * Ukončí služby i aplikaci
-     */
-    public void exitApp() {
-        exitServices();
-        System.exit(0);
     }
 }

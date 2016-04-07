@@ -90,8 +90,8 @@ public class LoginActivity extends Activity {
         }
 
 
-        if (ServiceManager.getInstance().network.isOnline()) {
-            ServiceManager.getInstance().network.loginUser(username, password);
+        if (ServiceManager.getInstance().getNetwork().isOnline()) {
+            ServiceManager.getInstance().getNetwork().loginUser(username, password);
             return;
         }
         if (MasterController.getInstance().user.verifyUser(username, password)) {

@@ -10,9 +10,6 @@ public class CreateOBDPidRequest {
 
     private List<OBDPidDto> records;
 
-    public CreateOBDPidRequest() {
-    }
-
     public CreateOBDPidRequest(List<OBDPidDto> records) {
         this.records = records;
     }

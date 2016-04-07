@@ -342,26 +342,6 @@ public class SpeedMeterView extends View implements ValueAnimator.AnimatorUpdate
             value = _value;
         }
 
-        public void logDebugInfo(){
-            AppLog.i(null, "Percentage: "+percentage);
-            AppLog.i(null, "PercentPerPiece: "+percentPerPiece);
-            AppLog.i(null, "Pieces: "+pieces);
-            AppLog.i(null, "Taken angle: " + takenAngle);
-            AppLog.i(null, "PercentPerSubPiece: " + percentPerSubPiece);
-            AppLog.i(null, "LeftOverPerc: " + leftOverPerc);
-            AppLog.i(null, "Subpieces: " + subPieces);
-            AppLog.i(null, "alpha: " + alpha);
-            AppLog.i(null, "StartAngleSubPiece: " + startAngleSubPiece);
-            AppLog.i(null, "CenterX: " + centerX);
-            AppLog.i(null, "CenterY: " + centerY);
-            AppLog.i(null, "Radius: " + radius);
-            AppLog.i(null, "boxLeft: " + boxLeft);
-            AppLog.i(null, "boxRight: " + boxRight);
-            AppLog.i(null, "boxTop: " + boxTop);
-            AppLog.i(null, "boxBottom: " + boxBottom);
-
-        }
-
     }
 
     @Override

@@ -10,9 +10,6 @@ public class CreateCarSettingRequest {
 
     private List<CarSettingDto> records;
 
-    public CreateCarSettingRequest() {
-    }
-
     public CreateCarSettingRequest(List<CarSettingDto> records) {
         this.records = records;
     }

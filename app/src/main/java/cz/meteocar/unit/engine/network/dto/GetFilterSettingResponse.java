@@ -10,13 +10,6 @@ public class GetFilterSettingResponse {
 
     private List<FilterSettingDto> records;
 
-    public GetFilterSettingResponse() {
-    }
-
-    public GetFilterSettingResponse(List<FilterSettingDto> records) {
-        this.records = records;
-    }
-
     public List<FilterSettingDto> getRecords() {
         if (records == null) {
             records = new ArrayList<>();

@@ -10,9 +10,6 @@ public class CreateFilterSettingRequest {
 
     private List<FilterSettingDto> records;
 
-    public CreateFilterSettingRequest() {
-    }
-
     public CreateFilterSettingRequest(List<FilterSettingDto> records) {
         this.records = records;
     }

@@ -131,7 +131,7 @@ public class DatabaseService extends Thread {
      * Povolí záznam jízdy
      */
     public void enableTripRecording() {
-        AppLog.i(AppLog.LOG_TAG_DB, "trip recording enabled");
+        Log.d(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
         tripStart = System.currentTimeMillis();
         DB.setTripId(DB.getLoggedUser() + String.valueOf(System.currentTimeMillis()));
@@ -141,7 +141,7 @@ public class DatabaseService extends Thread {
      * Zakáže záznam jízdy
      */
     public void disableTripRecording() {
-        AppLog.i(AppLog.LOG_TAG_DB, "trip recording disabled");
+        Log.d(AppLog.LOG_TAG_DB, "trip recording disabled");
         tripRecordEnabled = false;
         tripStop = System.currentTimeMillis();
     }
@@ -151,7 +151,7 @@ public class DatabaseService extends Thread {
      * - po uložeí do souboru
      */
     public void resetTripRecording() {
-        AppLog.i(AppLog.LOG_TAG_DB, "trip recording reset");
+        Log.d(AppLog.LOG_TAG_DB, "trip recording reset");
         seconds = 0;
         count = 0;
         gpsDistance = 0.0;
@@ -293,7 +293,7 @@ public class DatabaseService extends Thread {
                 try {
                     storeTripMessage(queue.take());
                 } catch (InterruptedException e) {
-                    AppLog.p(AppLog.LOG_TAG_DB, "Exception while reading msg from queue!");
+                    Log.e(AppLog.LOG_TAG_DB, "Exception while reading msg from queue!", e);
                 }
             } else {
 
@@ -306,7 +306,7 @@ public class DatabaseService extends Thread {
 
         }
         //
-        AppLog.i(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
+        Log.d(AppLog.LOG_TAG_DB, "Database Service exited LOOP");
     }
 
     // ---------- PERSISTENCE NASTAVENÍ ----------------------------------------------------------

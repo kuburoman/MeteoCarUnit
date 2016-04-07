@@ -39,8 +39,8 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
  */
 public class FilterSettingActivityHelper {
 
-    private FilterSettingHelper filterSettingHelper = ServiceManager.getInstance().db.getFilterSettingHelper();
-    private ObdPidHelper obdPidHelper = ServiceManager.getInstance().db.getObdPidHelper();
+    private FilterSettingHelper filterSettingHelper = ServiceManager.getInstance().getDB().getFilterSettingHelper();
+    private ObdPidHelper obdPidHelper = ServiceManager.getInstance().getDB().getObdPidHelper();
 
     private View dialogView;
     private Context context;
@@ -183,10 +183,9 @@ public class FilterSettingActivityHelper {
 
                     @Override
                     public void onClick(View view) {
-                        // připravíme si objekt
-                        FilterSettingEntity obj = new FilterSettingEntity();
 
-                        // id
+                        FilterSettingEntity obj = new FilterSettingEntity();
+                        
                         obj.setId(dialogDataID);
 
                         Spinner algorithm = (Spinner) dialogView.findViewById(R.id.dialog_filter_algorithm_edit);
@@ -195,14 +194,13 @@ public class FilterSettingActivityHelper {
                         }
 
                         Spinner tag = (Spinner) dialogView.findViewById(R.id.dialog_filter_tag_edit);
-                        if ("".equals(tag.getSelectedItem().toString())) {
-                            Toast.makeText(context, "Tag value cannot be empty.", Toast.LENGTH_LONG).show();
-                            return;
-                        }
                         if (tag != null) {
+                            if ("".equals(tag.getSelectedItem().toString())) {
+                                Toast.makeText(context, "Tag value cannot be empty.", Toast.LENGTH_LONG).show();
+                                return;
+                            }
                             obj.setTag(tag.getSelectedItem().toString());
                         }
-
 
                         EditText roundingDecimal = (EditText) dialogView.findViewById(R.id.dialog_filter_value_edit);
                         if (roundingDecimal != null) {
@@ -233,7 +231,6 @@ public class FilterSettingActivityHelper {
                     public void onClick(View view) {
                         alertDialog.dismiss();
 
-                        AppLog.i(AppLog.LOG_TAG_DB, "Deleting PID");
                         filterSettingHelper.delete(dialogDataID);
                         createScreen();
                     }

@@ -49,9 +49,9 @@ public class RecordConvertTask extends AbstractTask {
 
 
     public RecordConvertTask() {
-        this(ServiceManager.getInstance().db.getRecordHelper(),
-                ServiceManager.getInstance().db.getTripHelper(),
-                ServiceManager.getInstance().db.getFilterSettingHelper(),
+        this(ServiceManager.getInstance().getDB().getRecordHelper(),
+                ServiceManager.getInstance().getDB().getTripHelper(),
+                ServiceManager.getInstance().getDB().getFilterSettingHelper(),
                 new RecordEntity2DataPointConverter(),
                 new DataPoint2RecordEntityConverter(),
                 new PercentageSimplify(),

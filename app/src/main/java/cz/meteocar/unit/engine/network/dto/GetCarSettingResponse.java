@@ -10,13 +10,6 @@ public class GetCarSettingResponse {
 
     private List<CarSettingDto> records;
 
-    public GetCarSettingResponse() {
-    }
-
-    public GetCarSettingResponse(List<CarSettingDto> records) {
-        this.records = records;
-    }
-
     public List<CarSettingDto> getRecords() {
         if (records == null) {
             records = new ArrayList<>();

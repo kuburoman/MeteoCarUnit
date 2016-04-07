@@ -113,7 +113,7 @@ public class BoardUnitSettingActivityHelper {
 
                                 DB.setBoardUnitName(boardUnitName);
                                 DB.setBoardUnitSecretKey(boardUnitSecretKey);
-                                ServiceManager.getInstance().db.getDatabaseHelper().insertDefaultValues();
+                                ServiceManager.getInstance().getDB().getDatabaseHelper().insertDefaultValues();
                             }
                         })
                 .setNegativeButton(

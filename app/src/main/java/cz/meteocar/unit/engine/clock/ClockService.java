@@ -18,10 +18,9 @@ import cz.meteocar.unit.engine.log.AppLog;
 public class ClockService extends Thread {
 
     private boolean threadRun = false;
-    private Thread loopThread;
     private SimpleDateFormat dateFormat;
 
-    public MBassador<AppEvent> eventBus;
+    private MBassador<AppEvent> eventBus;
 
     /**
      * Inicializuje službu
@@ -73,7 +72,6 @@ public class ClockService extends Thread {
         String strDate = dateFormat.format(now);
 
         // event fire
-        //AppLog.i(null, "Time changed to: " + strDate);
         eventBus.post(new TimeEvent(strDate)).asynchronously();
     }
 
@@ -84,7 +82,7 @@ public class ClockService extends Thread {
     public void run() {
         try {
             while (threadRun) {
-                this.sleep(1000);
+                Thread.sleep(1000);
                 fireUpdateEvent();
             }
         } catch (InterruptedException e) {
