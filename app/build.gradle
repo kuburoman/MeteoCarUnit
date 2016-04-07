@@ -1,70 +1,8 @@
 apply plugin: 'com.android.application'
-
-android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
-
-    defaultConfig {
-        applicationId "cz.meteocar.unit"
-        minSdkVersion 16
-        targetSdkVersion 20
-        versionCode 4
-        versionName "1.0.3"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
-        debug {
-            debuggable true
-//            testCoverageEnabled = true
-        }
-    }
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-}
-apply plugin: 'sonar-runner'
-sonarRunner {
-    sonarProperties {
-        property "sonar.host.url", "http://localhost:9000" // Address of Sonar server
-        property "sonar.java.source", "7"
-        property "sonar.sources", "src/main/java" // Sources
-        property "sonar.projectName", "Meteocar" // Name of your project
-        property "sonar.projectVersion", "1.0.2" // Version of your project
-        property "sonar.projectDescription", "Sonar" // Description of your project
-        property "sonar.tests", "src/test/java"
-        property "sonar.jacoco.reportPath", "build/jacoco/testDebugUnitTest.exec"
-        property "sonar.junit.reportsPath", "build/test-results/debug"
-        property "sonar.binaries", "build/intermediates/classes/debug"
-
-    }
-}
-dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/mbassador-1.2.0.jar')
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-v4:21.0.0'
-    compile 'org.apache.commons:commons-lang3:3.0'
-    compile 'com.jjoe64:graphview:4.0.1'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.guava:guava:19.0'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.9.5'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
-    testCompile 'org.json:json:20140107'
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test:runner:0.3') {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
-}
 apply plugin: 'jacoco'
+
 jacoco {
-    version "0.7.1.201405082137"
+
 }
 task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
     group = "Reporting"
@@ -88,4 +26,72 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
             }
         }
     }
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    useLibrary 'org.apache.http.legacy'
+
+    defaultConfig {
+        applicationId "cz.meteocar.unit"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 5
+        versionName "1.0.4"
+        testApplicationId "cz.meteocar.unit.test"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+        debug {
+            debuggable true
+            testCoverageEnabled true
+        }
+    }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+}
+apply plugin: 'sonar-runner'
+sonarRunner {
+    sonarProperties {
+        property "sonar.host.url", "http://localhost:9000" // Address of Sonar server
+        property "sonar.java.source", "7"
+        property "sonar.sources", "src/main/java" // Sources
+        property "sonar.projectName", "Meteocar" // Name of your project
+        property "sonar.projectVersion", "1.0.2" // Version of your project
+        property "sonar.projectDescription", "Sonar" // Description of your project
+        property "sonar.tests", "src/test/java"
+        property "sonar.jacoco.reportPath", "build/jacoco/testDebugUnitTest.exec"
+        property "sonar.jacoco.itReportPath", "build/outputs/code-coverage/connected/coverage.ec"
+        property "sonar.junit.reportsPath", "build/test-results/debug"
+        property "sonar.binaries", "build/intermediates/classes/debug"
+
+    }
+}
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile files('libs/mbassador-1.2.0.jar')
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:support-v4:23.1.1'
+    compile 'org.apache.commons:commons-lang3:3.0'
+    compile 'com.jjoe64:graphview:4.0.1'
+    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.google.guava:guava:19.0'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.9.5'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.1'
+    testCompile 'org.powermock:powermock-module-junit4-rule-agent:1.6.1'
+    testCompile 'org.powermock:powermock-module-junit4-rule:1.6.1'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.1'
+    testCompile 'org.json:json:20140107'
+
+    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support.test:runner:0.4.1'
+
 }
