@@ -56,7 +56,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
 
     public RecordHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     @Override
@@ -252,26 +252,6 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
      *
      * @return id of users.
      */
-    public List<String> getUserIdStored() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        List<String> userIds = new ArrayList<>();
-        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_USER_ID}, null, null, COLUMN_NAME_ID, null, null, null);
-
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                userIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_USER_ID)));
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return userIds;
-    }
-
-    /**
-     * Return list of Users that have records stored in database/
-     *
-     * @return id of users.
-     */
     public List<String> getDistinctTrips(boolean processed) {
         SQLiteDatabase db = helper.getReadableDatabase();
         List<String> userIds = new ArrayList<>();
@@ -302,11 +282,6 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         return userIds;
     }
 
-    public void deleteUserNullRecords() {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        db.delete(getTableNameSQL(), COLUMN_NAME_USER_ID + " is NULL OR trim(" + COLUMN_NAME_USER_ID + ") = ''", null);
-    }
-
     @Override
     protected RecordEntity convert(Cursor cursor) {
         RecordEntity obj = new RecordEntity();
@@ -318,21 +293,6 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
         obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
         obj.setProcessed(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_PROCESSED)) != 0);
         return obj;
-    }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
     }
 
     /**
@@ -423,7 +383,7 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
 
         obj.setJson(jsonObj.toString());
 
-        if (obdEvent.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
+        if ("010D1".equals(obdEvent.getMessage().getCommand())) {
             ServiceManager.getInstance().getDB().incrementObdDistance(obdEvent);
         }
 

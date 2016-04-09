@@ -43,7 +43,7 @@ public class OBDPidsTask extends AbstractTask {
 
                 List<QueryParameter> params = new ArrayList<>();
                 params.add(new QueryParameter("lastUpdateTime", String.valueOf(updateTime)));
-                GetOBDPidResponse response = getConnector.get(null, params);
+                GetOBDPidResponse response = getConnector.get(params);
                 if (response.getRecords().isEmpty()) {
                     return;
                 }
@@ -59,7 +59,7 @@ public class OBDPidsTask extends AbstractTask {
                     try {
                         postConnector.post(new CreateOBDPidRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
                     } catch (NetworkException e1) {
-                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
+                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e1);
                         postNetworkException(e);
                     }
                 }

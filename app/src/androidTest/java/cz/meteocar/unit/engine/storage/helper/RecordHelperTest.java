@@ -17,13 +17,14 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Created by Nell on 30.3.2016.
+ * Test for {@link RecordHelper}.
  */
 @RunWith(AndroidJUnit4.class)
 public class RecordHelperTest {
 
     public DatabaseHelper db;
     public RecordHelper dao;
+
 
     @Before
     public void setUp() throws Exception {

@@ -180,7 +180,7 @@ public class DTCHelperTest {
 
         doReturn(1).when(db).delete(DTCHelper.TABLE_NAME, COLUMN_NAME_TRIP_ID + " != ? and " + COLUMN_NAME_POSTED + " = ?", new String[]{"tripId", String.valueOf(1)});
 
-        org.junit.Assert.assertTrue(helper.delete("tripId"));
+        helper.delete("tripId");
 
         verify(db).delete(DTCHelper.TABLE_NAME, COLUMN_NAME_TRIP_ID + " != ? and " + COLUMN_NAME_POSTED + " = ?", new String[]{"tripId", String.valueOf(1)});
     }

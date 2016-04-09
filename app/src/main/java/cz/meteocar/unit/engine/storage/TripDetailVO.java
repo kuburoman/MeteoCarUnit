@@ -1,9 +1,7 @@
 package cz.meteocar.unit.engine.storage;
 
-import android.location.Location;
-
 /**
- * Created by Nell on 3.2.2016.
+ * Trip Detail VO.
  */
 public class TripDetailVO {
 

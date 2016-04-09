@@ -24,7 +24,6 @@ import cz.meteocar.unit.engine.obd.OBDService;
 import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.obd.event.OBDStatusEvent;
 import cz.meteocar.unit.engine.storage.event.DBEvent;
-import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.ui.UIManager;
 import cz.meteocar.unit.ui.view.SpeedMeterView;
 
@@ -207,7 +206,7 @@ public class DashboardFragment extends Fragment {
             public void run() {
 
                 // speed
-                if (evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_SPEED) {
+                if ("010D1".equals(evt.getMessage().getCommand())) {
                     //line6obd_speed = "S: "+evt.getValue()   + "   [ "+evt.getRawResponse()+" ]";
 
                     int value = (int) Math.round(evt.getValue());
@@ -220,7 +219,7 @@ public class DashboardFragment extends Fragment {
 
                     //AppLog.i("SPEED");
                 }
-                if (evt.getMessage().getID() == ObdPidHelper.OBD_PID_ID_RPM) {
+                if ("010C2".equals(evt.getMessage().getCommand())) {
                     //line6obd_rpm = "R: "+evt.getValue()       + "   [ "+evt.getRawResponse()+" ]";
                     int value = (int) Math.round(evt.getValue());
                     rpmGauge.setValue(value);

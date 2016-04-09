@@ -14,7 +14,6 @@ import cz.meteocar.unit.engine.storage.model.TripEntity;
 public class TripHelper extends AbstractHelper<TripEntity> {
 
     private static final String TABLE_NAME = "trip_details";
-    private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_JSON = "json";
 
     public static final String SQL_CREATE_ENTRIES =
@@ -25,10 +24,8 @@ public class TripHelper extends AbstractHelper<TripEntity> {
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    private static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
-
     public TripHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     /**
@@ -41,7 +38,6 @@ public class TripHelper extends AbstractHelper<TripEntity> {
     public int save(TripEntity obj) throws DatabaseException {
         ContentValues values = new ContentValues();
         values.put(COLUMN_NAME_JSON, obj.getJson());
-
         return this.innerSave(obj.getId(), values);
     }
 
@@ -52,23 +48,8 @@ public class TripHelper extends AbstractHelper<TripEntity> {
      */
     public TripEntity getOneTrip() {
         SQLiteDatabase db = helper.getReadableDatabase();
-
         Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null, "1");
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                return convert(cursor);
-
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return convertSingle(cursor);
     }
 
     @Override
@@ -77,20 +58,5 @@ public class TripHelper extends AbstractHelper<TripEntity> {
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));
         obj.setJson(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_JSON)));
         return obj;
-    }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
     }
 }

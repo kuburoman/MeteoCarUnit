@@ -19,25 +19,24 @@
     <uses-permission android:name="android.net.wifi.WIFI_STATE_CHANGED" />
     <!-- Zapínání sítí -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!-- Buzení zařízení ze spánku a odemykání obrazovky -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <!-- SD karta, video záznam, obrázky a logy -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!-- NFC -->
-    <uses-permission android:name="android.permission.NFC" />
+
 
     <application
         android:allowBackup="true"
         android:icon="@drawable/metrocar_icon_android"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.activity.SplashActivity"
             android:label="@string/app_name"
-            android:noHistory="true" >
+            android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -48,27 +47,24 @@
             android:label="@string/app_login_title"
             android:noHistory="true">
             <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
         <activity
             android:name=".ui.activity.MenuActivity"
             android:label="@string/app_menu_title"
-            android:windowSoftInputMode="stateHidden"
-            android:theme="@style/MenuActTheme" >
-        </activity>
+            android:theme="@style/MenuActTheme"
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/settings_title"
-            android:theme="@style/SettingsActTheme" >
-        </activity>
+            android:theme="@style/SettingsActTheme"></activity>
         <activity
             android:name=".ui.activity.TripDetailActivity"
             android:label="@string/settings_title"
-            android:theme="@style/SettingsActTheme" >
-        </activity>
+            android:theme="@style/SettingsActTheme"></activity>
     </application>
 
 </manifest>

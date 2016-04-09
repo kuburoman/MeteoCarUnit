@@ -36,15 +36,13 @@ public class UserHelper extends AbstractHelper<UserEntity> {
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    public static final String SQL_GET_ALL = "SELECT * FROM " + TABLE_NAME;
-
     /**
      * Constructor.
      *
      * @param helper {@Link DatabaseHelper}
      */
     public UserHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     /**
@@ -76,18 +74,7 @@ public class UserHelper extends AbstractHelper<UserEntity> {
 
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ? and " + COLUMN_NAME_PASSWORD + " = ?", new String[]{username, password}, null, null, null);
 
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                return convert(cursor);
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return convertSingle(cursor);
     }
 
     /**
@@ -98,21 +85,8 @@ public class UserHelper extends AbstractHelper<UserEntity> {
      */
     public UserEntity getUser(String username) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_USERNAME + " = ?", new String[]{username}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                return convert(cursor);
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return convertSingle(cursor);
     }
 
     @Override
@@ -125,21 +99,4 @@ public class UserHelper extends AbstractHelper<UserEntity> {
         return obj;
 
     }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
-    }
-
-
 }

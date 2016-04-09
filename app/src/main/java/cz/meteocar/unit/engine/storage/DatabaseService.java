@@ -59,7 +59,7 @@ public class DatabaseService extends Thread {
         context = ctx;
 
         // nová fronta na eventy
-        queue = new ArrayBlockingQueue<AppEvent>(20);
+        queue = new ArrayBlockingQueue<>(20);
 
         // helper
         helper = new DatabaseHelper(ctx);

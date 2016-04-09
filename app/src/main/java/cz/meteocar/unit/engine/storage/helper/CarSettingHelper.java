@@ -41,10 +41,8 @@ public class CarSettingHelper extends AbstractHelper<CarSettingEntity> {
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    private static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
-
     public CarSettingHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     @Override
@@ -65,22 +63,8 @@ public class CarSettingHelper extends AbstractHelper<CarSettingEntity> {
      */
     public CarSettingEntity getByCode(String code) {
         SQLiteDatabase db = helper.getReadableDatabase();
-
         Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_CODE + " = ?", new String[]{code}, null, null, null);
-
-        try {
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-
-                return convert(cursor);
-            } else {
-                return null;
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
+        return convertSingle(cursor);
     }
 
     @Override
@@ -92,21 +76,6 @@ public class CarSettingHelper extends AbstractHelper<CarSettingEntity> {
         obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)) != 0);
         obj.setUpdateTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_UPDATE_TIME)));
         return obj;
-    }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
     }
 
 }

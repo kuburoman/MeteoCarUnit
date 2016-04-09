@@ -35,8 +35,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     private int status;
 
     private LocationManager locationManager;
-    private LocationProvider locationProvider;
-    private String loctionProviderName;
     private Criteria criteria;
     private Location latestLocation;
 
@@ -140,7 +138,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
         new Handler(context.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                loctionProviderName = locationManager.getBestProvider(criteria, true);
+                String loctionProviderName = locationManager.getBestProvider(criteria, true);
                 locationManager.requestLocationUpdates(
                         LocationManager.GPS_PROVIDER, 1, 0, thisObject);
                 locationManager.addGpsStatusListener(thisObject);
@@ -149,7 +147,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
 
         // můžeme také nastavit poslední známou polohu jako aktuální
         // - ale pozor, může být úplně špatně (pokud např. uživatel zapnul GPS po přejezdu někamú
-        //setLocation(locationManager.getLastKnownLocation(loctionProviderName));
     }
 
     private synchronized void setLocation(Location location) {

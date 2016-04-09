@@ -23,7 +23,7 @@ public class OBDPidEntity2VOConverterTest {
         input.setFormula("setFormula");
         input.setMin(0);
         input.setMax(10);
-        input.setActive(1);
+        input.setActive(true);
         input.setPidCode("setPidCode");
         input.setUpdateTime(1L);
 
@@ -57,7 +57,7 @@ public class OBDPidEntity2VOConverterTest {
         assertEquals(input.getFormula(), result.getFormula());
         assertEquals(input.getMin(), result.getMin());
         assertEquals(input.getMax(), result.getMax());
-        assertEquals(1, result.getActive());
+        assertEquals(true, result.isActive());
         assertEquals(input.getPidCode(), result.getPidCode());
         assertEquals(input.getUpdateTime(), result.getUpdateTime());
 

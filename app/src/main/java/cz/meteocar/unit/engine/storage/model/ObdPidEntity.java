@@ -5,14 +5,14 @@ package cz.meteocar.unit.engine.storage.model;
  */
 public class ObdPidEntity extends AbstractEntity {
 
-    public String name;
-    public String tag;
-    public String pidCode;
-    public String formula;
-    public int min;
-    public int max;
-    public int active;
-    public Long updateTime;
+    private String name;
+    private String tag;
+    private String pidCode;
+    private String formula;
+    private int min;
+    private int max;
+    private boolean active;
+    private Long updateTime;
 
     public String getName() {
         return name;
@@ -62,11 +62,11 @@ public class ObdPidEntity extends AbstractEntity {
         this.max = max;
     }
 
-    public int getActive() {
+    public boolean isActive() {
         return active;
     }
 
-    public void setActive(int active) {
+    public void setActive(boolean active) {
         this.active = active;
     }
 

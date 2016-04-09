@@ -3,14 +3,14 @@ package cz.meteocar.unit.engine.log;
 /**
  * Log tags.
  */
-public class AppLog {
+public interface AppLog {
 
-    public static final String LOG_TAG_DEFAULT = "APP_DEFAULT";
-    public static final String LOG_TAG_NETWORK = "NET";
-    public static final String LOG_TAG_DB = "DB";
-    public static final String LOG_TAG_OBD = "OBD";
-    public static final String LOG_TAG_GPS = "GPS";
-    public static final String LOG_TAG_UI = "UI";
-    public static final String LOG_TAG_ACC = "ACC";
+    String LOG_TAG_DEFAULT = "APP_DEFAULT";
+    String LOG_TAG_NETWORK = "NET";
+    String LOG_TAG_DB = "DB";
+    String LOG_TAG_OBD = "OBD";
+    String LOG_TAG_GPS = "GPS";
+    String LOG_TAG_UI = "UI";
+    String LOG_TAG_ACC = "ACC";
 
 }

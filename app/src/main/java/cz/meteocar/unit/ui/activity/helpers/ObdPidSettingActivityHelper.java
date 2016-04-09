@@ -93,7 +93,7 @@ public class ObdPidSettingActivityHelper {
             pid.setFormula("");
             pid.setMin(0);
             pid.setMax(0);
-            pid.setActive(0);
+            pid.setActive(false);
         }
 
         // name
@@ -135,7 +135,7 @@ public class ObdPidSettingActivityHelper {
         // active
         CheckBox active = (CheckBox) dialogView.findViewById(R.id.dialog_obd_enabled);
         active.setEnabled(true);
-        if (pid.getActive() == 1) {
+        if (pid.isActive()) {
             active.setChecked(true);
         } else {
             active.setChecked(false);
@@ -206,7 +206,7 @@ public class ObdPidSettingActivityHelper {
 
                         CheckBox active = (CheckBox) dialogView.findViewById(R.id.dialog_obd_enabled);
                         if (active.isEnabled()) {
-                            obj.setActive(active.isChecked() ? 1 : 0);
+                            obj.setActive(active.isChecked());
                         }
 
                         try {

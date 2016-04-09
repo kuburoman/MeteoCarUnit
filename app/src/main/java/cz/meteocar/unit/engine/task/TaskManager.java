@@ -27,7 +27,7 @@ import cz.meteocar.unit.engine.task.event.SyncWithServerChangedEvent;
  */
 public class TaskManager {
 
-    private static final long DEFAULT_TIME = 10;
+    private static final long DEFAULT_TIME = 30;
     private static final boolean INTERRUPT_RUNNING = false;
 
     private ScheduledFuture scheduledFilterSettingTask;
@@ -77,14 +77,14 @@ public class TaskManager {
 
         scheduledDtcTask = service.scheduleAtFixedRate(new DTCTask(), 0,
                 getTimeForTask(CarSettingEnum.DTC_SYNC_PERIOD.toString()), TimeUnit.SECONDS);
+
+        scheduledDtcRequestTask = service.scheduleAtFixedRate(new DTCRequestTask(), 0,
+                getTimeForTask(CarSettingEnum.DTC_REQUEST_PERIOD.toString()), TimeUnit.SECONDS);
     }
 
     protected void startOtherTasks() {
         scheduledPostTripTask = service.scheduleAtFixedRate(new PostTripTask(), 0,
                 getTimeForTask(CarSettingEnum.POST_TRIP_PERIOD.toString()), TimeUnit.SECONDS);
-
-        scheduledDtcRequestTask = service.scheduleAtFixedRate(new DTCRequestTask(), 0,
-                getTimeForTask(CarSettingEnum.DTC_REQUEST_PERIOD.toString()), TimeUnit.SECONDS);
 
         scheduledConvertService = service.scheduleAtFixedRate(new RecordConvertTask(), 0,
                 getTimeForTask(CarSettingEnum.RECORD_CONVERT_PERIOD.toString()), TimeUnit.SECONDS);
@@ -106,7 +106,6 @@ public class TaskManager {
 
     protected void stopSyncTasks() {
         cancelTask(scheduledFilterSettingTask);
-        cancelTask(scheduledConvertService);
         cancelTask(scheduledObdPidsTask);
         cancelTask(scheduledCarSettingTask);
         cancelTask(scheduledDtcRequestTask);
@@ -115,7 +114,6 @@ public class TaskManager {
 
     protected void stopOtherTasks() {
         cancelTask(scheduledPostTripTask);
-        cancelTask(scheduledDtcRequestTask);
         cancelTask(scheduledConvertService);
     }
 

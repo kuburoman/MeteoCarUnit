@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.storage.DatabaseException;
@@ -15,12 +14,6 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
  * Helper for saving and loading {@link ObdPidEntity}.
  */
 public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
-
-    public static final int OBD_PID_ID_SPEED = 1;
-    public static final int OBD_PID_ID_RPM = 2;
-    public static final int OBD_PID_ID_THROTTLE = 3;
-    public static final int OBD_PID_ID_ENGINE_TEMP = 4;
-    public static final int OBD_PID_ID_MASS_AIRFLOW = 5;
 
     private static final String TABLE_NAME = "obd_pids";
     private static final String COLUMN_NAME_ID = "id";
@@ -42,7 +35,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
                     COLUMN_NAME_FORMULA + MySQLiteConfig.TYPE_TEXT + " DEFAULT ''" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_MIN + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_MAX + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
-                    COLUMN_NAME_ACTIVE + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
+                    COLUMN_NAME_ACTIVE + MySQLiteConfig.TYPE_BOOLEAN + " DEFAULT 0" + MySQLiteConfig.COMMA_SEP +
                     COLUMN_NAME_UPDATE_TIME + MySQLiteConfig.TYPE_INTEGER + " DEFAULT 0" +
                     " )";
 
@@ -73,7 +66,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public ObdPidHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     @Override
@@ -86,7 +79,7 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
         values.put(COLUMN_NAME_MIN, entity.getMin());
         values.put(COLUMN_NAME_MAX, entity.getMax());
         values.put(COLUMN_NAME_UPDATE_TIME, entity.getUpdateTime());
-        values.put(COLUMN_NAME_ACTIVE, entity.getActive());
+        values.put(COLUMN_NAME_ACTIVE, entity.isActive());
         return innerSave(entity.getId(), values);
     }
 
@@ -96,20 +89,10 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
      * @return List of {@link ObdPidEntity}
      */
     public List<ObdPidEntity> getAllActive() {
-        ArrayList<ObdPidEntity> arr = new ArrayList<>();
-
         SQLiteDatabase db = helper.getReadableDatabase();
         Cursor cursor = db.rawQuery(SQL_GET_ALL + " WHERE " + COLUMN_NAME_ACTIVE + " = 1", null);
 
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                arr.add(convert(cursor));
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        return arr;
+        return convertArray(cursor);
     }
 
     protected ObdPidEntity convert(Cursor cursor) {
@@ -122,23 +105,8 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
         obj.setMin(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MIN)));
         obj.setMax(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_MAX)));
         obj.setUpdateTime(cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_UPDATE_TIME)));
-        obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)));
+        obj.setActive(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ACTIVE)) == 1);
         return obj;
-    }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
     }
 
 }

@@ -44,7 +44,7 @@ public class CarSettingTask extends AbstractTask {
 
                 List<QueryParameter> params = new ArrayList<>();
                 params.add(new QueryParameter("lastUpdateTime", String.valueOf(updateTime)));
-                GetCarSettingResponse response = getConnector.get(null, params);
+                GetCarSettingResponse response = getConnector.get(params);
                 if (response.getRecords().isEmpty()) {
                     return;
                 }

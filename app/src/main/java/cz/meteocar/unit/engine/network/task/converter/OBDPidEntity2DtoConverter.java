@@ -18,7 +18,7 @@ public class OBDPidEntity2DtoConverter extends Converter<ObdPidEntity, OBDPidDto
         result.setFormula(input.getFormula());
         result.setMin(input.getMin());
         result.setMax(input.getMax());
-        result.setActive(input.getActive() == 1);
+        result.setActive(input.isActive());
         result.setPidCode(input.getPidCode());
         result.setUpdateTime(input.getUpdateTime());
         return result;
@@ -32,7 +32,7 @@ public class OBDPidEntity2DtoConverter extends Converter<ObdPidEntity, OBDPidDto
         result.setFormula(input.getFormula());
         result.setMin(input.getMin());
         result.setMax(input.getMax());
-        result.setActive(input.isActive() ? 1 : 0);
+        result.setActive(input.isActive());
         result.setPidCode(input.getPidCode());
         result.setUpdateTime(input.getUpdateTime());
         return result;

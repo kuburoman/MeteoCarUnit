@@ -69,11 +69,11 @@ public class NetworkConnector<IN, OUT> {
         return getData(post);
     }
 
-    public OUT get(IN request) throws NetworkException {
-        return get(request, new ArrayList<QueryParameter>());
+    public OUT get() throws NetworkException {
+        return get(new ArrayList<QueryParameter>());
     }
 
-    public OUT get(IN request, List<QueryParameter> params) throws NetworkException {
+    public OUT get(List<QueryParameter> params) throws NetworkException {
 
         this.baseURL = DB.getNetworkAddress();
         this.unitName = DB.getBoardUnitName();

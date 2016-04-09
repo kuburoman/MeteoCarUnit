@@ -37,10 +37,8 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
-    public static final String SQL_GET_ALL = "SELECT  * FROM " + TABLE_NAME;
-
     public DTCHelper(DatabaseHelper helper) {
-        super(helper);
+        super(helper, TABLE_NAME);
     }
 
     @Override
@@ -217,13 +215,12 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
     /**
      * Deletes all records that are posted and they not belong into active trip.
      *
-     * @param tripId hash of active trip
-     * @return True - success, False - failed to delete
+     * @param exceptTripId hash of active trip
      */
-    public boolean delete(String tripId) {
+    public void delete(String exceptTripId) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        return db.delete(getTableNameSQL(), COLUMN_NAME_TRIP_ID + " != ? and " + COLUMN_NAME_POSTED + " = ?", new String[]{tripId, String.valueOf(1)}) > 0;
+        db.delete(TABLE_NAME, COLUMN_NAME_TRIP_ID + " != ? and " + COLUMN_NAME_POSTED + " = ?", new String[]{exceptTripId, String.valueOf(1)});
     }
 
     @Override
@@ -235,20 +232,5 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         obj.setDtcCode(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_DTC_CODE)));
         obj.setPosted(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_POSTED)) != 0);
         return obj;
-    }
-
-    @Override
-    protected String getAllSQL() {
-        return SQL_GET_ALL;
-    }
-
-    @Override
-    protected String getTableNameSQL() {
-        return TABLE_NAME;
-    }
-
-    @Override
-    protected String getColumnNameIdSQL() {
-        return COLUMN_NAME_ID;
     }
 }

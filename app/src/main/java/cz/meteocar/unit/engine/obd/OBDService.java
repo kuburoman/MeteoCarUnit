@@ -448,6 +448,7 @@ public class OBDService extends Thread {
                     // Deletes requests on DTC
                     if ("03".equals(msg.getCommand())) {
                         it.remove();
+                        addedDTC = false;
                     }
 
                 }

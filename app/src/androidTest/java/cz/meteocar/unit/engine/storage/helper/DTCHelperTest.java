@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.meteocar.unit.engine.obd.event.OBDPidEvent;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 import cz.meteocar.unit.engine.storage.model.DTCEntity;
 
@@ -18,6 +19,7 @@ import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Nell on 30.3.2016.
@@ -89,6 +91,11 @@ public class DTCHelperTest {
 
     @Test
     public void testGetNumberOfRecords() {
+        assertEquals(2, dao.getNumberOfRecords(false));
+    }
+
+    @Test
+    public void testUpdatePosted() {
 
         List<Integer> ids = new ArrayList<>();
         ids.add(saveId1);
@@ -105,5 +112,62 @@ public class DTCHelperTest {
         assertNotNull(dtcEntity);
         assertEquals(saveId2, dtcEntity.getId());
         assertEquals(true, dtcEntity.isPosted());
+    }
+
+    @Test
+    public void testSaveEvent() {
+        dao.deleteAll();
+
+        assertTrue(dao.getAll().isEmpty());
+
+        OBDPidEvent input = new OBDPidEvent(null, 0.0, "43 01 03 00 00 00 00");
+        input.setTimeCreated(1L);
+        input.setUserId("user");
+        input.setTripId("trip");
+
+
+        dao.save(input);
+
+        List<DTCEntity> result = dao.getAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+
+        DTCEntity dtcEntity = result.get(0);
+        assertNotNull(dtcEntity);
+        assertEquals("P0103", dtcEntity.getDtcCode());
+        assertEquals(input.getTripId(), dtcEntity.getTripId());
+        assertEquals(input.getTimeCreated(), dtcEntity.getTime());
+    }
+
+    @Test
+    public void testGetRecords() {
+        List<DTCEntity> records = dao.getRecords(false, 100);
+        assertNotNull(records);
+        assertEquals(2, records.size());
+
+
+        List<DTCEntity> result = dao.getRecords(false, 1);
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testDelete() {
+        assertEquals(2, dao.getAll().size());
+
+        dao.delete("trip");
+
+        assertEquals(2, dao.getAll().size());
+
+        dao.delete("activeTrip");
+
+        assertEquals(2, dao.getAll().size());
+
+        testUpdatePosted();
+
+        dao.delete("activeTrip");
+
+        assertEquals(0, dao.getAll().size());
     }
 }
