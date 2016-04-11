@@ -15,7 +15,7 @@ public interface MySQLiteConfig {
 
     String COMMA_SEP = ",";
 
-    int DATABASE_VERSION = 14;
+    int DATABASE_VERSION = 15;
     String DATABASE_NAME = "AndroidCarTracker.db";
 
 

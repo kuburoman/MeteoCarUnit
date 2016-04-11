@@ -17,7 +17,7 @@ import cz.meteocar.unit.engine.storage.simplify.DataPoint;
 public class RecordEntity2DataPointConverter extends AbstractConverter<RecordEntity, DataPoint> {
 
     private static final String ACCEL_ENUM = RecordTypeEnum.TYPE_ACCEL.getValue();
-    private static final String GPS_ENUM = RecordTypeEnum.TYPE_ACCEL.getValue();
+    private static final String GPS_ENUM = RecordTypeEnum.TYPE_GPS.getValue();
 
     @Override
     protected DataPoint innerConvert(RecordEntity input) {

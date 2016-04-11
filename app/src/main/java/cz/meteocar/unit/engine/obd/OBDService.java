@@ -90,8 +90,10 @@ public class OBDService extends Thread {
     private boolean threadRun = false;
     private boolean threadFinalized = false;
 
+    private int errorCount = 0;
 
-    private boolean addedDTC = false;
+    private boolean addDTC = false;
+    private boolean inQueueDTC = false;
 
     /**
      * Vytvoří novou prázdnou službu
@@ -381,6 +383,7 @@ public class OBDService extends Thread {
         threadRun = false;
     }
 
+    final
     /**
      * Hlavní cyklus služby
      */
@@ -418,6 +421,7 @@ public class OBDService extends Thread {
 
                         // připravíme OBD PID dotazy
                         initPIDQueue();
+                        errorCount = 0;
                     } else {
                         this.sleep(1000);
                         reconnectNeeded = true;
@@ -433,28 +437,37 @@ public class OBDService extends Thread {
 
                     // sends message
                     if (msgResolver.sendMessageToDeviceAndReadReply(msg)) {
+                        errorCount = 0;
                         firePIDEvent(msg, msgResolver.getLastInterpretedValue(), msgResolver.getLastResponse());
                     } else {
                         if (!"03".equals(msg.getCommand())) {
-                            disconnectAndCleanup();
-                            reconnectNeeded = true;
-                            break;
+                            errorCount++;
+                            if (errorCount > 10) {
+                                errorCount = 0;
+                                disconnectAndCleanup();
+                                reconnectNeeded = true;
+                                break;
+                            }
                         }
-                        // NO DATA response can be caused by request on DTC (03)
+
                         Log.d(AppLog.LOG_TAG_OBD, msg.getCommand() + " value not received :(");
-                        firePIDEvent(msg, -5.0, msgResolver.getLastResponse());
                     }
 
                     // Deletes requests on DTC
                     if ("03".equals(msg.getCommand())) {
                         it.remove();
-                        addedDTC = false;
+                        inQueueDTC = false;
                     }
 
                 }
 
-                if (addedDTC) {
-                    addDTC();
+                if (addDTC) {
+                    addDTC = false;
+                    if (!inQueueDTC) {
+                        addDTC();
+                        inQueueDTC = true;
+                    }
+
                 }
 
             } catch (Exception e) {
@@ -534,7 +547,7 @@ public class OBDService extends Thread {
      */
     @Handler
     public void handleDTCRequest(DTCRequestEvent evt) {
-        addedDTC = true;
+        addDTC = true;
     }
 
 }

@@ -140,7 +140,7 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
             public void run() {
                 String loctionProviderName = locationManager.getBestProvider(criteria, true);
                 locationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 1, 0, thisObject);
+                        LocationManager.GPS_PROVIDER, 1, 2, thisObject);
                 locationManager.addGpsStatusListener(thisObject);
             }
         });
