@@ -107,6 +107,8 @@
     <string name="settings_obd_edit_btn_save">Uložit</string>
     <string name="settings_obd_edit_btn_cancel">Zrušit</string>
 
+    <string name="field_required">Povinná položka</string>
+
     <!-- Setting - Filter -->
     <string name="settings_filter_title">Nastavení filtrů</string>
     <string name="settings_filter_algorithm">Nastavení filtru</string>

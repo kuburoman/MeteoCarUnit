@@ -126,7 +126,9 @@ public class FilterSettingActivityHelper {
         Spinner tag = (Spinner) dialogView.findViewById(R.id.dialog_filter_tag_edit);
         if (tag != null) {
             List<String> possibleTags = getPossibleTags();
-            possibleTags.add(filter.getTag());
+            if (!"".equals(filter.getTag())) {
+                possibleTags.add(filter.getTag());
+            }
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, possibleTags);
             tag.setAdapter(adapter);
             if (!"".equals(filter.getTag())) {
@@ -157,8 +159,8 @@ public class FilterSettingActivityHelper {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getResources().getString(R.string.settings_obd_edit_window_title));
         builder.setView(dialogView);
-        builder.setPositiveButton(R.string.settings_obd_edit_btn_cancel, null);
-        builder.setNeutralButton(R.string.settings_obd_edit_btn_save, null);
+        builder.setNeutralButton(R.string.settings_obd_edit_btn_cancel, null);
+        builder.setPositiveButton(R.string.settings_obd_edit_btn_save, null);
         builder.setNegativeButton(R.string.settings_obd_edit_btn_delete, null);
         builder.setCancelable(true);
         alertDialog = builder.create();
@@ -168,8 +170,8 @@ public class FilterSettingActivityHelper {
             @Override
             public void onShow(DialogInterface dialog) {
 
-                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
-                positiveButton.setOnClickListener(new View.OnClickListener() {
+                Button neutralButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                neutralButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View view) {
@@ -178,14 +180,14 @@ public class FilterSettingActivityHelper {
                 });
 
 
-                Button neutralButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-                neutralButton.setOnClickListener(new View.OnClickListener() {
+                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View view) {
 
                         FilterSettingEntity obj = new FilterSettingEntity();
-                        
+
                         obj.setId(dialogDataID);
 
                         Spinner algorithm = (Spinner) dialogView.findViewById(R.id.dialog_filter_algorithm_edit);

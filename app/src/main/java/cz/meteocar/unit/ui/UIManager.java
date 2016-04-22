@@ -111,7 +111,9 @@ public class UIManager {
      * Initialize fragments.
      */
     private void initFragments() {
-        dashboardFragment = new DashboardFragment();
+        if (dashboardFragment == null) {
+            dashboardFragment = new DashboardFragment();
+        }
     }
 
     /**
@@ -159,6 +161,15 @@ public class UIManager {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.fadein, R.anim.fadeout).toBundle();
+        appContext.startActivity(intent, options);
+    }
+
+    public void showLoginActivityWithoutAnimation() {
+
+        Intent intent = new Intent(appContext, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+        Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.in, R.anim.out).toBundle();
         appContext.startActivity(intent, options);
     }
 
@@ -220,7 +231,7 @@ public class UIManager {
             }
 
             DB.setLoggedUser(null);
-            this.showLoginActivity();
+            this.showLoginActivityWithoutAnimation();
             return true;
         }
 

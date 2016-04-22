@@ -37,6 +37,7 @@ public class ObdPidSettingActivityHelper {
     private AlertDialog dialog;
     private PreferenceScreen cat;
     private int dialogDataID = 0;
+    private boolean validationSuccessful = true;
 
     /**
      * Constructor.
@@ -156,7 +157,7 @@ public class ObdPidSettingActivityHelper {
         builder.setView(dialogView);
 
         dialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+                .setNeutralButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -164,42 +165,48 @@ public class ObdPidSettingActivityHelper {
 
 
                     }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                }).setPositiveButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
                         ObdPidEntity obj = new ObdPidEntity();
 
                         obj.setId(dialogDataID);
 
+                        validationSuccessful = true;
+
                         EditText editName = (EditText) dialogView.findViewById(R.id.dialog_obd_name_edit);
+                        validate(editName);
                         if (editName != null) {
                             obj.setName(editName.getText().toString());
                         }
 
                         EditText editTag = (EditText) dialogView.findViewById(R.id.dialog_obd_tag_edit);
+                        validate(editTag);
                         if (editTag != null) {
                             obj.setTag(editTag.getText().toString());
                         }
 
                         EditText editCode = (EditText) dialogView.findViewById(R.id.dialog_obd_code_edit);
+                        validate(editCode);
                         if (editCode != null) {
                             obj.setPidCode(editCode.getText().toString());
                         }
 
                         EditText editFormula = (EditText) dialogView.findViewById(R.id.dialog_obd_formula_edit);
+                        validate(editFormula);
                         if (editFormula != null) {
                             obj.setFormula(editFormula.getText().toString());
                         }
 
                         EditText editMin = (EditText) dialogView.findViewById(R.id.dialog_obd_min_edit);
+                        validate(editMin);
                         if (editMin != null) {
                             obj.setMin(Integer.parseInt(editMin.getText().toString()));
                         }
 
                         EditText editMax = (EditText) dialogView.findViewById(R.id.dialog_obd_max_edit);
+                        validate(editMax);
                         if (editMax != null) {
                             obj.setMax(Integer.parseInt(editMax.getText().toString()));
                         }
@@ -207,6 +214,10 @@ public class ObdPidSettingActivityHelper {
                         CheckBox active = (CheckBox) dialogView.findViewById(R.id.dialog_obd_enabled);
                         if (active.isEnabled()) {
                             obj.setActive(active.isChecked());
+                        }
+
+                        if(!validationSuccessful){
+                            return;
                         }
 
                         try {
@@ -271,5 +282,12 @@ public class ObdPidSettingActivityHelper {
                 showDialog(-1);
             }
         });
+    }
+
+    private void validate(EditText editText) {
+        if (editText.getText().toString().trim().length() == 0) {
+            editText.setError(context.getResources().getString(R.string.field_required));
+            validationSuccessful = false;
+        }
     }
 }

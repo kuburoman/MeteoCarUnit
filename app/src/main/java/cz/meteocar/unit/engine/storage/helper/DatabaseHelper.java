@@ -3,7 +3,9 @@ package cz.meteocar.unit.engine.storage.helper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import cz.meteocar.unit.BuildConfig;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 
 /**
@@ -12,7 +14,7 @@ import cz.meteocar.unit.engine.storage.MySQLiteConfig;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
-        super(context, MySQLiteConfig.DATABASE_NAME, null, MySQLiteConfig.DATABASE_VERSION);
+        super(context, BuildConfig.DATABASE, null, MySQLiteConfig.DATABASE_VERSION);
     }
 
     /**

@@ -107,7 +107,12 @@ public class CarSettingActivityHelper {
 
         Spinner code = (Spinner) dialogView.findViewById(R.id.dialog_car_setting_code_edit);
         if (code != null) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, getPossibleTags());
+            List<String> possibleTags = getPossibleTags();
+            if(!"".equals(item.getCode())){
+                possibleTags.add(item.getCode());
+            }
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, possibleTags);
             code.setAdapter(adapter);
             if (!"".equals(item.getCode())) {
                 code.setSelection(adapter.getPosition(item.getCode()));
@@ -133,7 +138,7 @@ public class CarSettingActivityHelper {
         builder.setView(dialogView);
 
         dialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+                .setNeutralButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -141,7 +146,7 @@ public class CarSettingActivityHelper {
 
 
                     }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                }).setPositiveButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -158,7 +163,7 @@ public class CarSettingActivityHelper {
                             obj.setCode(code.getSelectedItem().toString());
                         }
 
-                        EditText value = (EditText) dialogView.findViewById(R.id.dialog_filter_value_edit);
+                        EditText value = (EditText) dialogView.findViewById(R.id.dialog_car_setting_value_edit);
                         if (value != null) {
                             obj.setValue(value.getText().toString());
                         }

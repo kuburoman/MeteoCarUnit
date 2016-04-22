@@ -71,7 +71,7 @@ public class SettingsActivity extends PreferenceActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        UIManager.getInstance().showLoginActivity();
+        UIManager.getInstance().showLoginActivityWithoutAnimation();
         Log.e(AppLog.LOG_TAG_DEFAULT, "onDestroy");
     }
 

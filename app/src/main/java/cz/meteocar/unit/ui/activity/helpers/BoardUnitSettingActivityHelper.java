@@ -63,13 +63,13 @@ public class BoardUnitSettingActivityHelper {
         builder.setView(dialogView);
 
         dialog = builder
-                .setPositiveButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+                .setNeutralButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                }).setNeutralButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                }).setPositiveButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -116,7 +116,7 @@ public class BoardUnitSettingActivityHelper {
                                 ServiceManager.getInstance().getDB().getDatabaseHelper().insertDefaultValues();
                             }
                         })
-                .setNegativeButton(
+                .setNeutralButton(
                         context.getResources().getString(R.string.settings_obd_edit_btn_cancel),
                         new DialogInterface.OnClickListener() {
 

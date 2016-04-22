@@ -6,28 +6,22 @@ import java.util.ArrayList;
 
 import cz.meteocar.unit.engine.log.AppLog;
 
-// TODO - přidat možnost kontroly vzorce, jestli je OK, např. by se vytvořila instance a neznámé nody by házely chybu
-
 /**
- * Interpret OBD vzorců
- * v1.1 - bug fixy, testování
- * v1.0 - základní verze
+ * Interpretation of OBD formula
  * <p/>
  * Výkon
- * Setup (sestavení intepr. stuktury): 1M za 5500ms
- * Interpretace (dosazení dat do striktury a vrácení hodnoty): 1M za 400ms
+ * Setup: 1M in 5500ms
+ * Interpretation: 1M in 400ms
  * <p/>
- * Vzorce
- * Podporované operátory: + - * /
- * Podporované operandy: A B C D čísla
- * A,B,C,D odpovídají příslišné častí hexadecimální vstupního pole po 8 bitech s klesající významn.
+ * Performance
+ * Supported operations: + - * /
+ * Supported operands: A B C D numbers
  *
  * @author Toms, 2014
  */
 public class FormulaInterpreter {
 
     private Node rootNode;
-    private boolean isOK;
     public int errorCode = STATUS_BRACES_OK;
 
     public static final int STATUS_BRACES_OK = 0;
@@ -39,74 +33,56 @@ public class FormulaInterpreter {
 
 
     private void createTree(String expression) {
-        isOK = true;    // not guilty until proven otherwise :o)
-
-        // máme výraz?
         if (expression == null) {
-
-            // nemáme, označíme vzorec jako neplatný a zkončíme
             Log.d(AppLog.LOG_TAG_OBD, "Expression NULL!");
-            isOK = false;
             return;
-        } else {
-
-            //
-            Log.d(AppLog.LOG_TAG_OBD, "Parsing expression: " + expression);
         }
 
-        // předzpracování
-        expression = expression.replaceAll(",", ".");       // desetinná čísla
-        expression = expression.replaceAll("\\(", " ( ");   // závorky
-        expression = expression.replaceAll("\\)", " ) ");   // závorky
-        expression = expression.replaceAll("\\+", " + ");
-        expression = expression.replaceAll("\\-", " - ");
-        expression = expression.replaceAll("\\*", " * ");
-        expression = expression.replaceAll("\\\\", "/");    // dělění backsplash
-        expression = expression.replaceAll("\\/", " / ");
+        expression = expression
+                .replaceAll(",", ".")
+                .replaceAll("\\(", " ( ")
+                .replaceAll("\\)", " ) ")
+                .replaceAll("\\+", " + ")
+                .replaceAll("\\-", " - ")
+                .replaceAll("\\*", " * ")
+                .replaceAll("\\\\", "/")
+                .replaceAll("\\/", " / ");
 
-        // dělění pole
         String[] splitArrWithSpaces = expression.split(" ");
 
-        // čištění prázdných položek
-        ArrayList<String> splitArrClear = new ArrayList();
+        ArrayList<String> splitArrClear = new ArrayList<>();
         for (String part : splitArrWithSpaces) {
-            if (part.isEmpty()) continue;
+            if (part.isEmpty()) {
+                continue;
+            }
             splitArrClear.add(part);
         }
 
-        // rekursivni parsováni
         rootNode = parseExpression(splitArrClear);
     }
 
     /**
-     * Binární parsování, najednou můžeme výraz rozdělit
-     * jen do dvou polovin a ty dále parsovat
      *
-     * @param expParts
-     * @return
+     * Binary parsing , we can split into two
+     * halves and the further parse the rest
+     *
+     * @param expParts part of expression for parsing
+     * @return {@link Node}
      */
     private Node parseExpression(ArrayList<String> expParts) {
 
-        // debug
-        /*System.out.print("parseE:");
-        for (String expPart : expParts) {
-            System.out.print(" "+expPart+" |");
-        }
-        System.out.print("< end");System.out.println("");*/
+        // linearized list of nods
+        ArrayList<Node> expNodes = new ArrayList<>();
 
-        // linearizovaný seznam nodů
-        ArrayList<Node> expNodes = new ArrayList();
-
-        // eliminace závorek
-        boolean inBraces = false;           // jsme v závorkách?
-        boolean justInBraces = false;       // právě jsme vstoupili do závorek
-        boolean justOutOfBraces = false;    // právě jsme opustili závorky
+        // Elimination of brackets
+        boolean inBraces = false;           // are we in brackets
+        boolean justInBraces = false;       // just step in brackets
+        boolean justOutOfBraces = false;    // just left brackets
         int bracesOpened = 0;
         int bracesClosed = 0;
-        ArrayList<String> inBracesParts = new ArrayList();
+        ArrayList<String> inBracesParts = new ArrayList<>();
         for (String part : expParts) {
 
-            // počítání otevřených a uzavřených závorek, nastavování flagů
             if (part.equals("(")) {
                 bracesOpened++;
                 justInBraces = (bracesOpened == 1) && (bracesClosed == 0);
@@ -117,26 +93,22 @@ public class FormulaInterpreter {
                 justOutOfBraces = (bracesOpened == bracesClosed);
             }
 
-            // v závorkách
             if (inBraces) {
 
-                // přidávání částí do seznam
                 if (!justInBraces && !justOutOfBraces) {
                     inBracesParts.add(part);
                 }
 
-                // ukončení závorky
                 if (justOutOfBraces) {
                     expNodes.add(parseExpression(inBracesParts));
-                    inBracesParts = new ArrayList();
+                    inBracesParts = new ArrayList<>();
                     inBraces = false;
                     bracesOpened = 0;
                     bracesClosed = 0;
                 }
             } else {
 
-                // mimo závorky přidáme rovnou node udělaný z výrazu
-                Node newNode = null;
+                Node newNode;
                 switch (part) {
                     case "+":
                         newNode = new Plus();
@@ -168,27 +140,20 @@ public class FormulaInterpreter {
                 expNodes.add(newNode);
             }
 
-            // reset flagů
+            // reset of flags
             justInBraces = false;
             justOutOfBraces = false;
         }
 
-        //  zachycení chyby, neodpovídající počet závorek
         if (inBraces) {
-            isOK = false;
             errorCode = FormulaInterpreter.STATUS_BRACES_MISMATCH;
             Log.e(AppLog.LOG_TAG_OBD, "Braces don't match");
             return null;
         }
 
-        // proměnné pro odtranění operátorů
         Integer opIndex;
 
-        // odstranění operátoru
-        //<editor-fold defaultstate="collapsed" desc="DĚLENO">        
         do {
-
-            // nalezne operátor v listu
             opIndex = null;
             for (int i = 0; i < expNodes.size(); i++) {
                 if (expNodes.get(i).getCode() == Node.DIVIDE && ((Operator) expNodes.get(i)).isEmpty()) {
@@ -198,14 +163,11 @@ public class FormulaInterpreter {
                 }
             }
 
-            // řešení nalezeného operátoru
             if (opIndex != null) {
 
-                // mají se použít náhradní nody?
                 boolean useSpareBefore = false;
                 boolean useSpareAfter = false;
 
-                // jsou indexy mimo pole?
                 if (opIndex == 0) {
                     useSpareBefore = true;
                 }
@@ -213,8 +175,6 @@ public class FormulaInterpreter {
                     useSpareAfter = true;
                 }
 
-                // ověří zda operandy nejsou zároveň operátory
-                // a pokud ano, že jsou již naplněny
                 if (!useSpareBefore && expNodes.get(opIndex - 1).isOperator()) {
                     useSpareBefore = ((Operator) expNodes.get(opIndex - 1)).isEmpty();
                 }
@@ -223,13 +183,11 @@ public class FormulaInterpreter {
 
                 }
 
-                // nastavení operandů
                 Node before = useSpareBefore ? new Number("1.0") : expNodes.get(opIndex - 1);
                 Node after = useSpareAfter ? new Number("1.0") : expNodes.get(opIndex + 1);
                 ((Operator) expNodes.get(opIndex)).child1 = before;
                 ((Operator) expNodes.get(opIndex)).child2 = after;
 
-                // odstranění původních operandů z listu
                 if (!useSpareBefore) {
                     expNodes.remove(before);
                 }
@@ -239,10 +197,8 @@ public class FormulaInterpreter {
             }
         } while (opIndex != null);
 
-        // odstranění operátoru
         do {
 
-            // nalezne operátor v listu
             opIndex = null;
             for (int i = 0; i < expNodes.size(); i++) {
                 if (expNodes.get(i).getCode() == Node.MULTIPLY && ((Operator) expNodes.get(i)).isEmpty()) {
@@ -251,14 +207,11 @@ public class FormulaInterpreter {
                 }
             }
 
-            // řešení nalezeného operátoru
             if (opIndex != null) {
 
-                // mají se použít náhradní nody?
                 boolean useSpareBefore = false;
                 boolean useSpareAfter = false;
 
-                // jsou indexy mimo pole?
                 if (opIndex == 0) {
                     useSpareBefore = true;
                 }
@@ -266,8 +219,6 @@ public class FormulaInterpreter {
                     useSpareAfter = true;
                 }
 
-                // ověří zda operandy nejsou zároveň operátory
-                // a pokud ano, že jsou již naplněny
                 if (!useSpareBefore && expNodes.get(opIndex - 1).isOperator()) {
                     useSpareBefore = ((Operator) expNodes.get(opIndex - 1)).isEmpty();
                 }
@@ -275,13 +226,11 @@ public class FormulaInterpreter {
                     useSpareAfter = ((Operator) expNodes.get(opIndex + 1)).isEmpty();
                 }
 
-                // nastavení operandů
                 Node before = useSpareBefore ? new Number("1.0") : expNodes.get(opIndex - 1);
                 Node after = useSpareAfter ? new Number("1.0") : expNodes.get(opIndex + 1);
                 ((Operator) expNodes.get(opIndex)).child1 = before;
                 ((Operator) expNodes.get(opIndex)).child2 = after;
 
-                // odstranění původních operandů z listu
                 if (!useSpareBefore) {
                     expNodes.remove(before);
                 }
@@ -291,12 +240,8 @@ public class FormulaInterpreter {
             }
         } while (opIndex != null);
 
-
-        // odstranění operátoru
-        //<editor-fold defaultstate="collapsed" desc="MÍNUS">
         do {
 
-            // nalezne operátor v listu
             opIndex = null;
             for (int i = 0; i < expNodes.size(); i++) {
                 if (expNodes.get(i).getCode() == Node.MINUS) {
@@ -307,11 +252,8 @@ public class FormulaInterpreter {
                 }
             }
 
-            // řešení nalezeného operátoru
             if (opIndex != null) {
-                //System.out.println("Exp contains -");
 
-                // mají se použít náhradní nody?
                 boolean useSpareBefore = false;
                 boolean useSpareAfter = false;
 
@@ -323,8 +265,6 @@ public class FormulaInterpreter {
                     useSpareAfter = true;
                 }
 
-                // ověří zda operandy nejsou zároveň operátory
-                // a pokud ano, že jsou již naplněny
                 if (!useSpareBefore) {
                     if (expNodes.get(opIndex - 1).isOperator()) {
                         useSpareBefore = ((Operator) expNodes.get(opIndex - 1)).isEmpty();
@@ -336,13 +276,11 @@ public class FormulaInterpreter {
                     }
                 }
 
-                // nastavení operandů
                 Node before = useSpareBefore ? new Number("0.0") : expNodes.get(opIndex - 1);
                 Node after = useSpareAfter ? new Number("0.0") : expNodes.get(opIndex + 1);
                 ((Operator) expNodes.get(opIndex)).child1 = before;
                 ((Operator) expNodes.get(opIndex)).child2 = after;
 
-                // odstranění původních operandů z listu
                 if (!useSpareBefore) {
                     expNodes.remove(before);
                 }
@@ -351,13 +289,9 @@ public class FormulaInterpreter {
                 }
             }
         } while (opIndex != null);
-        //</editor-fold>
 
-        // odstranění operátoru
-        //<editor-fold defaultstate="collapsed" desc="PLUS">
         do {
 
-            // nalezne operátor v listu
             opIndex = null;
             for (int i = 0; i < expNodes.size(); i++) {
                 if (expNodes.get(i).getCode() == Node.PLUS) {
@@ -368,15 +302,11 @@ public class FormulaInterpreter {
                 }
             }
 
-            // řešení nalezeného operátoru
             if (opIndex != null) {
-                //System.out.println("Exp contains +");
 
-                // mají se použít náhradní nody?
                 boolean useSpareBefore = false;
                 boolean useSpareAfter = false;
 
-                // jsou indexy mimo pole?
                 if (opIndex == 0) {
                     useSpareBefore = true;
                 }
@@ -384,8 +314,6 @@ public class FormulaInterpreter {
                     useSpareAfter = true;
                 }
 
-                // ověří zda operandy nejsou zároveň operátory
-                // a pokud ano, že jsou již naplněny
                 if (!useSpareBefore) {
                     if (expNodes.get(opIndex - 1).isOperator()) {
                         useSpareBefore = ((Operator) expNodes.get(opIndex - 1)).isEmpty();
@@ -397,13 +325,11 @@ public class FormulaInterpreter {
                     }
                 }
 
-                // nastavení operandů
                 Node before = useSpareBefore ? new Number("0.0") : expNodes.get(opIndex - 1);
                 Node after = useSpareAfter ? new Number("0.0") : expNodes.get(opIndex + 1);
                 ((Operator) expNodes.get(opIndex)).child1 = before;
                 ((Operator) expNodes.get(opIndex)).child2 = after;
 
-                // odstranění původních operandů z listu
                 if (!useSpareBefore) {
                     expNodes.remove(before);
                 }
@@ -412,72 +338,35 @@ public class FormulaInterpreter {
                 }
             }
         } while (opIndex != null);
-        //</editor-fold>
 
-        // vrátí jediný zbylý node (root) výrazu
         return expNodes.get(0);
     }
 
     /**
-     * Flag označující zda je syntaxe poslední interpretované hodnoty v pořádku
+     * Flag that represents if syntax is all right.
      */
     private boolean isSyntaxAllRight = true;
 
     /**
-     * Je poslední interpretovaná hodnota v pořádku co se týče syntaxe?
+     * Is syntax of last expression all right.
      *
-     * @return True - pokud je v pořádku, False - pokud ne
+     * @return True - is syntax is ok.
      */
     public boolean isSyntaxOK() {
         return isSyntaxAllRight;
     }
 
-    private String traceTree(Node n, boolean getVal) {
-
-        boolean opFull = false;
-        boolean isOp = false;
-        if (n.isOperator()) {
-            isOp = true;
-            if (!((Operator) n).isEmpty()) {
-                opFull = true;
-            }
-        }
-
-        String ret = "";
-        if (isOp) {
-            if (opFull) {
-                ret = "•";
-            } else {
-                ret = "◦";
-            }
-        }
-        ret += "Node " + (new String[]{"+", "-", "*", "/", "A", "B", "C", "D", "#"})[n.getCode()];
-
-        if (getVal) {
-            ret += "(" + n.getValue() + ")";
-        }
-
-        if (opFull) {
-            ret += "[" + traceTree(((Operator) n).child1, getVal) + "]";
-            ret += "[" + traceTree(((Operator) n).child2, getVal) + "]";
-        }
-
-        return ret;
-    }
-
     /**
-     * Interpretuje textovou zprávu tvořenou čtyřmi hexadecimálními částmi, jež jsou oddělené
-     * mezerou, každá po dvou znacích 0-F
+     * Interprets message consistent of 4 hexadecimal parts  that is split by gap.
      *
-     * @param toInterpret Hexadecimální zpráva
-     * @return Číselná interpretace dle vzorce
+     * @param toInterpret Hexadecimal message
+     * @return Interpretation of expression
      */
     public double interpretString(String toInterpret) {
 
-        // rozdělíme zprávu po mezerách a ověříme počet částí
         String[] splitArr = toInterpret.split(" ");
 
-        // 3 a více bytů
+        // 3 or more bytes
         if (splitArr.length <= 2) {
             isSyntaxAllRight = false;
             return 0.0;
@@ -485,8 +374,7 @@ public class FormulaInterpreter {
             isSyntaxAllRight = true;
         }
 
-        // parsujeme byty a castujeme na double
-        // - začínáme od indexu 2, 0 a 1 je echo příkazu
+        // parsing of bytes, start with 2, 0 a 1 is echo command
         abcdBytes = new double[4];
         abcdBytes[0] = (double) Integer.parseInt(splitArr[2], 16);
         if (splitArr.length > 3) {
@@ -499,14 +387,13 @@ public class FormulaInterpreter {
             }
         }
 
-        // vracíme hodnotu zjištěnou interpr. stromem
         return getValue();
     }
 
     /**
-     * Vrátí hodnotu výrazu s aktuálními parametry (ABCD)
+     * Returns value of expression with actual values (ABCD).
      *
-     * @return Číselná hodnota
+     * @return Value of expression
      */
     private double getValue() {
         return rootNode.getValue();
@@ -524,13 +411,12 @@ public class FormulaInterpreter {
 
     public double getC() {
         return abcdBytes[2];
-    } // TODO - 41 0C na začátku se nepočají, upravit
+    }
 
     public double getD() {
         return abcdBytes[3];
-    } // TODO - A je tak až třetí byte v pořadí :(
+    }
 
-    //<editor-fold defaultstate="collapsed" desc="Basic">
     private abstract class Node {
         public static final int PLUS = 0;
         public static final int MINUS = 1;
@@ -612,7 +498,6 @@ public class FormulaInterpreter {
             return Node.DIVIDE;
         }
     }
-    //</editor-fold>
 
     private class A extends Node {
         FormulaInterpreter interpreter;
