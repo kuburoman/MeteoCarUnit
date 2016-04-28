@@ -22,7 +22,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by Nell on 30.3.2016.
+ * Test for {@link DTCHelper}.
  */
 @RunWith(AndroidJUnit4.class)
 public class DTCHelperTest {
@@ -100,6 +100,7 @@ public class DTCHelperTest {
         List<Integer> ids = new ArrayList<>();
         ids.add(saveId1);
         ids.add(saveId2);
+
 
         dao.updatePosted(ids, true);
 

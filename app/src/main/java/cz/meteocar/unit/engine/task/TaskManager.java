@@ -9,14 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.CarSettingEnum;
-import cz.meteocar.unit.engine.network.task.CarSettingTask;
-import cz.meteocar.unit.engine.network.task.DTCTask;
-import cz.meteocar.unit.engine.network.task.FilterSettingTask;
-import cz.meteocar.unit.engine.network.task.OBDPidsTask;
-import cz.meteocar.unit.engine.network.task.PostTripTask;
-import cz.meteocar.unit.engine.obd.taks.DTCRequestTask;
 import cz.meteocar.unit.engine.storage.DB;
-import cz.meteocar.unit.engine.storage.RecordConvertTask;
 import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
 import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
 import cz.meteocar.unit.engine.task.event.RescheduleTasksEvent;

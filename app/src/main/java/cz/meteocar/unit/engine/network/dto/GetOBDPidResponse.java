@@ -12,6 +12,9 @@ public class GetOBDPidResponse {
     private List<OBDPidDto> records;
 
     public List<OBDPidDto> getRecords() {
+        if (records == null) {
+            records = new ArrayList<>();
+        }
         return records;
     }
 

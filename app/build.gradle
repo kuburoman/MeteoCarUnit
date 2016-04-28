@@ -1,10 +1,16 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
 
+// -- Run for creating test result
+// gradlew clean createDevelDebugCoverageReport jacocoTestReport
+//
+// -- Run sonar task
+//gradlew sonarRunner
+
 jacoco {
 
 }
-task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
+task jacocoTestReport(type: JacocoReport, dependsOn: "testDevelDebugUnitTest") {
     group = "Reporting"
     description = "Generate Jacoco coverage reports after running tests."
     reports {
@@ -12,7 +18,7 @@ task jacocoTestReport(type: JacocoReport, dependsOn: "testDebugUnitTest") {
         html.enabled = true
     }
     classDirectories = fileTree(
-            dir: 'build/intermediates/classes/debug/cz/meteocar',
+            dir: 'build/intermediates/classes/devel/debug/cz/meteocar',
             excludes: ['**/R.class',
                        '**/R$*.class',
                        '**/BuildConfig.*',
@@ -47,6 +53,15 @@ android {
         testApplicationId "cz.meteocar.unit.test"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    productFlavors {
+        devel {
+            buildConfigField 'String', 'DATABASE', '"TEST_AndroidCarTracker.db"'
+        }
+
+        prod {
+            buildConfigField 'String', 'DATABASE', '"AndroidCarTracker.db"'
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -70,10 +85,10 @@ sonarRunner {
         property "sonar.projectVersion", "1.0.2" // Version of your project
         property "sonar.projectDescription", "Sonar" // Description of your project
         property "sonar.tests", "src/test/java"
-        property "sonar.jacoco.reportPath", "build/jacoco/testDebugUnitTest.exec"
-        property "sonar.jacoco.itReportPath", "build/outputs/code-coverage/connected/coverage.ec"
+        property "sonar.jacoco.reportPath", "build/jacoco/testDevelDebugUnitTest.exec"
+        property "sonar.jacoco.itReportPath", "build/outputs/code-coverage/connected/flavors/DEVEL/coverage.ec"
         property "sonar.junit.reportsPath", "build/test-results/debug"
-        property "sonar.binaries", "build/intermediates/classes/debug"
+        property "sonar.binaries", "build/intermediates/classes/devel/debug"
 
     }
 }
@@ -95,8 +110,14 @@ dependencies {
     testCompile 'org.powermock:powermock-module-junit4:1.6.1'
     testCompile 'org.json:json:20140107'
 
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.mockito:mockito-core:1.+'
+    androidTestCompile "com.crittercism.dexmaker:dexmaker:1.4"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-dx:1.4"
+    androidTestCompile "com.crittercism.dexmaker:dexmaker-mockito:1.4"
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
     androidTestCompile 'com.android.support:support-annotations:22+'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
-
+    androidTestCompile 'com.jayway.android.robotium:robotium-solo:5.5.4'
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.2.0'
 }

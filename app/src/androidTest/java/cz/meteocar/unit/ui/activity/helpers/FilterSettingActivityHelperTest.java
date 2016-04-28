@@ -8,12 +8,14 @@ import cz.meteocar.unit.ui.activity.*;
  */
 public class FilterSettingActivityHelperTest extends AbstractSettingActivityHelper {
 
-    public void testDelete(){
+    public void testDelete() throws InterruptedException {
         solo.unlockScreen();
 
         loginToSettings();
 
-        solo.clickOnText("Nastavení filtru");
+        solo.wait(100);
+
+        solo.clickInList(2);
         solo.clickOnText("obd_speed");
         solo.clickOnView(solo.getView(BUTTON_NEGATIVE));
         solo.goBack();
@@ -21,7 +23,7 @@ public class FilterSettingActivityHelperTest extends AbstractSettingActivityHelp
 
         loginToSettings();
 
-        solo.clickOnText("Nastavení filtru");
+        solo.clickInList(2);
         assertFalse(solo.searchText("obd_speed"));
     }
 
@@ -40,7 +42,7 @@ public class FilterSettingActivityHelperTest extends AbstractSettingActivityHelp
 
         loginToSettings();
 
-        solo.clickOnText("Nastavení filtru");
+        solo.clickInList(2);
         assertTrue(solo.searchText("obd_speed"));
         solo.clickOnText("obd_speed");
         assertTrue(solo.searchText("obd_speed"));
@@ -55,7 +57,9 @@ public class FilterSettingActivityHelperTest extends AbstractSettingActivityHelp
 
         loginToSettings();
 
-        solo.clickOnText("Nastavení filtru");
+        solo.wait(100);
+
+        solo.clickInList(2);
         solo.clickOnText("obd_speed");
 
         solo.clickOnButton(0);
@@ -70,7 +74,9 @@ public class FilterSettingActivityHelperTest extends AbstractSettingActivityHelp
 
         loginToSettings();
 
-        solo.clickOnText("Nastavení filtru");
+        solo.wait(100);
+
+        solo.clickInList(2);
         assertTrue(solo.searchText("obd_speed"));
         solo.clickOnText("obd_speed");
         assertTrue(solo.searchText("obd_speed"));

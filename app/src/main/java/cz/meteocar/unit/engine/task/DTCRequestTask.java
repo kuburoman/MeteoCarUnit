@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.obd.taks;
+package cz.meteocar.unit.engine.task;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.obd.event.DTCRequestEvent;

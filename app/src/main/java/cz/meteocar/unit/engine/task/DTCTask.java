@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.network.task;
+package cz.meteocar.unit.engine.task;
 
 import com.google.common.collect.Lists;
 
@@ -8,6 +8,7 @@ import java.util.List;
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateDiagnosticTroubleCodeRequest;
+import cz.meteocar.unit.engine.network.task.NetworkConnector;
 import cz.meteocar.unit.engine.network.task.converter.DTCEntity2DiagnosticTroubleCodeDtoConverter;
 import cz.meteocar.unit.engine.storage.helper.DTCHelper;
 import cz.meteocar.unit.engine.storage.model.DTCEntity;

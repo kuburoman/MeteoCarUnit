@@ -28,12 +28,17 @@ public abstract class AbstractTask extends TimerTask {
         }
     }
 
-    protected void postEvent(AppEvent event) {
-        ServiceManager.getInstance().eventBus.post(event).asynchronously();
+    protected boolean isNetworkReady() {
+        return ServiceManager.getInstance().getNetwork().isOnline();
     }
 
     protected void postNetworkException(NetworkException e) {
         ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
+    }
+
+    protected void logException(NetworkException exception){
+        Log.e(AppLog.LOG_TAG_NETWORK, exception.getMessage(), exception);
+        postNetworkException(exception);
     }
 
 }

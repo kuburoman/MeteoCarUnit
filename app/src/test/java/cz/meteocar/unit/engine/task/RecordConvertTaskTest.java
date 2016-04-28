@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.storage;
+package cz.meteocar.unit.engine.task;
 
 
 import org.json.JSONArray;
@@ -19,6 +19,7 @@ import java.util.List;
 import cz.meteocar.unit.engine.convertor.DataPoint2RecordEntityConverter;
 import cz.meteocar.unit.engine.convertor.RecordEntity2DataPointConverter;
 import cz.meteocar.unit.engine.enums.FilterEnum;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.JsonTags;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;

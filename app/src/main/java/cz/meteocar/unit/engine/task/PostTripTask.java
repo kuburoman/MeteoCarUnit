@@ -1,7 +1,8 @@
-package cz.meteocar.unit.engine.network.task;
+package cz.meteocar.unit.engine.task;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.network.NetworkException;
+import cz.meteocar.unit.engine.network.task.NetworkConnector;
 import cz.meteocar.unit.engine.storage.helper.TripHelper;
 import cz.meteocar.unit.engine.storage.model.TripEntity;
 import cz.meteocar.unit.engine.task.AbstractTask;

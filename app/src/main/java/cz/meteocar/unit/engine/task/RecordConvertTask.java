@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.storage;
+package cz.meteocar.unit.engine.task;
 
 import android.util.Log;
 
@@ -17,6 +17,8 @@ import cz.meteocar.unit.engine.convertor.RecordEntity2DataPointConverter;
 import cz.meteocar.unit.engine.enums.FilterEnum;
 import cz.meteocar.unit.engine.event.DebugMessageEvent;
 import cz.meteocar.unit.engine.log.AppLog;
+import cz.meteocar.unit.engine.storage.DB;
+import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.helper.JsonTags;
 import cz.meteocar.unit.engine.storage.helper.RecordHelper;

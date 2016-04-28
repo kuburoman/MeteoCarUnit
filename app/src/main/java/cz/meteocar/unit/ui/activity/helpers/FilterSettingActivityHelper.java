@@ -157,7 +157,7 @@ public class FilterSettingActivityHelper {
 
         // uděláme builder, nastavíme text a titulek
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getResources().getString(R.string.settings_obd_edit_window_title));
+        builder.setTitle(context.getResources().getString(R.string.settings_filter_title));
         builder.setView(dialogView);
         builder.setNeutralButton(R.string.settings_obd_edit_btn_cancel, null);
         builder.setPositiveButton(R.string.settings_obd_edit_btn_save, null);

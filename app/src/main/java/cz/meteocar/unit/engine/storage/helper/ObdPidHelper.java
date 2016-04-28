@@ -95,6 +95,19 @@ public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
         return convertArray(cursor);
     }
 
+    /**
+     * Return entity by tag.
+     *
+     * @return {@link ObdPidEntity}
+     */
+    public ObdPidEntity getByTag(String name) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TAG + " = ?", new String[]{name}, null, null, null);
+
+        return convertSingle(cursor);
+    }
+
+    @Override
     protected ObdPidEntity convert(Cursor cursor) {
         ObdPidEntity obj = new ObdPidEntity();
         obj.setId(cursor.getInt(cursor.getColumnIndex(COLUMN_NAME_ID)));

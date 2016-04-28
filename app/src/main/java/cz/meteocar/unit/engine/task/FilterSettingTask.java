@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.network.task;
+package cz.meteocar.unit.engine.task;
 
 import android.util.Log;
 
@@ -15,24 +15,40 @@ import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateFilterSettingRequest;
 import cz.meteocar.unit.engine.network.dto.FilterSettingDto;
 import cz.meteocar.unit.engine.network.dto.GetFilterSettingResponse;
+import cz.meteocar.unit.engine.network.task.NetworkConnector;
+import cz.meteocar.unit.engine.network.task.QueryParameter;
 import cz.meteocar.unit.engine.network.task.converter.FilterSettingsEntity2DtoConverter;
 import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.FilterSettingHelper;
 import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
-import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
- * Task for synchronization with server.
+ * Task for synchronization filter setting with server.
  */
 public class FilterSettingTask extends AbstractTask {
 
-    private NetworkConnector<Void, GetFilterSettingResponse> getConnector = new NetworkConnector<>(Void.class, GetFilterSettingResponse.class, "filterSettings");
-    private NetworkConnector<CreateFilterSettingRequest, Void> postConnector = new NetworkConnector<>(CreateFilterSettingRequest.class, Void.class, "filterSettings");
+    private NetworkConnector<Void, GetFilterSettingResponse> getConnector;
+    private NetworkConnector<CreateFilterSettingRequest, Void> postConnector;
 
-    private FilterSettingHelper dao = ServiceManager.getInstance().getDB().getFilterSettingHelper();
+    private FilterSettingHelper dao;
 
     private static final Converter<FilterSettingEntity, FilterSettingDto> converterForward = new FilterSettingsEntity2DtoConverter();
     private static final Converter<FilterSettingDto, FilterSettingEntity> converterBackward = converterForward.reverse();
+
+    public FilterSettingTask() {
+        this(
+                new NetworkConnector<>(Void.class, GetFilterSettingResponse.class, "filterSettings"),
+                new NetworkConnector<>(CreateFilterSettingRequest.class, Void.class, "filterSettings"),
+                ServiceManager.getInstance().getDB().getFilterSettingHelper());
+    }
+
+    public FilterSettingTask(NetworkConnector<Void, GetFilterSettingResponse> getConnector,
+                             NetworkConnector<CreateFilterSettingRequest, Void> postConnector,
+                             FilterSettingHelper dao) {
+        this.getConnector = getConnector;
+        this.postConnector = postConnector;
+        this.dao = dao;
+    }
 
     @Override
     public void runTask() {
@@ -48,28 +64,25 @@ public class FilterSettingTask extends AbstractTask {
                     return;
                 }
                 dao.deleteAll();
-                try {
-                    dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
-                } catch (DatabaseException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
-                }
+                dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
             } catch (NetworkException e) {
+                exceptionCaught(e);
+            } catch (DatabaseException e) {
                 Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
-                if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
-                    try {
-                        postConnector.post(new CreateFilterSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
-                    } catch (NetworkException e1) {
-                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e1);
-                        postNetworkException(e);
-                    }
-                }
-                postNetworkException(e);
             }
         }
     }
 
-    protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().getNetwork().isOnline();
+    protected void exceptionCaught(NetworkException e) {
+        if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
+            try {
+                postConnector.post(new CreateFilterSettingRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
+                return;
+            } catch (NetworkException e1) {
+                logException(e1);
+            }
+        }
+        logException(e);
     }
 
     protected Long getLatestUpdateTime(List<FilterSettingEntity> filterSettingEntities) {

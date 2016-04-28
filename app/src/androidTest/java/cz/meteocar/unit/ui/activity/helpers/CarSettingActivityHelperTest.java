@@ -9,14 +9,13 @@ import static org.junit.Assert.*;
  */
 public class CarSettingActivityHelperTest extends AbstractSettingActivityHelper {
 
-    private String itemName = "Nastavení procesů jednotky";
     private String settingName = "RECORD_CONVERT_PERIOD";
 
     public void testAdd(){
         solo.unlockScreen();
         loginToSettings();
 
-        solo.clickOnText(itemName);
+        solo.clickInList(3);
         solo.clickOnButton(0);
 
         solo.pressSpinnerItem(0, 1);
@@ -26,7 +25,7 @@ public class CarSettingActivityHelperTest extends AbstractSettingActivityHelper 
         solo.goBack();
 
         loginToSettings();
-        solo.clickOnText(itemName);
+        solo.clickInList(3);
         assertTrue(solo.searchText(settingName));
         solo.clickOnText(settingName);
         assertTrue(solo.searchText(settingName));
@@ -42,7 +41,7 @@ public class CarSettingActivityHelperTest extends AbstractSettingActivityHelper 
 
         loginToSettings();
 
-        solo.clickOnText(itemName);
+        solo.clickInList(3);
         assertFalse(solo.searchText(settingName));
     }
 
@@ -57,7 +56,7 @@ public class CarSettingActivityHelperTest extends AbstractSettingActivityHelper 
         solo.goBack();
 
         loginToSettings();
-        solo.clickOnText(itemName);
+        solo.clickInList(3);
         assertTrue(solo.searchText(settingName));
         solo.clickOnText(settingName);
         assertTrue(solo.searchText(settingName));

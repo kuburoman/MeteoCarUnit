@@ -57,9 +57,7 @@ public class RDPSimplify {
 
         double sqTolerance = tolerance * tolerance;
 
-        points = simplifyDouglasPeucker(points.toArray(new DataPoint[points.size()]), sqTolerance);
-
-        return points;
+        return simplifyDouglasPeucker(points.toArray(new DataPoint[points.size()]), sqTolerance);
     }
 
     private static class Range {
@@ -78,7 +76,7 @@ public class RDPSimplify {
         bitSet.set(0);
         bitSet.set(points.length - 1);
 
-        List<Range> stack = new ArrayList<Range>();
+        List<Range> stack = new ArrayList<>();
         stack.add(new Range(0, points.length - 1));
 
         while (!stack.isEmpty()) {

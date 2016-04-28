@@ -34,7 +34,7 @@ public class ObdPidSettingActivityHelper {
 
     private View dialogView;
     private Context context;
-    private AlertDialog dialog;
+    private AlertDialog alertDialog;
     private PreferenceScreen cat;
     private int dialogDataID = 0;
     private boolean validationSuccessful = true;
@@ -141,7 +141,7 @@ public class ObdPidSettingActivityHelper {
         } else {
             active.setChecked(false);
         }
-        dialog.show();
+        alertDialog.show();
     }
 
     /**
@@ -155,20 +155,33 @@ public class ObdPidSettingActivityHelper {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(context.getResources().getString(R.string.settings_obd_edit_window_title));
         builder.setView(dialogView);
+        builder.setNeutralButton(R.string.settings_obd_edit_btn_cancel, null);
+        builder.setPositiveButton(R.string.settings_obd_edit_btn_save, null);
+        builder.setNegativeButton(R.string.settings_obd_edit_btn_delete, null);
+        builder.setCancelable(true);
+        alertDialog = builder.create();
 
-        dialog = builder
-                .setNeutralButton(R.string.settings_obd_edit_btn_cancel, new DialogInterface.OnClickListener() {
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+
+                Button neutralButton = alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL);
+                neutralButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
                     }
-                }).setPositiveButton(R.string.settings_obd_edit_btn_save, new DialogInterface.OnClickListener() {
+                });
+
+
+                Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+                positiveButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(View view) {
+
                         ObdPidEntity obj = new ObdPidEntity();
 
                         obj.setId(dialogDataID);
@@ -184,7 +197,12 @@ public class ObdPidSettingActivityHelper {
                         EditText editTag = (EditText) dialogView.findViewById(R.id.dialog_obd_tag_edit);
                         validate(editTag);
                         if (editTag != null) {
-                            obj.setTag(editTag.getText().toString());
+                            String tag = editTag.getText().toString();
+                            if (obdPidHelper.getByTag(tag) != null) {
+                                editTag.setError("Tag již použitý");
+                                validationSuccessful = false;
+                            }
+                            obj.setTag(tag);
                         }
 
                         EditText editCode = (EditText) dialogView.findViewById(R.id.dialog_obd_code_edit);
@@ -201,13 +219,13 @@ public class ObdPidSettingActivityHelper {
 
                         EditText editMin = (EditText) dialogView.findViewById(R.id.dialog_obd_min_edit);
                         validate(editMin);
-                        if (editMin != null) {
+                        if (editMin != null && editMin.getText().toString().trim().length() != 0) {
                             obj.setMin(Integer.parseInt(editMin.getText().toString()));
                         }
 
                         EditText editMax = (EditText) dialogView.findViewById(R.id.dialog_obd_max_edit);
                         validate(editMax);
-                        if (editMax != null) {
+                        if (editMax != null && editMax.getText().toString().trim().length() != 0) {
                             obj.setMax(Integer.parseInt(editMax.getText().toString()));
                         }
 
@@ -216,7 +234,7 @@ public class ObdPidSettingActivityHelper {
                             obj.setActive(active.isChecked());
                         }
 
-                        if(!validationSuccessful){
+                        if (!validationSuccessful) {
                             return;
                         }
 
@@ -225,19 +243,24 @@ public class ObdPidSettingActivityHelper {
                         } catch (DatabaseException e) {
                             Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
                         }
-                        dialog.dismiss();
+                        alertDialog.dismiss();
                         createScreen();
                     }
-                }).setNegativeButton(R.string.settings_obd_edit_btn_delete, new DialogInterface.OnClickListener() {
+                });
+
+                Button negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+                negativeButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
+                    public void onClick(View view) {
+                        alertDialog.dismiss();
 
                         obdPidHelper.delete(dialogDataID);
                         createScreen();
                     }
-                }).setCancelable(true).create();
+                });
+            }
+        });
     }
 
     public void treeClick(PreferenceScreen myScreen) {

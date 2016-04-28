@@ -1,4 +1,4 @@
-package cz.meteocar.unit.engine.network.task;
+package cz.meteocar.unit.engine.task;
 
 import android.util.Log;
 
@@ -15,6 +15,8 @@ import cz.meteocar.unit.engine.network.NetworkException;
 import cz.meteocar.unit.engine.network.dto.CreateOBDPidRequest;
 import cz.meteocar.unit.engine.network.dto.GetOBDPidResponse;
 import cz.meteocar.unit.engine.network.dto.OBDPidDto;
+import cz.meteocar.unit.engine.network.task.NetworkConnector;
+import cz.meteocar.unit.engine.network.task.QueryParameter;
 import cz.meteocar.unit.engine.network.task.converter.OBDPidEntity2DtoConverter;
 import cz.meteocar.unit.engine.storage.DatabaseException;
 import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
@@ -22,17 +24,31 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 import cz.meteocar.unit.engine.task.AbstractTask;
 
 /**
- * Created by Nell on 20.3.2016.
+ * Task for synchronization of OBD Pids.
  */
 public class OBDPidsTask extends AbstractTask {
 
-    private NetworkConnector<Void, GetOBDPidResponse> getConnector = new NetworkConnector<>(Void.class, GetOBDPidResponse.class, "obdPids");
-    private NetworkConnector<CreateOBDPidRequest, Void> postConnector = new NetworkConnector<>(CreateOBDPidRequest.class, Void.class, "obdPids");
+    private NetworkConnector<Void, GetOBDPidResponse> getConnector;
+    private NetworkConnector<CreateOBDPidRequest, Void> postConnector;
 
-    private ObdPidHelper dao = ServiceManager.getInstance().getDB().getObdPidHelper();
+    private ObdPidHelper dao;
 
     private static final Converter<ObdPidEntity, OBDPidDto> converterForward = new OBDPidEntity2DtoConverter();
     private static final Converter<OBDPidDto, ObdPidEntity> converterBackward = converterForward.reverse();
+
+    public OBDPidsTask() {
+        this(
+                new NetworkConnector<>(Void.class, GetOBDPidResponse.class, "obdPids"),
+                new NetworkConnector<>(CreateOBDPidRequest.class, Void.class, "obdPids"),
+                ServiceManager.getInstance().getDB().getObdPidHelper()
+        );
+    }
+
+    public OBDPidsTask(NetworkConnector<Void, GetOBDPidResponse> getConnector, NetworkConnector<CreateOBDPidRequest, Void> postConnector, ObdPidHelper dao) {
+        this.getConnector = getConnector;
+        this.postConnector = postConnector;
+        this.dao = dao;
+    }
 
     @Override
     public void runTask() {
@@ -48,28 +64,27 @@ public class OBDPidsTask extends AbstractTask {
                     return;
                 }
                 dao.deleteAll();
-                try {
-                    dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
-                } catch (DatabaseException e) {
-                    Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
-                }
+                dao.saveAll(Lists.newArrayList(converterBackward.convertAll(response.getRecords())));
             } catch (NetworkException e) {
-                Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
-                if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
-                    try {
-                        postConnector.post(new CreateOBDPidRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
-                    } catch (NetworkException e1) {
-                        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e1);
-                        postNetworkException(e);
-                    }
-                }
-                postNetworkException(e);
+                exceptionCaught(e);
+            } catch (DatabaseException e) {
+                Log.e(AppLog.LOG_TAG_DB, e.getMessage(), e);
             }
         }
     }
 
-    protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().getNetwork().isOnline();
+    protected void exceptionCaught(NetworkException e) {
+        if (ErrorCodes.RECORDS_UPDATE_REQUIRED.toString().equals(e.getErrorResponse().getCode())) {
+            try {
+                postConnector.post(new CreateOBDPidRequest(Lists.newArrayList(converterForward.convertAll(dao.getAll()))));
+                return;
+            } catch (NetworkException e1) {
+                Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e1);
+                postNetworkException(e);
+            }
+        }
+        Log.e(AppLog.LOG_TAG_NETWORK, e.getMessage(), e);
+        postNetworkException(e);
     }
 
     protected Long getLatestUpdateTime(List<ObdPidEntity> OBDPidEntities) {
