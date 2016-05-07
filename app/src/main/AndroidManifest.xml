@@ -56,15 +56,15 @@
             android:name=".ui.activity.MenuActivity"
             android:label="@string/app_menu_title"
             android:theme="@style/MenuActTheme"
-            android:windowSoftInputMode="stateHidden"></activity>
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/settings_title"
-            android:theme="@style/SettingsActTheme"></activity>
+            android:theme="@style/SettingsActTheme"/>
         <activity
             android:name=".ui.activity.TripDetailActivity"
             android:label="@string/settings_title"
-            android:theme="@style/SettingsActTheme"></activity>
+            android:theme="@style/SettingsActTheme"/>
     </application>
 
 </manifest>

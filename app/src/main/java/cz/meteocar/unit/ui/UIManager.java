@@ -215,7 +215,7 @@ public class UIManager {
 
             fragmentManager
                     .beginTransaction()
-                    .replace(R.id.content_frame, dashboardFragment)
+                    .replace(R.id.content_frame, dashboardFragment, "dashboardFragment")
                     .addToBackStack("fragment" + position)
                     .commit();
 

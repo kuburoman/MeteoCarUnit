@@ -5,7 +5,7 @@ apply plugin: 'jacoco'
 // gradlew clean createDevelDebugCoverageReport jacocoTestReport
 //
 // -- Run sonar task
-//gradlew sonarRunner
+// gradlew sonarRunner
 
 jacoco {
 
@@ -48,8 +48,8 @@ android {
         applicationId "cz.meteocar.unit"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 7
-        versionName "1.0.6"
+        versionCode 8
+        versionName "1.0.7"
         testApplicationId "cz.meteocar.unit.test"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

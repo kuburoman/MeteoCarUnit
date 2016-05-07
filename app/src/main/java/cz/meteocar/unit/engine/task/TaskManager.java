@@ -62,24 +62,24 @@ public class TaskManager {
         scheduledFilterSettingTask = service.scheduleAtFixedRate(new FilterSettingTask(), 0,
                 getTimeForTask(CarSettingEnum.FILTER_SETTING_SYNC_PERIOD.toString()), TimeUnit.SECONDS);
 
-        scheduledObdPidsTask = service.scheduleAtFixedRate(new OBDPidsTask(), 0,
+        scheduledObdPidsTask = service.scheduleAtFixedRate(new OBDPidsTask(), 1,
                 getTimeForTask(CarSettingEnum.OBD_PID_SYNC_PERIOD.toString()), TimeUnit.SECONDS);
 
-        scheduledCarSettingTask = service.scheduleAtFixedRate(new CarSettingTask(), 0,
+        scheduledCarSettingTask = service.scheduleAtFixedRate(new CarSettingTask(), 2,
                 getTimeForTask(CarSettingEnum.CAR_SETTING_SYNC_PERIOD.toString()), TimeUnit.SECONDS);
 
-        scheduledDtcTask = service.scheduleAtFixedRate(new DTCTask(), 0,
+        scheduledDtcTask = service.scheduleAtFixedRate(new DTCTask(), 3,
                 getTimeForTask(CarSettingEnum.DTC_SYNC_PERIOD.toString()), TimeUnit.SECONDS);
 
-        scheduledDtcRequestTask = service.scheduleAtFixedRate(new DTCRequestTask(), 0,
+        scheduledDtcRequestTask = service.scheduleAtFixedRate(new DTCRequestTask(), 4,
                 getTimeForTask(CarSettingEnum.DTC_REQUEST_PERIOD.toString()), TimeUnit.SECONDS);
     }
 
     protected void startOtherTasks() {
-        scheduledPostTripTask = service.scheduleAtFixedRate(new PostTripTask(), 0,
+        scheduledPostTripTask = service.scheduleAtFixedRate(new PostTripTask(), 5,
                 getTimeForTask(CarSettingEnum.POST_TRIP_PERIOD.toString()), TimeUnit.SECONDS);
 
-        scheduledConvertService = service.scheduleAtFixedRate(new RecordConvertTask(), 0,
+        scheduledConvertService = service.scheduleAtFixedRate(new RecordConvertTask(), 6,
                 getTimeForTask(CarSettingEnum.RECORD_CONVERT_PERIOD.toString()), TimeUnit.SECONDS);
     }
 

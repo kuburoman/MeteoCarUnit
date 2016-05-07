@@ -37,4 +37,13 @@ public class SplashActivity extends Activity {
         setContentView(view);
     }
 
+    /**
+     * Used here to empty memory.
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        view.clearView();
+    }
 }

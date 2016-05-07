@@ -4,9 +4,6 @@
     android:orientation="horizontal"
     android:background="@drawable/dashboard_bg">
 
-
-
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="fill_parent"

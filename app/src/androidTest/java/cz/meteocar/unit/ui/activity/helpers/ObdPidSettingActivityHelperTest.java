@@ -19,17 +19,24 @@ public class ObdPidSettingActivityHelperTest extends AbstractSettingActivityHelp
         solo.clickInList(3);
 
         solo.clickOnButton(0);
-        solo.clearEditText(4);
-        solo.clearEditText(5);
+
+
+        EditText max = (EditText) solo.getView(R.id.dialog_obd_max_edit);
+        EditText min = (EditText) solo.getView(R.id.dialog_obd_min_edit);
+
+        solo.clearEditText(min);
+        solo.clearEditText(max);
 
         solo.clickOnView(solo.getView(BUTTON_POSITIVE));
 
         EditText name = (EditText) solo.getView(R.id.dialog_obd_name_edit);
-        EditText max = (EditText) solo.getView(R.id.dialog_obd_max_edit);
+
         EditText code = (EditText) solo.getView(R.id.dialog_obd_code_edit);
         EditText tag = (EditText) solo.getView(R.id.dialog_obd_tag_edit);
         EditText formula = (EditText) solo.getView(R.id.dialog_obd_formula_edit);
-        EditText min = (EditText) solo.getView(R.id.dialog_obd_min_edit);
+        max = (EditText) solo.getView(R.id.dialog_obd_max_edit);
+        min = (EditText) solo.getView(R.id.dialog_obd_min_edit);
+
         assertNotNull(name.getError());
         assertNotNull(code.getError());
         assertNotNull(tag.getError());
@@ -37,32 +44,21 @@ public class ObdPidSettingActivityHelperTest extends AbstractSettingActivityHelp
         assertNotNull(min.getError());
         assertNotNull(max.getError());
 
-        solo.enterText(0, "test");
-        solo.enterText(2, "obd_speed");
-        solo.enterText(1, "0100");
-        solo.enterText(3, "A");
-        solo.enterText(4, "0");
-        solo.enterText(5, "100");
+        solo.enterText(name, "test");
+        solo.enterText(tag, "obd_speed");
+        solo.enterText(code, "0100");
+        solo.enterText(formula, "A");
+        solo.enterText(min, "0");
+        solo.enterText(max, "100");
         solo.clickOnCheckBox(0);
         solo.clickOnView(solo.getView(BUTTON_POSITIVE));
 
         assertNotNull(tag.getError());
 
         solo.clearEditText(2);
-        solo.enterText(2, "test_test");
+        solo.enterText(tag, "test_test");
 
         solo.clickOnView(solo.getView(BUTTON_POSITIVE));
-
-        assertTrue(solo.searchText("test"));
-
-        solo.goBack();
-        solo.goBack();
-        solo.goBack();
-
-        loginToSettings();
-
-        solo.clickInList(0);
-        solo.clickInList(3);
 
         assertTrue(solo.searchText("test"));
         solo.clickOnText("test");

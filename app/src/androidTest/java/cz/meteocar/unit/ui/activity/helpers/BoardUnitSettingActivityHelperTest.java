@@ -14,7 +14,9 @@ public class BoardUnitSettingActivityHelperTest extends AbstractSettingActivityH
 
     public void testSetUp(){
         solo.unlockScreen();
+
         loginToSettings();
+
         solo.clickOnText("Nastavení palubní jednotky");
         solo.clickOnCheckBox(0);
         solo.clickOnText("Nastavení palubní jednotky");

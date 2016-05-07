@@ -61,6 +61,7 @@ public class SplashView extends View {
     }
     private void init() {
 
+
         // boxy
         boxBack = new Box();
         boxFore = new Box();
@@ -165,4 +166,21 @@ public class SplashView extends View {
         // super
         super.onLayout(changed, boxBack.left, boxBack.top, boxBack.right, boxBack.bottom);
     }
+
+    public void clearView(){
+        if(bmpBack != null){
+            bmpBack.recycle();
+            bmpBack = null;
+        }
+
+        if(bmpFore != null){
+            bmpFore.recycle();
+            bmpFore = null;
+        }
+
+    }
+
+
+
+
 }

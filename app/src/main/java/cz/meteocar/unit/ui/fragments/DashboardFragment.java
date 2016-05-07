@@ -42,15 +42,6 @@ public class DashboardFragment extends Fragment {
     TextView gpsText;
     TextView infoText;
 
-    private static int instCount = 0;
-
-    public DashboardFragment() {
-        if (instCount == 1) {
-            throw new NullPointerException("return value is null at method AAA");
-        }
-        instCount++;
-    }
-
     /**
      * Vytvoření fragmentu
      *

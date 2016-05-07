@@ -2,13 +2,13 @@ package cz.meteocar.unit.ui.activity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.widget.EditText;
 
 import com.robotium.solo.Solo;
 
 import cz.meteocar.unit.BuildConfig;
-import cz.meteocar.unit.LoginHelper;
 import cz.meteocar.unit.R;
 
 /**
@@ -53,11 +53,18 @@ public class AbstractSettingActivityHelper extends ActivityInstrumentationTestCa
         solo.finishOpenedActivities();
     }
 
-    public void loginToSettings(){
+    public void loginToSettings() {
         solo.enterText((EditText) solo.getView(R.id.nameEditText), "root");
         solo.enterText((EditText) solo.getView(R.id.pwdEditText), "root");
         solo.clickOnCheckBox(0);
 
         solo.clickOnView(solo.getView(R.id.btnlogin));
+
+        solo.waitForActivity(SettingsActivity.class);
+    }
+
+    public void setWifiEnabled(boolean state) {
+        WifiManager wifiManager = (WifiManager) solo.getCurrentActivity().getSystemService(Context.WIFI_SERVICE);
+        wifiManager.setWifiEnabled(state);
     }
 }
