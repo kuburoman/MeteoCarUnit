@@ -67,10 +67,6 @@ public class DashboardFragment extends Fragment {
         timeText = (TextView) view.findViewById(R.id.dashboardTextTime);
         infoText = (TextView) view.findViewById(R.id.osmInfoText);
 
-        // inicializace trip kontroleru
-        //Button tripButton = (Button) view.findViewById(R.id.dashboardTripButton);
-        //MasterController.getInstance().trip.init(tripButton);
-
         // zákl texty
         obdText.setText("OBD OFF");
         gpsText.setText("GPS OFF");
@@ -128,37 +124,26 @@ public class DashboardFragment extends Fragment {
 
     @Handler
     public void handleLocationUpdate(GPSPositionEvent msg) {
-        /*AppLog.i(AppLog.LOG_TAG_GPS, "Location delivered: ");
-        line1gps = "LAT: "+msg.getLocation().getLatitude();
-        line2gps = "LON: "+msg.getLocation().getLongitude();
-        line3gps = "ACC: "+msg.getLocation().getAccuracy();
-        postInvalidate();*/
-
-        // updatovat rychlost?
-        //if(!isOBD){
-        //AppLog.i(AppLog.LOG_TAG_GPS, "Updating speed (GPS): "+msg.getLocation().getSpeed());
 
         int value = (int) Math.round(msg.getLocation().getSpeed() * 3.6);
 
-        //debugText.setText("S: "+value);
         speedGauge.setSecondValue(value);
 
         if (getView() != null) {
             getView().postInvalidate();
         }
-        //}
     }
 
     @Handler
     public void handleGPSStatus(GPSStatusEvent msg) {
-        if ((msg.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE) ||
-                (msg.getStatus() == ServiceGPS.STATUS_NO_HARDWARE)) {
+        if (msg.getStatus() == ServiceGPS.STATUS_GPS_OFFLINE ||
+                msg.getStatus() == ServiceGPS.STATUS_NO_HARDWARE) {
             gpsText.setText("GPS OFF");
         }
-        if ((msg.getStatus() == ServiceGPS.STATUS_NO_FIX)) {
+        if (msg.getStatus() == ServiceGPS.STATUS_NO_FIX) {
             gpsText.setText("GPS ON");
         }
-        if ((msg.getStatus() == ServiceGPS.STATUS_FIXED)) {
+        if (msg.getStatus() == ServiceGPS.STATUS_FIXED) {
             gpsText.setText("GPS OK");
         }
     }
@@ -171,15 +156,15 @@ public class DashboardFragment extends Fragment {
      */
     @Handler
     public void handleOBDStatus(OBDStatusEvent msg) {
-        if ((msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED) ||
-                (msg.getStatusCode() == OBDService.OBD_STATE_NOT_CONNECTED)) {
+        if (msg.getStatusCode() == OBDService.OBD_STATE_NOT_INITIALIZED ||
+                msg.getStatusCode() == OBDService.OBD_STATE_NOT_CONNECTED) {
             obdText.setText("OBD SEARCH");
         }
-        if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTING) ||
-                (msg.getStatusCode() == OBDService.OBD_STATE_RECONNECTING)) {
+        if (msg.getStatusCode() == OBDService.OBD_STATE_CONNECTING ||
+                msg.getStatusCode() == OBDService.OBD_STATE_RECONNECTING) {
             obdText.setText("OBD CONN");
         }
-        if ((msg.getStatusCode() == OBDService.OBD_STATE_CONNECTED)) {
+        if (msg.getStatusCode() == OBDService.OBD_STATE_CONNECTED) {
             obdText.setText("OBD OK");
         }
     }
@@ -188,9 +173,6 @@ public class DashboardFragment extends Fragment {
     @Handler
     public void handleOBDPID(final OBDPidEvent evt) {
 
-        // debug
-        //AppLog.i(AppLog.LOG_TAG_UI, "PID received, tag: "+evt.getMessage().getTag()+" value: "+evt.getValue()+" id: "+evt.getMessage().getID());
-
         // update tachometrů spustíme v UI threadu
         getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -198,26 +180,19 @@ public class DashboardFragment extends Fragment {
 
                 // speed
                 if ("010D1".equals(evt.getMessage().getCommand())) {
-                    //line6obd_speed = "S: "+evt.getValue()   + "   [ "+evt.getRawResponse()+" ]";
 
                     int value = (int) Math.round(evt.getValue());
-                    //debugText.setText("S: "+value);
                     speedGauge.setValue(value);
 
                     if (getView() != null) {
                         getView().postInvalidate();
                     }
 
-                    //AppLog.i("SPEED");
                 }
                 if ("010C2".equals(evt.getMessage().getCommand())) {
-                    //line6obd_rpm = "R: "+evt.getValue()       + "   [ "+evt.getRawResponse()+" ]";
                     int value = (int) Math.round(evt.getValue());
                     rpmGauge.setValue(value);
-                    //AppLog.i("RPM");
                 }
-
-                //AppLog.i(null, "Time delivered: " + line4time);
             }
         });
     }
@@ -230,11 +205,6 @@ public class DashboardFragment extends Fragment {
      */
     @Handler
     public void handleDatabaseEvent(DBEvent evt) {
-        //line7db = "DB count: "+evt.getCount();
-        // postInvalidate();
-
-        // debug
-        //AppLog.i(AppLog.LOG_TAG_UI, "received time event: "+counter);
 
         // přepočítáme dobu trvání jízdy na HH : MM
         int secs = evt.getTime();
@@ -243,20 +213,19 @@ public class DashboardFragment extends Fragment {
         int hours = mins / 60;
         mins -= hours * 60;
 
-        String h = ((hours > 9) ? "" + hours : "0" + hours);
-        String m = ((mins > 9) ? "" + mins : "0" + mins);
-        String s = ((secs > 9) ? "" + secs : "0" + secs);
+        String h = (hours > 9) ? Integer.toString(hours) : "0" + hours;
+        String m = (mins > 9) ? Integer.toString(mins) : "0" + mins;
+        String s = (secs > 9) ? Integer.toString(secs) : "0" + secs;
         String time = h + " : " + m + " : " + s;
-        //AppLog.i(AppLog.LOG_TAG_UI, "time: "+time);
 
         // zobrazíme
         timeText.setText(time);
         timeText.invalidate();
 
-        double val = Math.round((double) evt.getObdDistance() / 10);
-        String distObd = "" + (val / 100);
-        val = Math.round((double) evt.getGpsDistance() / 10);
-        String distGps = "" + (val / 100);
+        double val = Math.round(evt.getObdDistance() / 10.0);
+        String distObd = Double.toString(val / 100);
+        val = Math.round(evt.getGpsDistance() / 10.0);
+        String distGps = Double.toString(val / 100);
 
         // vzdálenost
         infoText.setText(
@@ -265,8 +234,10 @@ public class DashboardFragment extends Fragment {
         );
         infoText.invalidate();
 
-        // překreslíme view
-        getView().postInvalidate();
+        if (getView() != null) {
+            // překreslíme view
+            getView().postInvalidate();
+        }
     }
 
 }

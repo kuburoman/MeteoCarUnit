@@ -3,7 +3,6 @@ package cz.meteocar.unit.engine.storage.helper;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import cz.meteocar.unit.BuildConfig;
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;

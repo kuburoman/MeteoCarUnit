@@ -58,7 +58,7 @@ public class ObdPidSettingActivityHelper {
     public void createScreen() {
         cat.removeAll();
         List<ObdPidEntity> arr = obdPidHelper.getAll();
-        if (arr.size() == 0) {
+        if (arr.isEmpty()) {
             cat.addPreference(new Preference(context));
             return;
         }

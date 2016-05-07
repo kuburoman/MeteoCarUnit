@@ -16,7 +16,6 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 public class ObdPidHelper extends AbstractHelper<ObdPidEntity> {
 
     private static final String TABLE_NAME = "obd_pids";
-    private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_NAME = "name";
     private static final String COLUMN_NAME_TAG = "tag";
     private static final String COLUMN_NAME_PID_CODE = "pid_code";

@@ -20,7 +20,6 @@ import cz.meteocar.unit.engine.storage.model.DTCEntity;
 public class DTCHelper extends AbstractHelper<DTCEntity> {
 
     protected static final String TABLE_NAME = "dtc_messages";
-    protected static final String COLUMN_NAME_ID = "id";
     protected static final String COLUMN_NAME_TIME = "time";
     protected static final String COLUMN_NAME_TRIP_ID = "trip_id";
     protected static final String COLUMN_NAME_DTC_CODE = "dtc_code";

@@ -14,7 +14,6 @@ import cz.meteocar.unit.engine.storage.model.FilterSettingEntity;
 public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
 
     private static final String TABLE_NAME = "filter_setting";
-    private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_ALGORITHM = "algorithm";
     private static final String COLUMN_NAME_TAG = "tag";
     private static final String COLUMN_NAME_VALUE = "value";

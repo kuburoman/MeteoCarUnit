@@ -94,9 +94,9 @@ public class CarSettingTask extends AbstractTask {
         ServiceManager.getInstance().eventBus.post(event).asynchronously();
     }
 
-    protected Long getLatestUpdateTime(List<CarSettingEntity> CarSettingEntities) {
+    protected Long getLatestUpdateTime(List<CarSettingEntity> carSettingEntities) {
         Long max = 0L;
-        for (CarSettingEntity entity : CarSettingEntities) {
+        for (CarSettingEntity entity : carSettingEntities) {
             if (max < entity.getUpdateTime()) {
                 max = entity.getUpdateTime();
             }

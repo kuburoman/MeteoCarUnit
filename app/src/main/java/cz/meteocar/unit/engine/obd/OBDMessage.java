@@ -10,11 +10,13 @@ package cz.meteocar.unit.engine.obd;
 public class OBDMessage {
 
     // ID (get/set)
-    private int ID = -1; public void setID(int mID){ID = mID;} public int getID(){return ID;}
+    private int ID = -1;
 
     // další údaje (get/set)
-    private String name; public String getName(){ return name;} public void setName(String name) { this.name = name; }
-    private String tag; public String getTag(){ return tag; } public void setTag(String tag){ this.tag = tag; }
+    private String name;
+
+
+    private String tag;
 
     // příkaz a interpretace / validace
     private String command = null;
@@ -25,15 +27,17 @@ public class OBDMessage {
     public OBDMessage() {
     }
 
-    OBDMessage(String obdCommand, String formulaOrValidationString, boolean isFormula){
+    OBDMessage(String obdCommand, String formulaOrValidationString, boolean isFormula) {
         setCommand(obdCommand);
         init(isFormula, formulaOrValidationString);
     }
-    OBDMessage(String obdCommand, String formula){
+
+    OBDMessage(String obdCommand, String formula) {
         setCommand(obdCommand);
         init(true, formula);
     }
-    OBDMessage(String obdCommand, String formula, int mID, String tag, String name){
+
+    OBDMessage(String obdCommand, String formula, int mID, String tag, String name) {
         setID(mID);
         setCommand(obdCommand);
         setName(name);
@@ -41,8 +45,8 @@ public class OBDMessage {
         init(true, formula);
     }
 
-    private void init(boolean useFormula, String formulaOrValidationString){
-        if(useFormula){
+    private void init(boolean useFormula, String formulaOrValidationString) {
+        if (useFormula) {
             setFormula(formulaOrValidationString);
         } else {
             validationString = formulaOrValidationString;
@@ -51,42 +55,47 @@ public class OBDMessage {
 
     /**
      * (Pře)nastaví kód OBD příkazu a přepočítá bytové pole příkazu
+     *
      * @param newCommand Nový příkaz odesílaný objektem
      */
-    public void setCommand(String newCommand){
+    public void setCommand(String newCommand) {
         command = newCommand;
-        commandByteData = ((String)command+"\r").getBytes();
+        commandByteData = ((String) command + "\r").getBytes();
     }
 
     /**
      * Získá OBD příkaz zprávy
+     *
      * @return OBD kód
      */
-    public String getCommand(){
+    public String getCommand() {
         return command;
     }
 
     /**
      * Vrátí datové pole, které se odešle jako příkaz do BT OBD zařízení
+     *
      * @return Bytové pole
      */
-    public byte[] getCommandByteData(){
+    public byte[] getCommandByteData() {
         return commandByteData;
     }
 
     /**
      * Vrátí řetězec pro ověření korektnosti přijaté odpovědi
+     *
      * @return String, který by se měl v odpovědi nacházet
      */
-    public String getValidationString(){
+    public String getValidationString() {
         return validationString;
     }
 
     /**
      * Nastaví vzorec pro výpočet číselné hodnoty z binární odpovědi
+     *
      * @param formula Vzorec pro interpretaci dat
      */
-    public void setFormula(String formula){
+    public void setFormula(String formula) {
         interpret = new FormulaInterpreter(formula);
     }
 
@@ -95,29 +104,55 @@ public class OBDMessage {
      * - např. výsledky zpráv kontrolovy protokolu nepotřebují být interpretovány
      * - PID zprávy to potřebují
      * Interně tyto dva druhy zpráv odlišíme přítomností nebo absencí interpreteru
+     *
      * @return True pokud ano, False pokud ne
      */
-    public boolean needsInterpreting(){
-        return (interpret != null);
+    public boolean needsInterpreting() {
+        return interpret != null;
     }
 
     /**
      * Zjistí zda je zpráva platná
+     *
      * @return
      */
-    public boolean isValid(){
-        if(needsInterpreting()){
-            return interpret.isSyntaxOK();
-        }
-        return true;
+    public boolean isValid() {
+        return !needsInterpreting() || interpret.isSyntaxOK();
     }
+
+
 
     /**
      * Interpretuje zjištěnou hodnotu
+     *
      * @param response Textová odezva OBD zařízení
      * @return Interpretovaná číselná hodnota
      */
-    public double getValueFrom(String response){
+    public double getValueFrom(String response) {
         return interpret.interpretString(response);
+    }
+
+    public void setID(int mID) {
+        ID = mID;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

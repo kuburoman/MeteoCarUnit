@@ -32,7 +32,6 @@ import cz.meteocar.unit.engine.storage.model.RecordEntity;
 public class RecordHelper extends AbstractHelper<RecordEntity> {
 
     private static final String TABLE_NAME = "record_details";
-    private static final String COLUMN_NAME_ID = "id";
     private static final String COLUMN_NAME_TIME = "time";
     private static final String COLUMN_NAME_USER_ID = "user_id";
     private static final String COLUMN_NAME_TRIP_ID = "trip_id";

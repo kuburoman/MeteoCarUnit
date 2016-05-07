@@ -96,22 +96,8 @@ public class DetailsFragment extends Fragment {
         graph.addSeries(seriesY);
         graph.addSeries(seriesZ);
 
-//        DataPoint[] pointsY = new DataPoint[100];
-//        for (int i = 0; i < pointsY.length; i++) {
-//            pointsY[i] = new DataPoint(i, Math.sin(i * 0.5) * 20 * (Math.random() * 10 + 1));
-//        }
-//        LineGraphSeries<DataPoint> series2 = new LineGraphSeries<DataPoint>(pointsY);
-//        graph.addSeries(series2);
-
         // enable scaling
         graph.getViewport().setScalable(true);
-
-//        graph.getViewport().setScrollable(true);
-
-//        graph.getViewport().setXAxisBoundsManual(true);
-//        graph.getViewport().setMinX(getArguments().getLong("startTime"));
-//        graph.getViewport().setMaxX(getArguments().getLong("endTime"));
-
 
         return rootView;
     }

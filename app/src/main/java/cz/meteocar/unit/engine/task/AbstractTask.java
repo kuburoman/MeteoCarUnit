@@ -5,14 +5,13 @@ import android.util.Log;
 import java.util.TimerTask;
 
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.event.AppEvent;
 import cz.meteocar.unit.engine.event.ErrorViewType;
 import cz.meteocar.unit.engine.event.NetworkErrorEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.network.NetworkException;
 
 /**
- * Created by Nell on 27.3.2016.
+ * This is abstract task with common methods for Timer Tasks.
  */
 public abstract class AbstractTask extends TimerTask {
 
@@ -36,7 +35,7 @@ public abstract class AbstractTask extends TimerTask {
         ServiceManager.getInstance().eventBus.post(new NetworkErrorEvent(e.getErrorResponse(), ErrorViewType.DASHBOARD)).asynchronously();
     }
 
-    protected void logException(NetworkException exception){
+    protected void logException(NetworkException exception) {
         Log.e(AppLog.LOG_TAG_NETWORK, exception.getMessage(), exception);
         postNetworkException(exception);
     }

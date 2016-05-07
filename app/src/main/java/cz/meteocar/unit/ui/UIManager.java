@@ -28,14 +28,10 @@ import cz.meteocar.unit.ui.fragments.DashboardFragment;
  */
 public class UIManager {
 
-    public final String version = "1.9";
+    public static final String version = "1.9";
 
     // singleton pattern
     private static final UIManager INSTANCE = new UIManager();
-
-    public static UIManager getInstance() {
-        return INSTANCE;
-    }
 
     /**
      * Celková doba zobrazení úvodní obrazovky
@@ -59,6 +55,9 @@ public class UIManager {
 
     private int actualFragment = DEFAULT_FRAGMENT;
 
+    public static UIManager getInstance() {
+        return INSTANCE;
+    }
 
     /**
      * Sets default page and context.

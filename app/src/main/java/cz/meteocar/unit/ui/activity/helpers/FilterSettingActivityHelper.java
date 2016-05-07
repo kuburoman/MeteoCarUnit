@@ -68,7 +68,7 @@ public class FilterSettingActivityHelper {
         cat.removeAll();
 
         List<FilterSettingEntity> arr = filterSettingHelper.getAll();
-        if (arr.size() == 0) {
+        if (arr.isEmpty()) {
             cat.addPreference(new Preference(context));
             return;
         }

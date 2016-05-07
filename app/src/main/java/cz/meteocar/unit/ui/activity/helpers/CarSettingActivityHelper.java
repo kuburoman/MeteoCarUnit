@@ -63,7 +63,7 @@ public class CarSettingActivityHelper {
         cat.removeAll();
 
         List<CarSettingEntity> arr = helper.getAll();
-        if (arr.size() == 0) {
+        if (arr.isEmpty()) {
             cat.addPreference(new Preference(context));
             return;
         }

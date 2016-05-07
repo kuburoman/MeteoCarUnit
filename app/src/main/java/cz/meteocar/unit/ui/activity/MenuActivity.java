@@ -53,6 +53,8 @@ public class MenuActivity extends Activity {
     private View actionBarView;
     private BitmapDrawable actionBarBg;
 
+    private boolean gpsDialogShowing = false;
+
     /**
      * Handler nového "záměru" otevření aktivity, využito pro animaci
      *
@@ -64,9 +66,6 @@ public class MenuActivity extends Activity {
         overridePendingTransition(R.anim.fadein, R.anim.fadeout);
     }
 
-    public static int instCount = 0;
-    private int instID;
-
     /**
      * Vytvoření hlavní "menu" aktivity
      *
@@ -76,15 +75,10 @@ public class MenuActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(null);
 
-        // zdvojení instance aktivity
-        // TODO: opravit lepším způsobem
-        instID = instCount++;
-
         // nastavíme instanci v manageru
         UIManager.getInstance().setMenuActivity(this);
 
         // nastaví FS
-        //UIManager.getInstance().setupFullscreen(this);
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);    // flagy - nastaví typ okna FS
         getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
@@ -134,13 +128,9 @@ public class MenuActivity extends Activity {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
 
-                // debug
-                //AppLog.log(AppLog.LOG_MSG_INFO, "getView for position: "+position);
-
                 // vytvoříme položku pokud pro danou pozici ještě není
                 if (convertView == null) {
                     convertView = getLayoutInflater().inflate(R.layout.drawer_list_item, null);
-                    //AppLog.log(AppLog.LOG_MSG_INFO, "convertView created");
                 }
 
                 // první prvek nebudeme plnit
@@ -159,7 +149,6 @@ public class MenuActivity extends Activity {
                 txtTitle.setText(getResources().getStringArray(
                         R.array.array_menu_item_names)[position - 1]);
 
-                //
                 return convertView;
             }
         });
@@ -194,8 +183,6 @@ public class MenuActivity extends Activity {
         actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-        //actionBar.setDisplayShowHomeEnabled(false);
-        //actionBar.setDisplayUseLogoEnabled(false);
         actionBarBg = new BitmapDrawable(
                 BitmapFactory.decodeResource(getResources(), R.drawable.app_action_bar_bg));
         actionBarBg.setTileModeX(Shader.TileMode.CLAMP);
@@ -204,10 +191,6 @@ public class MenuActivity extends Activity {
         actionBarView = getWindow().getDecorView().findViewById(
                 getResources().getIdentifier("action_bar_container", "id", "android"));
         actionBarView.setPadding(0, 0, 0, 0);
-/*        View iconView = getWindow().getDecorView().findViewById(
-                getResources().getIdentifier("home", "id", "android"));
-        iconView.setPadding(0,0,0,0);
-        iconView.setVisibility(View.GONE);*/
 
 
         // propojení navigační ikony a obrázku s menu
@@ -277,18 +260,9 @@ public class MenuActivity extends Activity {
         };
         menuLayout.setDrawerListener(menuToggle);
 
-        // nastaví defaultní fragment / obrazovku
-        //if (savedInstanceState == null) {
         UIManager.getInstance().onMenuItemSelected(UIManager.DEFAULT_FRAGMENT, getFragmentManager(), getApplicationContext());
-        //}
 
-        // připravíme dialogy
         initGPSDialog();
-
-        //
-        if (instID == 0) {
-            return;
-        }
 
         // odložíme check hardware, aby stihli doběhnout animace (kt. by se jinak zasekli)
         (new Handler()).postDelayed(new Runnable() {
@@ -305,19 +279,11 @@ public class MenuActivity extends Activity {
         super.onResume();
 
         //zrušíme GPS dialog
-        if (gpsDialog != null) {
-            if (gpsDialog.isShowing()) {
-                gpsDialog.dismiss();
-            }
+        if (gpsDialog != null && gpsDialog.isShowing()) {
+            gpsDialog.dismiss();
         }
         gpsDialogShowing = false;
     }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
 
     /**
      * Otevře action bar
@@ -365,7 +331,6 @@ public class MenuActivity extends Activity {
             return true;
         }
 
-        // super
         return super.onOptionsItemSelected(item);
     }
 
@@ -396,13 +361,11 @@ public class MenuActivity extends Activity {
 
         // máme už jen poslední záznam v zásobníku?
         // - to znamená prázný fragment, tj. nic ke zobrazení
-        if (getFragmentManager().getBackStackEntryCount() <= 1) {
+        if (getFragmentManager().getBackStackEntryCount() <= 1 && MasterController.getInstance().trip.isActive()) {
 
             // zeptáme se trip controlleru, jestli můžeme zkončit
-            if (MasterController.getInstance().trip.isActive()) {
-                requestTripExit(getWindow().getContext());
-                return;
-            }
+            requestTripExit(getWindow().getContext());
+            return;
         }
 
         super.onBackPressed();
@@ -414,8 +377,6 @@ public class MenuActivity extends Activity {
     public void checkHardware() {
         askUserToActivateGPSifNeeded();
     }
-
-    private boolean gpsDialogShowing = false;
 
     /**
      * Ověříme stav GPS a pokud má být zaplá a máme hardware, zeptáme se uživatele

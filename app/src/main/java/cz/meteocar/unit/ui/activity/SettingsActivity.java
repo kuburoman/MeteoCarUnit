@@ -47,7 +47,6 @@ public class SettingsActivity extends PreferenceActivity
     public static final String CAR_SETTINGS = "car_settings";
     public static final String CHECKBOX_SHOW_FILTER_RESULT = "checkbox_show_filter_result";
 
-
     private ListPreference obdList;
     private CheckBoxPreference obdCheckBox;
     private CheckBoxPreference gpsCheckBox;
@@ -60,6 +59,11 @@ public class SettingsActivity extends PreferenceActivity
     private ObdPidSettingActivityHelper obdPidDialog;
     private BoardUnitSettingActivityHelper boardUnitDialog;
     private CarSettingActivityHelper carSettingDialog;
+
+    /**
+     * Preference, která je nově otevírána
+     */
+    private boolean obdPidScreenOptionsInitialized = false;
 
     @Override
     public void onContentChanged() {
@@ -151,11 +155,6 @@ public class SettingsActivity extends PreferenceActivity
     }
 
     /**
-     * Preference, která je nově otevírána
-     */
-    private boolean obdPidScreenOptionsInitialized = false;
-
-    /**
      * Handler kliknutí na položku v celé hierarchii nastavení
      * - použijeme k vytvoření menu
      *
@@ -238,13 +237,10 @@ public class SettingsActivity extends PreferenceActivity
             //entryValues[index] = device.getAddress(); // pokud bychom chtěli používat BT adresy jako ID
 
             // ověříme zda není naším defaultním adaptérem
-            if (defaultEntryValue != null) {
-                if (defaultEntryValue.equals(entryValues[index])) {
-                    defaultEntryPresent = true;
-                }
+            if (defaultEntryValue != null && defaultEntryValue.equals(entryValues[index])) {
+                defaultEntryPresent = true;
             }
 
-            //
             index++;
         }
 

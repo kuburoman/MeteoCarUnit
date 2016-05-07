@@ -71,11 +71,6 @@ public class LoginActivity extends Activity {
         ServiceManager.getInstance().eventBus.subscribe(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
     /**
      * Akce po kliknutí na tlačítko přihlásit
      */
@@ -152,7 +147,7 @@ public class LoginActivity extends Activity {
         }
     }
 
-    private boolean validateBoardUnit(String name, String secretKey) {
+    private static boolean validateBoardUnit(String name, String secretKey) {
         return DB.getBoardUnitName().equals(name) && DB.getBoardUnitSecretKey().equals(secretKey);
     }
 

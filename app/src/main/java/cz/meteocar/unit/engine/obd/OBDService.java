@@ -28,18 +28,12 @@ import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
  */
 public class OBDService extends Thread {
 
-    // singleton
-    public static OBDService getInstance() {
-        return ServiceManager.getInstance().getOBD();
-    }
-
     // obd state codes - stavové kódy komponenty - v jakém je komponenta stavu
     public static final int OBD_STATE_NOT_INITIALIZED = 0;
     public static final int OBD_STATE_NOT_CONNECTED = 1;
     public static final int OBD_STATE_CONNECTING = 2;
     public static final int OBD_STATE_RECONNECTING = 3;
     public static final int OBD_STATE_CONNECTED = 4;
-    public static final int OBD_STATE_ERROR = 5;
     private static final String[] OBD_STATE_TEXTS = new String[]{
             "OBD_STATE_NOT_INITIALIZED",
             "OBD_STATE_NOT_CONNECTED",
@@ -52,20 +46,6 @@ public class OBDService extends Thread {
     public static final int OBD_ERROR_ALL_OK = 0;
     public static final int OBD_ERROR_NO_ADAPTER = 1;
     public static final int OBD_ERROR_ADAPTER_ENABLE_FAILED = 2;
-    public static final int OBD_ERROR_NO_DEVICE = 3;
-    public static final int OBD_ERROR_DEV_INIT_FAILED = 4;
-    private static final String[] OBD_ERROR_TEXTS = new String[]{
-            "OBD_ERROR_ALL_OK",
-            "OBD_ERROR_NO_ADAPTER",
-            "OBD_ERROR_ADAPTER_ENABLE_FAILED",
-            "OBD_ERROR_NO_DEVICE",
-            "OBD_ERROR_DEV_INIT_FAILED"};
-
-    // obd event codes - kódy událostí komponenty - co se v komponentě právě stalo
-    public static final int OBD_EVENT_ERROR = 10;
-    public static final int OBD_EVENT_STATUS_CHANGE = 11;
-    public static final int OBD_EVENT_DATA = 12;
-    public static final int OBD_EVENT_CYCLE_COMPLETED = 13;
 
     //
     private int serviceStatus = OBD_STATE_NOT_INITIALIZED;
@@ -118,6 +98,11 @@ public class OBDService extends Thread {
         initAdapter();
     }
 
+    // singleton
+    public static OBDService getInstance() {
+        return ServiceManager.getInstance().getOBD();
+    }
+
     /**
      * Incializuje proměnnou adaptéru pro přístup k BT hardware
      * - tato metoda se volá z kontruktoru, neboť proměnná btAdapter je potřeba i pokud ještě
@@ -135,15 +120,6 @@ public class OBDService extends Thread {
         } else {
             Log.d(AppLog.LOG_TAG_OBD, "Device have BT adapter");
         }
-    }
-
-    /**
-     * Zjištění aktuálního stavu služby
-     *
-     * @return Stav služby
-     */
-    public int getStatus() {
-        return serviceStatus;
     }
 
     /**
@@ -186,7 +162,6 @@ public class OBDService extends Thread {
 
         // počkáme až se bt připojí
         boolean waitForAdapter = true;
-        int btAdapterState;
         while (waitForAdapter) {
             try {
                 this.sleep(1000);
@@ -194,8 +169,6 @@ public class OBDService extends Thread {
                 Log.e(AppLog.LOG_TAG_OBD, "OBDService.sleep() caused error.", e);
             }
 
-            // zkontrolujeme status
-            btAdapterState = btAdapter.getState();
             if (btAdapter.getState() != BluetoothAdapter.STATE_TURNING_ON) {
                 waitForAdapter = false;
             }
@@ -272,7 +245,6 @@ public class OBDService extends Thread {
 
         // máme BT device, zařízení ke kterému se připojit?
         if (btDevice == null) {
-            // TODO - no device error
             return false;
         }
 

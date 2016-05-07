@@ -34,6 +34,33 @@ public class OBDMessageResolver {
     private StringBuilder readStringBuilder;
 
     /**
+     * Poslední odpověď zařízení (na poslední dotaz)
+     */
+    private String lastResponse;
+
+    /**
+     * Poslední interpretovaná odpověď zařízení
+     */
+    private double lastInterpretedValue;
+
+    /**
+     * Poslední zpracovaná obd zpráva
+     */
+    private OBDMessage lastMessage;
+
+    /**
+     * Známé chybové kódy zařízení
+     * - převzato z práce Romana Kubů
+     */
+    private static final String[] errorCode = new String[]{"UNABLE TO CONNECT", "?", "ACT ALERT", "BUFFER FULL", "BUS BUSY", "ERR", "LP ALERT", "LV RESET", "NO DATA", "STOPPED", "SEARCHING"};
+
+    /**
+     * Chybový kód poslední zprávy
+     * - jako index do seznamu všech chybových zpráv
+     */
+    private int lastErrorCode = -1;
+
+    /**
      * Init
      */
     public OBDMessageResolver() {
@@ -57,21 +84,6 @@ public class OBDMessageResolver {
     public void setOutputStream(OutputStream os) {
         outStream = os;
     }
-
-    /**
-     * Poslední odpověď zařízení (na poslední dotaz)
-     */
-    private String lastResponse;
-
-    /**
-     * Poslední interpretovaná odpověď zařízení
-     */
-    private double lastInterpretedValue;
-
-    /**
-     * Poslední zpracovaná obd zpráva
-     */
-    private OBDMessage lastMessage;
 
     /**
      * Vrátí textovou hodnotu poslední odpocědi OBD BT zařízení
@@ -170,18 +182,6 @@ public class OBDMessageResolver {
             return false;
         }
     }
-
-    /**
-     * Známé chybové kódy zařízení
-     * - převzato z práce Romana Kubů
-     */
-    private static final String[] errorCode = new String[]{"UNABLE TO CONNECT", "?", "ACT ALERT", "BUFFER FULL", "BUS BUSY", "ERR", "LP ALERT", "LV RESET", "NO DATA", "STOPPED", "SEARCHING"};
-
-    /**
-     * Chybový kód poslední zprávy
-     * - jako index do seznamu všech chybových zpráv
-     */
-    private int lastErrorCode = -1;
 
     /**
      * Vrátí poslední chybový kód, zjištěný při volání isValid()

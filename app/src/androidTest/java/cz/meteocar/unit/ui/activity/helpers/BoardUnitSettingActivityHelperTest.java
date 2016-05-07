@@ -5,14 +5,12 @@ import android.widget.EditText;
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.ui.activity.AbstractSettingActivityHelper;
 
-import static org.junit.Assert.*;
-
 /**
- * Created by Nell on 22.4.2016.
+ * Test for {@link BoardUnitSettingActivityHelper}.
  */
 public class BoardUnitSettingActivityHelperTest extends AbstractSettingActivityHelper {
 
-    public void testSetUp(){
+    public void testSetUp() {
         solo.unlockScreen();
 
         loginToSettings();

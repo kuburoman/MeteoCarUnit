@@ -87,9 +87,9 @@ public class OBDPidsTask extends AbstractTask {
         postNetworkException(e);
     }
 
-    protected Long getLatestUpdateTime(List<ObdPidEntity> OBDPidEntities) {
+    protected Long getLatestUpdateTime(List<ObdPidEntity> obdPidEntities) {
         Long max = 0L;
-        for (ObdPidEntity entity : OBDPidEntities) {
+        for (ObdPidEntity entity : obdPidEntities) {
             if (max < entity.getUpdateTime()) {
                 max = entity.getUpdateTime();
             }

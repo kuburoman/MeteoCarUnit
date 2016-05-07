@@ -55,6 +55,19 @@ public class DatabaseService extends Thread {
     private DTCHelper dtcHelper;
 
 
+    private int seconds;
+    private long count;
+    private double gpsDistance;
+    private double obdDistance;
+    private Location gpsLastLocation;
+    private OBDPidEvent obdLastEvent;
+
+    /**
+     * Mají být jízdní události zaznamenány
+     */
+    private boolean tripRecordEnabled;
+
+
     public DatabaseService(Context ctx) {
         context = ctx;
 
@@ -82,43 +95,6 @@ public class DatabaseService extends Thread {
         start();
     }
 
-    // ---------- Záznam z jízdy -----------------------------------------------------------------
-    // -------------------------------------------------------------------------------------------
-
-    private int seconds;
-
-    public int getTripTime() {
-        return seconds;
-    }
-
-    private long count;
-    private double gpsDistance;
-    private double obdDistance;
-
-    public double getTripDistance() {
-        return obdDistance;
-    }
-
-    private long tripStart;
-
-    public long getTripStart() {
-        return tripStart;
-    }
-
-    private long tripStop;
-
-    public long getTripStop() {
-        return tripStop;
-    }
-
-    private Location gpsLastLocation;
-    private OBDPidEvent obdLastEvent;
-
-    /**
-     * Mají být jízdní události zaznamenány
-     */
-    private boolean tripRecordEnabled;
-
     /**
      * Inicializuje stav záznamu jízdy
      */
@@ -133,7 +109,6 @@ public class DatabaseService extends Thread {
     public void enableTripRecording() {
         Log.d(AppLog.LOG_TAG_DB, "trip recording enabled");
         tripRecordEnabled = true;
-        tripStart = System.currentTimeMillis();
         DB.setTripId(DB.getLoggedUser() + String.valueOf(System.currentTimeMillis()));
     }
 
@@ -143,7 +118,6 @@ public class DatabaseService extends Thread {
     public void disableTripRecording() {
         Log.d(AppLog.LOG_TAG_DB, "trip recording disabled");
         tripRecordEnabled = false;
-        tripStop = System.currentTimeMillis();
     }
 
     /**
@@ -312,15 +286,13 @@ public class DatabaseService extends Thread {
     // ---------- PERSISTENCE NASTAVENÍ ----------------------------------------------------------
     // -------------------------------------------------------------------------------------------
 
-    private final String SHARED_PREFS_NAME = "appSettings";
-
     /**
      * Vrátí objekt nastavení, je možné z něj přímo číst
      *
      * @return SharedPreferences
      */
     public SharedPreferences getSettings() {
-        return context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_MULTI_PROCESS);
+        return context.getSharedPreferences("appSettings", Context.MODE_MULTI_PROCESS);
     }
 
     /**

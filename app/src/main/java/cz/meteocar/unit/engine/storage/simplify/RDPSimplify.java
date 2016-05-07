@@ -61,13 +61,15 @@ public class RDPSimplify {
     }
 
     private static class Range {
+
+        int first;
+        int last;
+
         private Range(int first, int last) {
             this.first = first;
             this.last = last;
         }
 
-        int first;
-        int last;
     }
 
     protected List<DataPoint> simplifyDouglasPeucker(DataPoint[] points, double sqTolerance) {
