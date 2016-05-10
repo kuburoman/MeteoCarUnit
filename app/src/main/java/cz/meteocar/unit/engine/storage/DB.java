@@ -18,6 +18,7 @@ public class DB {
     private static final String TRIP_ID = "trip_id";
     private static final String SYNC_SWITCH = "sync_switch";
     private static final String SHOW_FILTER_RESULT = "show_filter_result";
+    private static final String REDRAW_SPEED_METER = "redraw_speed_meter";
 
 
     // persistence key-value
@@ -91,5 +92,13 @@ public class DB {
 
     public static boolean getShowFilterResults() {
         return get().getBoolean(SHOW_FILTER_RESULT, false);
+    }
+
+    public static void setRedrawSpeedMeter(boolean value) {
+        set().putBoolean(REDRAW_SPEED_METER, value).commit();
+    }
+
+    public static boolean getRedrawSpeedMeter() {
+        return get().getBoolean(REDRAW_SPEED_METER, false);
     }
 }

@@ -13,11 +13,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.text.Html;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -34,11 +32,8 @@ import android.widget.TextView;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.controller.MasterController;
-import cz.meteocar.unit.controller.UserController;
 import cz.meteocar.unit.engine.ServiceManager;
-import cz.meteocar.unit.engine.gps.ServiceGPS;
 import cz.meteocar.unit.engine.log.AppLog;
-import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.UIManager;
 
 /**
@@ -52,8 +47,6 @@ public class MenuActivity extends Activity {
     private ActionBar actionBar;
     private View actionBarView;
     private BitmapDrawable actionBarBg;
-
-    private boolean gpsDialogShowing = false;
 
     /**
      * Handler nového "záměru" otevření aktivity, využito pro animaci
@@ -247,42 +240,14 @@ public class MenuActivity extends Activity {
                 invalidateOptionsMenu();
 
                 // načteme předchozí stav action baru
-                if (initBefore) {
-
-                    // otevřeme jej, pokud je to potřeba
-                    if (actionBarStatusBefore) {
-                        if (fragmentBefore == UIManager.getInstance().getActualFragment()) {
-                            showActionBar();
-                        }
-                    }
+                if (initBefore && actionBarStatusBefore && fragmentBefore == UIManager.getInstance().getActualFragment()) {
+                    showActionBar();
                 }
             }
         };
         menuLayout.setDrawerListener(menuToggle);
 
         UIManager.getInstance().onMenuItemSelected(UIManager.DEFAULT_FRAGMENT, getFragmentManager(), getApplicationContext());
-
-        initGPSDialog();
-
-        // odložíme check hardware, aby stihli doběhnout animace (kt. by se jinak zasekli)
-        (new Handler()).postDelayed(new Runnable() {
-            public void run() {
-                checkHardware();
-            }
-        }, 150);
-
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        //zrušíme GPS dialog
-        if (gpsDialog != null && gpsDialog.isShowing()) {
-            gpsDialog.dismiss();
-        }
-        gpsDialogShowing = false;
     }
 
     /**
@@ -369,87 +334,6 @@ public class MenuActivity extends Activity {
         }
 
         super.onBackPressed();
-    }
-
-    /**
-     * Zkontrolujeme stav hardwaru, případně vyzveme uživatele k jejich aktivaci
-     */
-    public void checkHardware() {
-        askUserToActivateGPSifNeeded();
-    }
-
-    /**
-     * Ověříme stav GPS a pokud má být zaplá a máme hardware, zeptáme se uživatele
-     */
-    public void askUserToActivateGPSifNeeded() {
-
-        // není náhodou GPS zakázána?
-        if (!DB.get().getBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false)) {
-            Log.d(AppLog.LOG_TAG_UI, "GPS Check - DISABLED");
-            return;
-        }
-
-        // pokud nemáme hardware
-        if (ServiceManager.getInstance().getGPS().getStatus() == ServiceGPS.STATUS_NO_HARDWARE) {
-            Log.d(AppLog.LOG_TAG_UI, "GPS Check - NO HARDWARE");
-            return;
-        }
-
-        boolean gpsState = ServiceManager.getInstance().getGPS().isHardwareEnabled();
-
-        if (!gpsState && !gpsDialogShowing) {
-            if (!gpsDialog.isShowing()) {
-                gpsDialogShowing = true;
-                gpsDialog.show();
-            }
-        }
-    }
-
-    private AlertDialog gpsDialog;
-
-    /**
-     * Připravíme dialog žádající uživatele o zapnutí GPS
-     */
-    private void initGPSDialog() {
-
-        // připravíme si textview
-        TextView txt = new TextView(this);
-        txt.setText(Html.fromHtml(getResources().getString(R.string.dialog_gps_html)));
-        int padding = getResources().getDimensionPixelOffset(R.dimen.fragment_padding);
-        txt.setPadding(padding, padding, padding, 0);
-
-        // uděláme builder, nastavíme text a titulek
-        AlertDialog.Builder builder = new AlertDialog.Builder(MenuActivity.this);
-        builder.setTitle(getResources().getString(R.string.dialog_gps_title));
-        builder.setView(txt);
-
-        gpsDialog = builder
-                .setPositiveButton(R.string.dialog_gps_enable, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        // TODO - dismiss by měl být jinde
-
-                        // nabídneme nastavení
-                        startActivity(new Intent(
-                                android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                    }
-                }).setNegativeButton(R.string.dialog_gps_disable, new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-
-                        // změníme nastavení GPS
-                        DB.set().putBoolean(UserController.SETTINGS_KEY_GPS_ENABLED, false).commit();
-                        MasterController.getInstance().user.updateGPSstate();
-
-                        // vyžádáme si restart
-                        UIManager.getInstance().restartApp(MenuActivity.this);
-
-                    }
-                }).setCancelable(false).create();
     }
 
     /**

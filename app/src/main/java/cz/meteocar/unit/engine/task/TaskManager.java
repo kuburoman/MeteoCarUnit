@@ -1,5 +1,7 @@
 package cz.meteocar.unit.engine.task;
 
+import android.util.Log;
+
 import net.engio.mbassy.listener.Handler;
 
 import java.util.concurrent.Executors;
@@ -9,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.enums.CarSettingEnum;
+import cz.meteocar.unit.engine.log.AppLog;
 import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.engine.storage.helper.CarSettingHelper;
 import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
@@ -118,6 +121,7 @@ public class TaskManager {
 
     @Handler
     public void handleSyncChanged(SyncWithServerChangedEvent event) {
+        Log.d(AppLog.LOG_TAG_DEFAULT, event.getType().name());
         stopSyncTasks();
         if (getSyncSwitch()) {
             startSyncTasks();
@@ -126,6 +130,7 @@ public class TaskManager {
 
     @Handler
     public void handleRescheduleTasks(RescheduleTasksEvent event) {
+        Log.d(AppLog.LOG_TAG_DEFAULT, event.getType().name());
         stopSyncTasks();
         stopOtherTasks();
 

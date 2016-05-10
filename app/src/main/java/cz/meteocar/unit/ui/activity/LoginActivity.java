@@ -118,6 +118,8 @@ public class LoginActivity extends Activity {
                 UIManager.getInstance().showSettingsActivity();
             } else {
                 runOnUiThread(new Runnable() {
+
+                    @Override
                     public void run() {
                         showWarningDialog("Only user with admin role can go into settings.");
                     }
@@ -140,6 +142,8 @@ public class LoginActivity extends Activity {
     public void handleErrorNetworkEvent(final NetworkErrorEvent evt) {
         if (ErrorViewType.LOGIN.equals(evt.getView())) {
             runOnUiThread(new Runnable() {
+
+                @Override
                 public void run() {
                     showWarningDialog(evt.getErrorResponse().getMessage());
                 }

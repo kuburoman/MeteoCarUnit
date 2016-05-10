@@ -81,20 +81,6 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         db.update(TABLE_NAME, values, "id IN (" + makePlaceholders(id.size()) + ")", array);
     }
 
-    protected String makePlaceholders(int len) {
-        if (len < 1) {
-            // It will lead to an invalid query anyway ..
-            throw new RuntimeException("No placeholders");
-        } else {
-            StringBuilder sb = new StringBuilder(len * 2 - 1);
-            sb.append("?");
-            for (int i = 1; i < len; i++) {
-                sb.append(",?");
-            }
-            return sb.toString();
-        }
-    }
-
     public void save(OBDPidEvent obj) {
         List<String> dtcList = parseEveryFrame(obj.getRawResponse());
 
@@ -109,8 +95,8 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         }
     }
 
-    protected List<String> parseEveryFrame(String message) {
-        message = message.replace(" ", "");
+    protected List<String> parseEveryFrame(String inputMessage) {
+        String message = inputMessage.replace(" ", "");
         if (message.length() % 14 != 0) {
             Log.d(AppLog.LOG_TAG_OBD, "DTC message corrupted");
             return new ArrayList<>();

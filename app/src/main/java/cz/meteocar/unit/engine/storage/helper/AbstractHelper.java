@@ -172,4 +172,14 @@ public abstract class AbstractHelper<E extends AbstractEntity> {
     }
 
     protected abstract E convert(Cursor cursor);
+
+    protected String makePlaceholders(int len) {
+        StringBuilder sb = new StringBuilder(len * 2 - 1);
+        sb.append("?");
+        for (int i = 1; i < len; i++) {
+            sb.append(",?");
+        }
+        return sb.toString();
+    }
+
 }

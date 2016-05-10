@@ -31,9 +31,4 @@ public class PostTripTask extends AbstractTask {
             }
         }
     }
-
-    protected boolean isNetworkReady() {
-        return ServiceManager.getInstance().getNetwork().isOnline();
-    }
-
 }

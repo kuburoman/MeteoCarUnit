@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 
 import cz.meteocar.unit.R;
+import cz.meteocar.unit.engine.storage.DB;
 
 public class SpeedMeterView extends View implements ValueAnimator.AnimatorUpdateListener {
 
@@ -126,6 +127,10 @@ public class SpeedMeterView extends View implements ValueAnimator.AnimatorUpdate
      * @param newValue Nová hodnota
      */
     public void setValue(int newValue) {
+
+        if (oldValue == newValue){
+            return;
+        }
 
         // overflow min a max hodnot
         if (newValue > maskPaths.maxValue) {
@@ -348,30 +353,34 @@ public class SpeedMeterView extends View implements ValueAnimator.AnimatorUpdate
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // vypočítá a vytvoří masku
-        maskPaths.updateSize(width / 2, height / 2, tachoSize);
-        maskPaths.updateValue(value);
-        maskPaths.recalcAll();
+        if(DB.getRedrawSpeedMeter()) {
 
-        // nakreslí obě plné textury
-        canvasOnline.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        canvasOffline.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-        canvasOnline.drawBitmap(bmpOnline, null, new Rect(0, 0, tachoSize, tachoSize), pAntiAlias);
-        canvasOffline.drawBitmap(bmpOffline, null, new Rect(0, 0, tachoSize, tachoSize), pAntiAlias);
+            // vypočítá a vytvoří masku
+            maskPaths.updateSize(width / 2, height / 2, tachoSize);
+            maskPaths.updateValue(value);
+            maskPaths.recalcAll();
 
-        // odmaže maskovanou část
-        pTrans.setAlpha(255);
-        canvasOnline.drawPath(maskPaths.positiveMaskPrimaryPath, pTrans);       // online plná
-        pTrans.setAlpha(maskPaths.invertedAlpha);
-        canvasOnline.drawPath(maskPaths.positiveMaskSecondaryPath, pTrans);     // online průhledná
-        pTrans.setAlpha(255);
-        canvasOffline.drawPath(maskPaths.negativeMaskPrimaryPath, pTrans);      // offline plná
-        pTrans.setAlpha(maskPaths.alpha);
-        canvasOffline.drawPath(maskPaths.negativeMaskSecondaryPath, pTrans);   // offline průhledná
+            // nakreslí obě plné textury
+            canvasOnline.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            canvasOffline.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
+            canvasOnline.drawBitmap(bmpOnline, null, new Rect(0, 0, tachoSize, tachoSize), pAntiAlias);
+            canvasOffline.drawBitmap(bmpOffline, null, new Rect(0, 0, tachoSize, tachoSize), pAntiAlias);
 
-        // zakreslí maskované bitmapy
-        canvas.drawBitmap(bmpOfflineMasked, maskPaths.boxLeft, maskPaths.boxTop, null);     // pozadí
-        canvas.drawBitmap(bmpOnlineMasked, maskPaths.boxLeft, maskPaths.boxTop, null);     // popředí
+            // odmaže maskovanou část
+            pTrans.setAlpha(255);
+            canvasOnline.drawPath(maskPaths.positiveMaskPrimaryPath, pTrans);       // online plná
+            pTrans.setAlpha(maskPaths.invertedAlpha);
+            canvasOnline.drawPath(maskPaths.positiveMaskSecondaryPath, pTrans);     // online průhledná
+            pTrans.setAlpha(255);
+            canvasOffline.drawPath(maskPaths.negativeMaskPrimaryPath, pTrans);      // offline plná
+            pTrans.setAlpha(maskPaths.alpha);
+            canvasOffline.drawPath(maskPaths.negativeMaskSecondaryPath, pTrans);   // offline průhledná
+
+            // zakreslí maskované bitmapy
+            canvas.drawBitmap(bmpOfflineMasked, maskPaths.boxLeft, maskPaths.boxTop, null);     // pozadí
+            canvas.drawBitmap(bmpOnlineMasked, maskPaths.boxLeft, maskPaths.boxTop, null);     // popředí
+
+        }
 
         // získáme hodnotu
         String valueText;

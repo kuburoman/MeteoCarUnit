@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cz.meteocar.unit.R;
 import cz.meteocar.unit.engine.ServiceManager;
@@ -26,7 +27,7 @@ public class TripsListFragment extends ListFragment {
 
         String id = DB.getLoggedUser();
 
-        ArrayList<TripDetailVO> userTripDetailList = ServiceManager.getInstance().getDB().getRecordHelper().getUserTripDetailList(id);
+        List<TripDetailVO> userTripDetailList = ServiceManager.getInstance().getDB().getRecordHelper().getUserTripDetailList(id);
 
         setListAdapter(new TripAdapter(getActivity(), R.layout.trip_list_item, userTripDetailList));
 
@@ -68,11 +69,8 @@ public class TripsListFragment extends ListFragment {
 
         getListView().setItemChecked(index, true);
 
-        // Check what fragment is currently shown, replace if needed.
-        DetailsFragment details = (DetailsFragment) getFragmentManager().findFragmentById(R.id.details);
-
         // Make new fragment to show this selection.
-        details = DetailsFragment.newInstance(index, object);
+        DetailsFragment details = DetailsFragment.newInstance(index, object);
 
         // Execute a transaction, replacing any existing fragment
         // with this one inside the frame.

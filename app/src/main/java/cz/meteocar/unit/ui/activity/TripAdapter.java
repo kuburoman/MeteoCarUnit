@@ -23,7 +23,7 @@ public class TripAdapter extends ArrayAdapter<TripDetailVO> {
 
     private List<TripDetailVO> objects;
 
-    public TripAdapter(Context context, int textViewResourceId, ArrayList<TripDetailVO> objects) {
+    public TripAdapter(Context context, int textViewResourceId, List<TripDetailVO> objects) {
         super(context, textViewResourceId, objects);
         this.objects = objects;
     }

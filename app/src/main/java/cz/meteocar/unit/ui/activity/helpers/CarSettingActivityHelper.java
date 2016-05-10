@@ -112,7 +112,7 @@ public class CarSettingActivityHelper {
                 possibleTags.add(item.getCode());
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, possibleTags);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, possibleTags);
             code.setAdapter(adapter);
             if (!"".equals(item.getCode())) {
                 code.setSelection(adapter.getPosition(item.getCode()));

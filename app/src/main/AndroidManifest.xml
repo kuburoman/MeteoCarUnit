@@ -18,6 +18,7 @@
     <uses-permission android:name="android.net.conn.CONNECTIVITY_CHANGE" />
     <uses-permission android:name="android.net.wifi.WIFI_STATE_CHANGED" />
     <!-- Zapínání sítí -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!-- Buzení zařízení ze spánku a odemykání obrazovky -->
