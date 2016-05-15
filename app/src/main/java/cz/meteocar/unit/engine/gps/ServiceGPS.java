@@ -23,9 +23,9 @@ import cz.meteocar.unit.engine.gps.event.GPSStatusEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 
 /**
- *GPS service listener
+ * GPS service listener
  */
-public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Listener {
+public class ServiceGPS implements LocationListener, GpsStatus.Listener {
 
     public static final int STATUS_NO_HARDWARE = 0;
     public static final int STATUS_GPS_OFFLINE = 1;
@@ -35,9 +35,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
 
     private LocationManager locationManager;
     private Criteria criteria;
-    private Location latestLocation;
-
-    private AtomicBoolean locationUpdated;
     private boolean threadRun;
     private boolean threadFinalized = false;
 
@@ -47,9 +44,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
 
     public ServiceGPS(Context ctx) {
         context = ctx;
-
-        // bool
-        locationUpdated = new AtomicBoolean(false);
 
         // event bus
         eventBus = ServiceManager.getInstance().eventBus;
@@ -62,11 +56,9 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     /**
      * Starts GPS service.
      */
-    @Override
-    public synchronized void start() {
+    public void start() {
         Log.d(AppLog.LOG_TAG_GPS, "GPS start()");
-        threadRun = true;
-        super.start();
+        init();
     }
 
     /**
@@ -89,25 +81,6 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
     public void exit() {
         Log.d(AppLog.LOG_TAG_GPS, "GPS Exit reuqired");
         threadRun = false;
-    }
-
-    @Override
-    public void run() {
-
-        init();
-
-        while (threadRun) {
-            try {
-                this.sleep(1000);
-            } catch (InterruptedException e) {
-                Log.e(AppLog.LOG_TAG_NETWORK, "ServiceGPS.sleep() caused error.", e);
-            }
-
-            eventBus.post(new GPSPositionEvent(getLocation())).asynchronously();
-        }
-
-        Log.d(AppLog.LOG_TAG_GPS, "GPS E");
-        threadFinalized = true;
     }
 
     /**
@@ -135,24 +108,18 @@ public class ServiceGPS extends Thread implements LocationListener, GpsStatus.Li
             @Override
             public void run() {
                 locationManager.requestLocationUpdates(
-                        LocationManager.GPS_PROVIDER, 1, 2, thisObject);
+                        LocationManager.GPS_PROVIDER, 150, 2, thisObject);
                 locationManager.addGpsStatusListener(thisObject);
             }
         });
     }
 
-    private synchronized void setLocation(Location location) {
-        latestLocation = location;
-        locationUpdated.set(true);
-    }
-
-    public Location getLocation() {
-        return latestLocation;
-    }
-
     @Override
     public void onLocationChanged(Location location) {
-        setLocation(location);
+        if (location.hasAccuracy() && location.getAccuracy() > 20) {
+            return;
+        }
+        eventBus.post(new GPSPositionEvent(location)).asynchronously();
     }
 
     @Override
