@@ -60,6 +60,15 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
         return new ContentValues();
     }
 
+    public boolean recordExists(String tripId, String dtcCode) {
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ? and " + COLUMN_NAME_DTC_CODE + " = ?", new String[]{tripId, dtcCode}, null, null, null);
+        int count = cursor.getCount();
+        cursor.close();
+
+        return count > 0;
+    }
+
     /**
      * Sets records processed.
      *
@@ -91,7 +100,11 @@ public class DTCHelper extends AbstractHelper<DTCEntity> {
             dtc.setDtcCode(dtcMessage);
             dtc.setTime(obj.getTimeCreated());
             dtc.setPosted(false);
-            save(dtc);
+
+            if (!recordExists(dtc.getTripId(), dtc.getDtcCode())) {
+                save(dtc);
+            }
+
         }
     }
 

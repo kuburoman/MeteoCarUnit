@@ -17,6 +17,7 @@ import cz.meteocar.unit.engine.storage.model.DTCEntity;
 
 import static android.support.test.InstrumentationRegistry.getTargetContext;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -170,5 +171,41 @@ public class DTCHelperTest {
         dao.delete("activeTrip");
 
         assertEquals(0, dao.getAll().size());
+    }
+
+    @Test
+    public void recordExistsTestTrue() {
+        assertTrue(dao.recordExists("trip", "P0103"));
+        assertTrue(dao.recordExists("trip", "P0105"));
+    }
+
+    @Test
+    public void recordExistsTestFalse() {
+        assertFalse(dao.recordExists("xxx", "P0103"));
+        assertFalse(dao.recordExists("trip", "xxx"));
+    }
+
+    @Test
+    public void testSaveEventSameRecords() {
+        assertEquals(2, dao.getNumberOfRecords(false));
+
+        OBDPidEvent input = new OBDPidEvent(null, 0.0, "43 01 03 01 05 01 06");
+        input.setTimeCreated(1L);
+        input.setUserId("user");
+        input.setTripId("trip");
+
+        dao.save(input);
+
+        assertEquals(3, dao.getNumberOfRecords(false));
+
+        input = new OBDPidEvent(null, 0.0, "43 01 03 01 05 01 06");
+        input.setTimeCreated(1L);
+        input.setUserId("user");
+        input.setTripId("trip2");
+
+        dao.save(input);
+
+        assertEquals(6, dao.getNumberOfRecords(false));
+
     }
 }
