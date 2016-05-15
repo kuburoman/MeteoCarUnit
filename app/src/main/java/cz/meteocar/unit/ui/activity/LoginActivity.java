@@ -2,6 +2,7 @@ package cz.meteocar.unit.ui.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
@@ -29,6 +30,7 @@ import cz.meteocar.unit.ui.UIManager;
 public class LoginActivity extends Activity {
 
     private AlertDialog dialogWarning;
+    private ProgressDialog progressDialog;
 
     private String username;
     private String password;
@@ -67,6 +69,8 @@ public class LoginActivity extends Activity {
         // dialogy
         initWarningDialog();
 
+        initProgressDialog();
+
         // registrace na bus
         ServiceManager.getInstance().eventBus.subscribe(this);
     }
@@ -87,6 +91,7 @@ public class LoginActivity extends Activity {
 
         if (ServiceManager.getInstance().getNetwork().isOnline()) {
             ServiceManager.getInstance().getNetwork().loginUser(username, password);
+            progressDialog.show();
             return;
         }
         if (MasterController.getInstance().user.verifyUser(username, password)) {
@@ -113,6 +118,10 @@ public class LoginActivity extends Activity {
     @Handler
     public void handleLoginEvent(final LoginEvent evt) {
 
+        if (progressDialog.isShowing()) {
+            progressDialog.hide();
+        }
+
         if (goToSettings) {
             if (evt.getResponse().getIsAdmin() || validateBoardUnit(username, password)) {
                 UIManager.getInstance().showSettingsActivity();
@@ -125,6 +134,7 @@ public class LoginActivity extends Activity {
                     }
                 });
             }
+            hideProgressDialog();
             return;
         }
 
@@ -136,6 +146,8 @@ public class LoginActivity extends Activity {
         DB.set().putBoolean(UserController.SETTINGS_KEY_OBD_PIDS_SET, true).commit();
 
         UIManager.getInstance().showMenuActivity();
+
+        hideProgressDialog();
     }
 
     @Handler
@@ -149,6 +161,9 @@ public class LoginActivity extends Activity {
                 }
             });
         }
+
+        hideProgressDialog();
+
     }
 
     private static boolean validateBoardUnit(String name, String secretKey) {
@@ -179,5 +194,16 @@ public class LoginActivity extends Activity {
                         dialog.dismiss();
                     }
                 }).create();
+    }
+
+    private void initProgressDialog() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getResources().getString(R.string.login_wait));
+    }
+
+    private void hideProgressDialog(){
+        if (progressDialog.isShowing()) {
+            progressDialog.hide();
+        }
     }
 }

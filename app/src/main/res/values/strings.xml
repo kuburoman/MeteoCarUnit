@@ -38,6 +38,8 @@
     <string name="login_check_no_user">Uživatelský účet nebyl nalezen</string>
     <string name="login_check_bad_pwd">Zadané heslo není správné</string>
 
+    <string name="login_wait">Prosím čekejte</string>
+
     <!-- ========== Menu ====================================================================== -->
     <!-- ====================================================================================== -->
 
