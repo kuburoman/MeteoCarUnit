@@ -103,6 +103,6 @@ public class DB {
     }
 
     public static boolean getRedrawSpeedMeter() {
-        return get().getBoolean(REDRAW_SPEED_METER, false);
+        return get().getBoolean(REDRAW_SPEED_METER, true);
     }
 }

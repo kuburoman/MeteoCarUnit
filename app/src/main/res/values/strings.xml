@@ -143,6 +143,9 @@
     <string name="settings_sync_with_server">Synchronizovat nastavení</string>
     <string name="settings_sync_with_server_summary">Chcete synchornizovat nasvení OBD, filtrů a další se serverem?</string>
 
+    <string name="settings_gauge">Zobrazování budíků</string>
+    <string name="settings_gauge_summary">Chcete vykreslovat budíky?</string>
+
     <string name="settings_show_filter_result">Zobrazovat výsledky filtrování</string>
     <string name="settings_show_filter_result_summary">Chcete zobrazovat výsledky filtrování?</string>
 

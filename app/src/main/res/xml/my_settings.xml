@@ -67,6 +67,12 @@
             android:key="checkbox_sync_with_server"
             android:summary="@string/settings_sync_with_server_summary"
             android:title="@string/settings_sync_with_server" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:icon="@null"
+            android:key="checkbox_gauge"
+            android:summary="@string/settings_gauge_summary"
+            android:title="@string/settings_gauge" />
         <PreferenceScreen
             android:icon="@null"
             android:key="board_unit_setting_category"

@@ -110,11 +110,6 @@ public class ServiceManager {
             Log.e(AppLog.LOG_TAG_DEFAULT, "Clock thread interrupted for calling join.", e);
         }
         try {
-            gps.join(500);
-        } catch (InterruptedException e) {
-            Log.e(AppLog.LOG_TAG_DEFAULT, "GPS thread interrupted for calling join.", e);
-        }
-        try {
             obd.join(500);
         } catch (InterruptedException e) {
             Log.e(AppLog.LOG_TAG_DEFAULT, "OBD thread interrupted for calling join.", e);

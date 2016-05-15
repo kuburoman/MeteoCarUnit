@@ -118,10 +118,6 @@ public class LoginActivity extends Activity {
     @Handler
     public void handleLoginEvent(final LoginEvent evt) {
 
-        if (progressDialog.isShowing()) {
-            progressDialog.hide();
-        }
-
         if (goToSettings) {
             if (evt.getResponse().getIsAdmin() || validateBoardUnit(username, password)) {
                 UIManager.getInstance().showSettingsActivity();

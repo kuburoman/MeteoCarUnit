@@ -43,6 +43,7 @@ public class SettingsActivity extends PreferenceActivity
     public static final String BOARD_UNIT_NAME = "board_unit_name";
     public static final String BOARD_UNIT_SECRET_KEY = "board_unit_secret_key";
     public static final String CHECKBOX_SYNC_WITH_SERVER = "checkbox_sync_with_server";
+    public static final String CHECKBOX_GAUGE = "checkbox_gauge";
     public static final String BOARD_UNIT_SETTING_CAT = "board_unit_setting_category";
     public static final String CAR_SETTINGS = "car_settings";
     public static final String CHECKBOX_SHOW_FILTER_RESULT = "checkbox_show_filter_result";
@@ -311,5 +312,17 @@ public class SettingsActivity extends PreferenceActivity
             boolean isEnabled = sharedPreferences.getBoolean(key, false);
             DB.setShowFilterResults(isEnabled);
         }
+
+        if (key.equals(CHECKBOX_SHOW_FILTER_RESULT)) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, false);
+            DB.setShowFilterResults(isEnabled);
+        }
+
+        if (key.equals(CHECKBOX_GAUGE)) {
+            boolean isEnabled = sharedPreferences.getBoolean(key, false);
+            DB.setRedrawSpeedMeter(isEnabled);
+        }
+
+
     }
 }
