@@ -62,7 +62,6 @@ public class FormulaInterpreter {
     }
 
     /**
-     *
      * Binary parsing , we can split into two
      * halves and the further parse the rest
      *
@@ -83,14 +82,14 @@ public class FormulaInterpreter {
         ArrayList<String> inBracesParts = new ArrayList<>();
         for (String part : expParts) {
 
-            if (part.equals("(")) {
+            if ("(".equals(part)) {
                 bracesOpened++;
                 justInBraces = (bracesOpened == 1) && (bracesClosed == 0);
                 inBraces = true;
             }
-            if (part.equals(")")) {
+            if (")".equals(part)) {
                 bracesClosed++;
-                justOutOfBraces = (bracesOpened == bracesClosed);
+                justOutOfBraces = bracesOpened == bracesClosed;
             }
 
             if (inBraces) {
@@ -438,8 +437,8 @@ public class FormulaInterpreter {
     }
 
     private abstract class Operator extends Node {
-        public Node child1 = null;
-        public Node child2 = null;
+        protected Node child1 = null;
+        protected Node child2 = null;
 
         @Override
         boolean isOperator() {

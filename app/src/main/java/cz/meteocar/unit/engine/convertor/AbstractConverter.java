@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Nell on 23.1.2016.
+ * Abstract converter.
  */
 public abstract class AbstractConverter<I, O> {
 
+    /**
+     * From one class to another.
+     */
     public O convert(I input) {
         if (input == null) {
             return null;
@@ -18,6 +21,9 @@ public abstract class AbstractConverter<I, O> {
 
     protected abstract O innerConvert(I input);
 
+    /**
+     * Converts list to list.
+     */
     public List<O> convertList(List<I> inputList) {
         ArrayList<O> outputList = new ArrayList<>();
         if (inputList == null) {

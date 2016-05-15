@@ -44,7 +44,6 @@
     <!-- Položky navigace - Názvy -->
     <string-array name="array_menu_item_names">
         <item>Přístrojovka</item>
-        <item>Trips</item>
         <item>Odhlásit</item>
     </string-array>
 

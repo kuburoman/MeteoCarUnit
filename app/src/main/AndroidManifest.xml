@@ -62,10 +62,6 @@
             android:name=".ui.activity.SettingsActivity"
             android:label="@string/settings_title"
             android:theme="@style/SettingsActTheme"/>
-        <activity
-            android:name=".ui.activity.TripDetailActivity"
-            android:label="@string/settings_title"
-            android:theme="@style/SettingsActTheme"/>
     </application>
 
 </manifest>

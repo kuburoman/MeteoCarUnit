@@ -32,7 +32,7 @@ public class LoginTest extends AbstractSettingActivityHelper {
             solo.wait(2000);
         }
 
-        solo.clickInList(4);
+        solo.clickInList(3);
 
         solo.waitForActivity(LoginActivity.class);
 

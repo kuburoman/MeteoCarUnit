@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.event;
 
 /**
- * Created by Nell on 4.4.2016.
+ * Event for debug message.
  */
 public class DebugMessageEvent extends AppEvent {
 

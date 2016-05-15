@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Nell on 14.3.2016.
+ * Create filter setting request.
  */
 public class CreateFilterSettingRequest {
 

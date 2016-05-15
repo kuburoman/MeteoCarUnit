@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Nell on 27.2.2016.
+ * Login response.
  */
 public class LoginResponse {
 

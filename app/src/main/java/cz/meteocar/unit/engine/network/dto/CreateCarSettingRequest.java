@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Nell on 14.3.2016.
+ * Create CarSetting request data transfer object.
  */
 public class CreateCarSettingRequest {
 

@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.enums;
 
 /**
- * Created by Nell on 27.3.2016.
+ * Enum of all types of car setting.
  */
 public enum CarSettingEnum {
     FILTER_SETTING_SYNC_PERIOD,

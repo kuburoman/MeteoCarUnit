@@ -94,53 +94,6 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     }
 
     /**
-     * Returns entities based on type and trip id.
-     *
-     * @param tripId id of trip
-     * @param type   of record
-     * @return List of {@link AccelerationVO}
-     */
-    public List<AccelerationVO> getTripByType(String tripId, String type) {
-        List<AccelerationVO> arr = new ArrayList<>();
-
-        SQLiteDatabase db = helper.getReadableDatabase();
-
-        Cursor cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ? and " + COLUMN_NAME_TYPE + " = ?", new String[]{tripId, type}, null, null, null);
-
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                arr.add(convertToAcceleration(convert(cursor)));
-
-                cursor.moveToNext();
-            }
-        }
-
-        cursor.close();
-        return arr;
-    }
-
-
-    protected AccelerationVO convertToAcceleration(RecordEntity entity) {
-        AccelerationVO obj = new AccelerationVO();
-        obj.setUserId(entity.getUserName());
-        obj.setTripId(entity.getTripId());
-        obj.setTime(entity.getTime());
-        obj.setType(entity.getType());
-
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(entity.getJson());
-            obj.setX(jsonObject.getDouble("x"));
-            obj.setY(jsonObject.getDouble("y"));
-            obj.setZ(jsonObject.getDouble("z"));
-        } catch (JSONException e) {
-            Log.e(AppLog.LOG_TAG_DB, "Cannot parse acceleration.", e);
-        }
-
-        return obj;
-    }
-
-    /**
      * Return number of processed records.
      *
      * @param processed If they are processed
@@ -177,79 +130,23 @@ public class RecordHelper extends AbstractHelper<RecordEntity> {
     }
 
     /**
-     * Return list of trip details based on userId.
+     * Return list of Trips that have records stored in database/
      *
-     * @param userId id of user
-     * @return List of {@link TripDetailVO}
+     * @return id of trips.
      */
-    public List<TripDetailVO> getUserTripDetailList(String userId) {
-        ArrayList<TripDetailVO> detailVOs = new ArrayList<>();
-        List<String> userTrips = getUserTrips(userId);
-        for (String tripId : userTrips) {
-            Long startTime = getTimeOfTrip(tripId, true);
-            Long endTime = getTimeOfTrip(tripId, false);
-            detailVOs.add(new TripDetailVO(tripId, startTime, endTime));
-        }
-        return detailVOs;
-    }
-
-    protected List<String> getUserTrips(String userId) {
-        if (userId == null) {
-            return new ArrayList<>();
-        }
+    public List<String> getDistinctTrips(boolean processed) {
         SQLiteDatabase db = helper.getReadableDatabase();
         List<String> tripIds = new ArrayList<>();
-        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_USER_ID + " = ?", new String[]{userId}, null, null, null, null);
+        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_PROCESSED + " = ?", new String[]{processed ? "1" : "0"}, COLUMN_NAME_TRIP_ID, null, null, null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-
                 tripIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-
                 cursor.moveToNext();
             }
         }
         cursor.close();
         return tripIds;
-    }
-
-    protected Long getTimeOfTrip(String tripId, boolean min) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor cursor;
-        if (min) {
-            cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ?", new String[]{tripId}, null, null, COLUMN_NAME_TIME + " ASC", "1");
-        } else {
-            cursor = db.query(TABLE_NAME, null, COLUMN_NAME_TRIP_ID + " = ?", new String[]{tripId}, null, null, COLUMN_NAME_TIME + " DESC", "1");
-        }
-
-        if (cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            Long time = cursor.getLong(cursor.getColumnIndex(COLUMN_NAME_TIME));
-            cursor.close();
-            return time;
-
-        }
-        return null;
-    }
-
-    /**
-     * Return list of Users that have records stored in database/
-     *
-     * @return id of users.
-     */
-    public List<String> getDistinctTrips(boolean processed) {
-        SQLiteDatabase db = helper.getReadableDatabase();
-        List<String> userIds = new ArrayList<>();
-        Cursor cursor = db.query(true, TABLE_NAME, new String[]{COLUMN_NAME_TRIP_ID}, COLUMN_NAME_PROCESSED + " = ?", new String[]{processed ? "1" : "0"}, COLUMN_NAME_TRIP_ID, null, null, null);
-
-        if (cursor.moveToFirst()) {
-            while (!cursor.isAfterLast()) {
-                userIds.add(cursor.getString(cursor.getColumnIndex(COLUMN_NAME_TRIP_ID)));
-                cursor.moveToNext();
-            }
-        }
-        cursor.close();
-        return userIds;
     }
 
     public List<String> getRecordsDistinctTypesForTrip(String tripId) {

@@ -25,6 +25,7 @@ public class OBDMessage {
     private String validationString = null;
 
     public OBDMessage() {
+        // for build purposes
     }
 
     OBDMessage(String obdCommand, String formulaOrValidationString, boolean isFormula) {

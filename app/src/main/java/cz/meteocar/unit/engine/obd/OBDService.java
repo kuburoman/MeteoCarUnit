@@ -49,7 +49,6 @@ public class OBDService extends Thread {
 
     //
     private int serviceStatus = OBD_STATE_NOT_INITIALIZED;
-    private int lastError = OBD_ERROR_ALL_OK;
 
     // bluetooth
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -116,7 +115,6 @@ public class OBDService extends Thread {
         // ověříme přítomnost BT adaptéru v zařízení
         if (btAdapter == null) {
             Log.d(AppLog.LOG_TAG_OBD, "Device bluetooth adapter NOT AVAILABLE");
-            lastError = OBD_ERROR_NO_ADAPTER;
         } else {
             Log.d(AppLog.LOG_TAG_OBD, "Device have BT adapter");
         }
@@ -143,18 +141,12 @@ public class OBDService extends Thread {
 
         // ověříme jestli máme adaptér
         if (btAdapter == null) {
-            lastError = OBD_ERROR_NO_ADAPTER;
             Log.d(AppLog.LOG_TAG_OBD, "btAdapter is NULL");
             return;
         }
 
         // ověříme stav BT adaptéru (vypnut/zapnut)
         if (!btAdapter.isEnabled()) {
-            //Intent bluetoothEnableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            //bluetoothEnableIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //context.startActivity(bluetoothEnableIntent);
-
-            // nebo, když máme BT admin práva
 
             // zapneme BT přímo
             btAdapter.enable();
@@ -164,7 +156,7 @@ public class OBDService extends Thread {
         boolean waitForAdapter = true;
         while (waitForAdapter) {
             try {
-                this.sleep(1000);
+                OBDService.sleep(1000);
             } catch (InterruptedException e) {
                 Log.e(AppLog.LOG_TAG_OBD, "OBDService.sleep() caused error.", e);
             }
@@ -176,7 +168,6 @@ public class OBDService extends Thread {
 
         // nyní by již měl být připojený
         if (!btAdapter.isEnabled()) {
-            lastError = OBD_ERROR_ADAPTER_ENABLE_FAILED;
             Log.d(AppLog.LOG_TAG_OBD, "BT Adapter NOT ENABLED");
             Log.d(AppLog.LOG_TAG_OBD, "BT Adapter status: " + btAdapter.getState());
             return;
@@ -193,7 +184,7 @@ public class OBDService extends Thread {
 
             while (btAdapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE) {
                 try {
-                    this.sleep(1000);
+                    OBDService.sleep(1000);
                 } catch (InterruptedException e) {
                     Log.e(AppLog.LOG_TAG_OBD, "OBDService.sleep() caused error.", e);
                 }
@@ -395,7 +386,7 @@ public class OBDService extends Thread {
                         initPIDQueue();
                         errorCount = 0;
                     } else {
-                        this.sleep(1000);
+                        OBDService.sleep(1000);
                         reconnectNeeded = true;
                         continue;
                     }
@@ -519,6 +510,7 @@ public class OBDService extends Thread {
      */
     @Handler
     public void handleDTCRequest(DTCRequestEvent evt) {
+        Log.d(AppLog.LOG_TAG_DEFAULT, evt.getType().toString());
         addDTC = true;
     }
 

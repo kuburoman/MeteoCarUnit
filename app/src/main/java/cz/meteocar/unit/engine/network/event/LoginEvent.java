@@ -5,7 +5,7 @@ import cz.meteocar.unit.engine.event.EventType;
 import cz.meteocar.unit.engine.network.dto.LoginResponse;
 
 /**
- * Created by Nell on 6.3.2016.
+ * Login event.
  */
 public class LoginEvent extends AppEvent {
 

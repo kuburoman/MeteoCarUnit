@@ -201,6 +201,8 @@ public class DatabaseService extends Thread {
      */
     @Handler
     public void handleClockEvent(TimeEvent evt) {
+        Log.d(AppLog.LOG_TAG_DEFAULT, evt.getType().toString());
+
         if (!tripRecordEnabled) {
             return;
         }
@@ -263,7 +265,7 @@ public class DatabaseService extends Thread {
         while (threadRun) {
 
             // pokud máme zprávy, zpracujeme je, jinak nemcháme vlákno usnout
-            if (queue.size() > 0) {
+            if (queue.isEmpty()) {
                 try {
                     storeTripMessage(queue.take());
                 } catch (InterruptedException e) {
@@ -272,7 +274,7 @@ public class DatabaseService extends Thread {
             } else {
 
                 try {
-                    this.sleep(200);
+                    DatabaseService.sleep(200);
                 } catch (Exception e) {
                     Log.e(AppLog.LOG_TAG_DB, "Error when sleep.", e);
                 }

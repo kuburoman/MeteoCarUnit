@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.meteocar.unit.engine.storage.MySQLiteConfig;
@@ -103,9 +104,10 @@ public class RecordHelperTest {
         List<RecordEntity> result = dao.getByTripIdAndType("trip", "type", false);
 
         assertNotNull(result);
-        assertEquals(1, result.size());
+        assertEquals(2, result.size());
 
         RecordEntity recordEntity = result.get(0);
+        assertNotNull(recordEntity);
 
         assertEquals("type", recordEntity.getType());
         assertEquals("trip", recordEntity.getTripId());
@@ -113,5 +115,43 @@ public class RecordHelperTest {
         assertEquals("1", recordEntity.getTime().toString());
         assertEquals(false, recordEntity.isProcessed());
 
+    }
+
+    @Test
+    public void testUpdateProcessed(){
+        List<RecordEntity> result = dao.getByTripIdAndType("trip", "type", false);
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        RecordEntity entity = result.get(0);
+        assertNotNull(entity);
+        int id = entity.getId();
+
+        List<Integer> entities = new ArrayList<>();
+        entities.add(id);
+
+        dao.updateProcessed(entities, true);
+
+        result = dao.getByTripIdAndType("trip", "type", true);
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testGetDistinctTrips(){
+        List<String> distinctTrips = dao.getDistinctTrips(false);
+
+        assertNotNull(distinctTrips);
+        assertEquals(2, distinctTrips.size());
+    }
+
+    @Test
+    public void testGetRecordsDistinctTypesForTrip(){
+        List<String> trip = dao.getRecordsDistinctTypesForTrip("trip");
+        assertNotNull(trip);
+        assertEquals(1, trip.size());
+        assertEquals("type", trip.get(0));
     }
 }

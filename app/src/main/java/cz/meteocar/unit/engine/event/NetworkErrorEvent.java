@@ -1,11 +1,9 @@
 package cz.meteocar.unit.engine.event;
 
-import cz.meteocar.unit.engine.event.AppEvent;
-import cz.meteocar.unit.engine.event.EventType;
 import cz.meteocar.unit.engine.network.dto.ErrorResponse;
 
 /**
- * Created by Nell on 7.3.2016.
+ * Network event error type.
  */
 public class NetworkErrorEvent extends AppEvent {
 

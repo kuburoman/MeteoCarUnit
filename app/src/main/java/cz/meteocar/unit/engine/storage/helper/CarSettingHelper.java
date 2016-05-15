@@ -29,15 +29,6 @@ public class CarSettingHelper extends AbstractHelper<CarSettingEntity> {
                     COLUMN_NAME_UPDATE_TIME + MySQLiteConfig.TYPE_INTEGER + " DEFAULT ''" +
                     " )";
 
-    private static final String INSERT_INTO_START = "INSERT INTO " + TABLE_NAME + " (" +
-            COLUMN_NAME_ID + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_CODE + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_VALUE + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_ACTIVE + MySQLiteConfig.COMMA_SEP +
-            COLUMN_NAME_UPDATE_TIME +
-            " ) VALUES ";
-
-
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 
     public CarSettingHelper(DatabaseHelper helper) {

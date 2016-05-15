@@ -13,7 +13,7 @@ import cz.meteocar.unit.engine.clock.event.TimeEvent;
 import cz.meteocar.unit.engine.log.AppLog;
 
 /**
- * Created by Toms, 2014
+ * Clock service to count seconds.
  */
 public class ClockService extends Thread {
 
@@ -23,7 +23,7 @@ public class ClockService extends Thread {
     private MBassador<AppEvent> eventBus;
 
     /**
-     * Inicializuje službu
+     * Initialize service
      */
     public ClockService() {
 
@@ -33,12 +33,11 @@ public class ClockService extends Thread {
         // event bus
         eventBus = ServiceManager.getInstance().eventBus;
 
-        // start - základ. služba, tu budeme chtít vždy
         start();
     }
 
     /**
-     * Spustí službu
+     * Run service.
      */
     @Override
     public synchronized void start() {
@@ -47,37 +46,20 @@ public class ClockService extends Thread {
     }
 
     /**
-     * Je služba spuštěna?
-     *
-     * @return True pokud ano, False pokud ne
-     */
-    public boolean isRunning() {
-        return threadRun;
-    }
-
-    /**
-     * Nastaví přízna ukončení služby
+     * Sets clock service to exit.
      */
     public void exit() {
         threadRun = false;
     }
 
-    /**
-     * Vytvoří časovou událost a odešle ji na bus
-     */
     private void fireUpdateEvent() {
 
-        // datum
         Date now = new Date();
         String strDate = dateFormat.format(now);
 
-        // event fire
         eventBus.post(new TimeEvent(strDate)).asynchronously();
     }
 
-    /**
-     * Hlavní cyklus služby
-     */
     @Override
     public void run() {
         try {

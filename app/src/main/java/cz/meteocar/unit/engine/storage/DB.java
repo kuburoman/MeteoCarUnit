@@ -21,6 +21,10 @@ public class DB {
     private static final String REDRAW_SPEED_METER = "redraw_speed_meter";
 
 
+    private DB() {
+        // hide public constructor
+    }
+
     // persistence key-value
     public static SharedPreferences get() {
         return ServiceManager.getInstance().getDB().getSettings();

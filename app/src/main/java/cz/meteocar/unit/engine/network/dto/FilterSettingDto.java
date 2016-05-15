@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Nell on 14.3.2016.
+ * Filter setting data transfer object.
  */
 public class FilterSettingDto {
 

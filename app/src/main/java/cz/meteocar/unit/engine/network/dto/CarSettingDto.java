@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Nell on 13.3.2016.
+ * CarSetting data transfer object.
  */
 public class CarSettingDto {
 

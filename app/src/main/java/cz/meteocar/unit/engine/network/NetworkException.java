@@ -3,7 +3,7 @@ package cz.meteocar.unit.engine.network;
 import cz.meteocar.unit.engine.network.dto.ErrorResponse;
 
 /**
- * Created by Nell on 7.3.2016.
+ * Network exception.
  */
 public class NetworkException extends Exception {
 

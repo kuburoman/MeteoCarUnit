@@ -13,7 +13,7 @@ import cz.meteocar.unit.engine.network.dto.LoginResponse;
 import cz.meteocar.unit.engine.network.event.LoginEvent;
 
 /**
- * Created by Nell on 6.3.2016.
+ * Sends login request on server.
  */
 public class PostLoginTask extends AsyncTask<LoginRequest, Void, Void> {
 

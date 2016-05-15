@@ -17,7 +17,7 @@ import cz.meteocar.unit.engine.log.AppLog;
 
 
 /**
- *
+ *  Splash view
  */
 public class SplashView extends View {
 
@@ -59,14 +59,13 @@ public class SplashView extends View {
         super(context, attrs, defStyle);
         init();
     }
+
     private void init() {
-
-
         // boxy
         boxBack = new Box();
         boxFore = new Box();
 
-        // červená čára
+        // red line
         red = new Paint();
         red.setColor(Color.RED);
         red.setStrokeWidth(1f);
@@ -81,7 +80,7 @@ public class SplashView extends View {
         pBack = new Paint();
         pFore = new Paint();
 
-        // fade-in animátor pozadí
+        // fade-in animator back
         animatorOfFore = new ValueAnimator();
         animatorOfFore.setDuration(TIMEOUT/2);
         animatorOfFore.setIntValues(alphaOfFore, 255);
@@ -95,7 +94,7 @@ public class SplashView extends View {
         animatorOfFore.setStartDelay(TIMEOUT/4);
         animatorOfFore.start();
 
-        // fade-in animátor pozadí
+        // fade-in animator back
         animatorOfBack = new ValueAnimator();
         animatorOfBack.setDuration(TIMEOUT/2);
         animatorOfBack.setIntValues(alphaOfBack, 255);
@@ -118,7 +117,7 @@ public class SplashView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // rámeček
+        // border
         Path p = new Path();
         p.moveTo(boxBack.left, boxBack.bottom);
         p.lineTo(boxBack.left,  boxBack.top);
@@ -126,13 +125,13 @@ public class SplashView extends View {
         p.lineTo(boxBack.right, boxBack.bottom);
         p.lineTo(boxBack.left, boxBack.bottom);
 
-        // pozadí
+        // background
         canvas.drawColor(getResources().getColor(R.color.splash_back));
 
         pBack.setAlpha(alphaOfBack);
         canvas.drawBitmap(bmpBack, null, new Rect(0,0, canvas.getWidth(), canvas.getHeight()), pBack);
 
-        // popředí
+        // foreground
         pFore.setAlpha(alphaOfFore);
         canvas.drawBitmap(bmpFore, (float)boxFore.left, (float)boxFore.top, pFore);
 
@@ -151,13 +150,13 @@ public class SplashView extends View {
         width = _right - _left - 2*border - 1;
         height = _bottom - _top - 2*border - 1;
 
-        // box pro pozadí
+        // box for background
         boxBack.left = border;
         boxBack.top = border;
         boxBack.right = border + width;
         boxBack.bottom = border + height;
 
-        // box pro popředí (logo + text)
+        // box for foreground (logo + text)
         int realWidth = _right - _left;
         int realHeight = _bottom - _top;
         boxFore.left = _left + (realWidth - bmpFore.getWidth())/2;
@@ -167,6 +166,9 @@ public class SplashView extends View {
         super.onLayout(changed, boxBack.left, boxBack.top, boxBack.right, boxBack.bottom);
     }
 
+    /**
+     * Recycle bitmaps.
+     */
     public void clearView(){
         if(bmpBack != null){
             bmpBack.recycle();
@@ -177,7 +179,6 @@ public class SplashView extends View {
             bmpFore.recycle();
             bmpFore = null;
         }
-
     }
 
 

@@ -7,6 +7,7 @@ public class TripEntity extends AbstractEntity {
     private String json;
 
     public TripEntity() {
+        // Used by JSON
     }
 
     public TripEntity(int id, String json) {

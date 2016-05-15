@@ -8,7 +8,7 @@ import cz.meteocar.unit.engine.network.dto.LoginRequest;
 import cz.meteocar.unit.engine.network.task.PostLoginTask;
 
 /**
- * Created by Toms, 2014.
+ * Network service fo logging user and network info.
  */
 public class NetworkService {
 

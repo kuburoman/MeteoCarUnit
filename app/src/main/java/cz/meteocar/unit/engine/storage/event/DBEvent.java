@@ -4,7 +4,7 @@ import cz.meteocar.unit.engine.event.AppEvent;
 import cz.meteocar.unit.engine.event.EventType;
 
 /**
- * Created by Nell on 27.2.2016.
+ * Database event.
  */
 public class DBEvent extends AppEvent {
 

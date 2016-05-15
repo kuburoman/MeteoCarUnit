@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.enums;
 
 /**
- * Created by Nell on 7.12.2015.
+ * Enum for filter tags that are not connected with OBD.
  */
 public enum RecordTypeEnum {
     TYPE_GPS("gps123"),

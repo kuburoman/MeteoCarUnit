@@ -20,7 +20,6 @@ import cz.meteocar.unit.engine.storage.DB;
 import cz.meteocar.unit.ui.activity.LoginActivity;
 import cz.meteocar.unit.ui.activity.MenuActivity;
 import cz.meteocar.unit.ui.activity.SettingsActivity;
-import cz.meteocar.unit.ui.activity.TripDetailActivity;
 import cz.meteocar.unit.ui.fragments.DashboardFragment;
 
 /**
@@ -34,7 +33,7 @@ public class UIManager {
     private static final UIManager INSTANCE = new UIManager();
 
     /**
-     * Celková doba zobrazení úvodní obrazovky
+     * The total duration of the splash screen
      */
     public static final int SPLASH_TIMEOUT = 1500;
 
@@ -48,8 +47,7 @@ public class UIManager {
 
     // Menu items
     public static final int MENU_DASHBOARD = 1;
-    public static final int MENU_TRIPS = 2;
-    public static final int MENU_EXIT = 3;
+    public static final int MENU_EXIT = 2;
 
     public static final int DEFAULT_FRAGMENT = MENU_DASHBOARD;
 
@@ -129,17 +127,6 @@ public class UIManager {
         actualFragment = DEFAULT_FRAGMENT;
     }
 
-    public void showTripsActivity() {
-
-        Intent intent = new Intent(appContext, TripDetailActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        // animation
-        Bundle options = ActivityOptionsCompat.makeCustomAnimation(appContext, R.anim.in, R.anim.out).toBundle();
-
-        appContext.startActivity(intent, options);
-    }
-
     /**
      * Shows settings activity.
      */
@@ -205,10 +192,6 @@ public class UIManager {
      * @return true if menu shloud be closed.
      */
     public boolean onMenuItemSelected(int position, FragmentManager fragmentManager, Context ctx) {
-        if (position == MENU_TRIPS) {
-            showTripsActivity();
-            return true;
-        }
 
         if (position == MENU_DASHBOARD) {
 

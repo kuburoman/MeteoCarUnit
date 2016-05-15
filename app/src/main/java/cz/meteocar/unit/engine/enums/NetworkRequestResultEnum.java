@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.enums;
 
 /**
- * Created by Nell on 12.12.2015.
+ * Network result types.
  */
 public enum NetworkRequestResultEnum {
 

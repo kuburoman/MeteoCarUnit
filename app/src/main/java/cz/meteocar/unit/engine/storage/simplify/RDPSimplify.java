@@ -9,7 +9,10 @@ import java.util.List;
  */
 public class RDPSimplify {
 
-    public double getSquareSegmentDistance(DataPoint p0, DataPoint p1, DataPoint p2) {
+    private static final double EPSILON = 0.0000001;
+
+    protected double getSquareSegmentDistance(DataPoint p0, DataPoint p1, DataPoint p2) {
+
         double x0, y0, x1, y1, x2, y2, dx, dy, t;
 
         x1 = p1.getValueX();
@@ -22,7 +25,7 @@ public class RDPSimplify {
         dx = x2 - x1;
         dy = y2 - y1;
 
-        if (dx != 0.0d || dy != 0.0d) {
+        if (notZero(dx) || notZero(dy)) {
             t = ((x0 - x1) * dx + (y0 - y1) * dy)
                     / (dx * dx + dy * dy);
 
@@ -40,6 +43,11 @@ public class RDPSimplify {
 
         return dx * dx + dy * dy;
     }
+
+    protected boolean notZero(Double number) {
+        return number <= (0 - EPSILON) || number >= (0 + EPSILON);
+    }
+
 
     /**
      * Simplifies a list of points to a shorter list of points.

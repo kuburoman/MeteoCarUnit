@@ -1,7 +1,7 @@
 package cz.meteocar.unit.engine.network.dto;
 
 /**
- * Created by Nell on 2.3.2016.
+ * OBDPid data transfer object.
  */
 public class OBDPidDto {
 
