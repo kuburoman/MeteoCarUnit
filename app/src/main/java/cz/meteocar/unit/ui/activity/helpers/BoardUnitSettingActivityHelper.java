@@ -11,7 +11,7 @@ import cz.meteocar.unit.engine.ServiceManager;
 import cz.meteocar.unit.engine.storage.DB;
 
 /**
- * Created by Nell on 27.3.2016.
+ * Prepares dialog for board unit settings.
  */
 public class BoardUnitSettingActivityHelper {
 

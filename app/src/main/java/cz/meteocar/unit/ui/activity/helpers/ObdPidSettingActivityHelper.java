@@ -26,7 +26,7 @@ import cz.meteocar.unit.engine.storage.helper.ObdPidHelper;
 import cz.meteocar.unit.engine.storage.model.ObdPidEntity;
 
 /**
- * Created by Nell on 25.3.2016.
+ * Settings helper for dialog and list of obd pid´s.
  */
 public class ObdPidSettingActivityHelper {
 
@@ -145,7 +145,7 @@ public class ObdPidSettingActivityHelper {
     }
 
     /**
-     * Připravíme dialog žádající uživatele o zapnutí GPS
+     * Init´s dialog for settings.
      */
     public void initDialog() {
 
@@ -263,6 +263,11 @@ public class ObdPidSettingActivityHelper {
         });
     }
 
+    /**
+     * Creates list of obd pid´s.
+     *
+     * @param myScreen
+     */
     public void treeClick(PreferenceScreen myScreen) {
         // připravíme si layout
         RelativeLayout layout = new RelativeLayout(context);

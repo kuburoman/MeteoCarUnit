@@ -275,6 +275,11 @@ public class FilterSettingActivityHelper {
         return possibleTags;
     }
 
+    /**
+     * Creates list of filters settings.
+     *
+     * @param myScreen
+     */
     public void treeClick(PreferenceScreen myScreen) {
 
         createScreen();

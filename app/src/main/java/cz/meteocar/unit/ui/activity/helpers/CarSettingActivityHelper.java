@@ -31,7 +31,7 @@ import cz.meteocar.unit.engine.storage.model.CarSettingEntity;
 import cz.meteocar.unit.engine.task.event.RescheduleTasksEvent;
 
 /**
- * Prepares dialog for editing filter settings.
+ * Prepares dialog for editing car settings.
  */
 public class CarSettingActivityHelper {
 
@@ -224,6 +224,11 @@ public class CarSettingActivityHelper {
         return enums;
     }
 
+    /**
+     * Creates list of car settings.
+     *
+     * @param myScreen
+     */
     public void treeClick(PreferenceScreen myScreen) {
 
         createScreen();
