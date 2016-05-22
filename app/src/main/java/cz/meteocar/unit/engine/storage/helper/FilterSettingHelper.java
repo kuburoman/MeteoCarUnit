@@ -42,13 +42,13 @@ public class FilterSettingHelper extends AbstractHelper<FilterSettingEntity> {
     public static final String INSERT_INTO_ALL =
             "" +
                     INSERT_INTO_START +
-                    "(1, 'RDP', 'obd_speed'      , '1.0', '1', '1451602800000')," +
-                    "(2, 'RDP', 'obd_rpm'        , '1.0', '1', '1451602800000')," +
+                    "(1, 'RDP', 'obd_speed'      , '1.2', '1', '1451602800000')," +
+                    "(2, 'RDP', 'obd_rpm'        , '9.8', '1', '1451602800000')," +
                     "(3, 'RDP', 'obd_throttle'   , '1.0', '1', '1451602800000')," +
-                    "(4, 'RDP', 'obd_engine_temp', '1.0', '1', '1451602800000')," +
+                    "(4, 'RDP', 'obd_engine_temp', '0.0', '1', '1451602800000')," +
                     "(5, 'RDP', 'obf_airflow'    , '1.0', '1', '1451602800000')," +
-                    "(6, 'RDP', 'gps123'         , '1.0', '1', '1451602800000')," +
-                    "(7, 'RDP', 'acc123'         , '1.5', '1', '1451602800000');";
+                    "(6, 'RDP', 'gps123'         , '6.7', '1', '1451602800000')," +
+                    "(7, 'RDP', 'acc123'         , '4.3', '1', '1451602800000');";
 
     public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + TABLE_NAME;
 

@@ -265,7 +265,7 @@ public class DatabaseService extends Thread {
         while (threadRun) {
 
             // pokud máme zprávy, zpracujeme je, jinak nemcháme vlákno usnout
-            if (queue.isEmpty()) {
+            if (!queue.isEmpty()) {
                 try {
                     storeTripMessage(queue.take());
                 } catch (InterruptedException e) {
